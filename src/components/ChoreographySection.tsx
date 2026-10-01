@@ -18,7 +18,7 @@ export interface ChoreographyPerformanceItem {
 const DEFAULT_PERFORMANCES: ChoreographyPerformanceItem[] = [
   {
     id: 'choreo-1',
-    title: 'Kids Dance Showcase',
+    title: 'Kids Performance',
     videoUrl: '/choreography/choreo-kids.mp4',
     yPosition: 20,
     brightness: 1.1,
