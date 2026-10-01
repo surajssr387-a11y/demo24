@@ -1,0 +1,39 @@
+[
+  {
+    "id": "reel-hiphop",
+    "categoryTag": "ADVANCE / HIP HOP",
+    "title": "Hip Hop Choreography Routine",
+    "description": "Fast-paced synchronicity and stage control during our weekly advance routine.",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=1200&q=80",
+    "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-young-woman-dancing-in-a-dance-hall-39824-large.mp4",
+    "instagramUrl": "https://instagram.com/ramysdancestudio",
+    "badge": "Most Viewed"
+  },
+  {
+    "id": "reel-kids",
+    "categoryTag": "KIDS TRAINING",
+    "title": "Kids Dance Level 1 Batch",
+    "description": "Young energetic students learning foundational steps and expressions.",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=800&q=80",
+    "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-dancer-spinning-gracefully-on-the-dance-floor-41604-large.mp4",
+    "instagramUrl": "https://instagram.com/ramysdancestudio"
+  },
+  {
+    "id": "reel-bollywood",
+    "categoryTag": "BOLLYWOOD LADIES",
+    "title": "Bollywood Ladies Session",
+    "description": "Graceful expressions and cardio fusion dancing to chartbuster tracks.",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1518834107812-67b0b7c58434?auto=format&fit=crop&w=800&q=80",
+    "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-group-of-dancers-performing-a-choreography-42999-large.mp4",
+    "instagramUrl": "https://instagram.com/ramysdancestudio"
+  },
+  {
+    "id": "reel-wedding",
+    "categoryTag": "WEDDING SPECIAL",
+    "title": "Wedding Choreography Rehearsal",
+    "description": "Family sangeet and couple dance preparation in the private rehearsal zone.",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80",
+    "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-couple-dancing-at-their-wedding-party-43615-large.mp4",
+    "instagramUrl": "https://instagram.com/ramysdancestudio"
+  }
+]

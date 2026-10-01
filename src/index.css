@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+}
+
+.font-display {
+  font-family: 'Syne', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.font-wide-heading {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-transform: capitalize;
+}
+
+.font-title-caps {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+/* Custom glow effects */
+.glow-accent {
+  box-shadow: 0 0 40px -10px rgba(216, 248, 0, 0.3);
+}
+
+.glow-card {
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+}

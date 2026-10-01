@@ -1,0 +1,8 @@
+{
+  "name": "Ramy\u0027s Dance Studio",
+  "description": "Premier dance academy and choreography studio in Ranchi offering foundational to advanced disciplines, certified coaching, and custom routines.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
