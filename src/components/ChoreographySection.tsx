@@ -94,6 +94,16 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
       .catch(() => {});
   }, []);
 
+  // Keep active modal video in sync with latest performances
+  useEffect(() => {
+    if (activeModalVideo) {
+      const match = performances.find((p) => p.id === activeModalVideo.id);
+      if (match && (match.title !== activeModalVideo.title || match.videoUrl !== activeModalVideo.videoUrl)) {
+        setActiveModalVideo(match);
+      }
+    }
+  }, [performances, activeModalVideo]);
+
   // Ensure all videos play smoothly when rendered
   useEffect(() => {
     const vids = document.querySelectorAll<HTMLVideoElement>('section#choreography video');
