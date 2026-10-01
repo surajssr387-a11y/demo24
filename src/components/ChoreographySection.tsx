@@ -50,7 +50,7 @@ const DEFAULT_PERFORMANCES: ChoreographyPerformanceItem[] = [
   },
   {
     id: 'choreo-5',
-    title: 'Gymnastic & Freestyle Routine',
+    title: 'Free Style Dance',
     videoUrl: '/choreography/choreo-freestyle.mp4',
     yPosition: 20,
     brightness: 1.0,
@@ -229,6 +229,8 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
                       ? 'Bollywood Ladies'
                       : activeModalVideo.title.includes('Private')
                       ? 'Private Class'
+                      : activeModalVideo.title.includes('Style') || activeModalVideo.title.includes('Free')
+                      ? 'Gymnastic'
                       : 'Advance';
                     setActiveModalVideo(null);
                     onOpenBooking?.(categoryName);
