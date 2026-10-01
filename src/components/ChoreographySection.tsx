@@ -42,7 +42,7 @@ const DEFAULT_PERFORMANCES: ChoreographyPerformanceItem[] = [
   },
   {
     id: 'choreo-4',
-    title: 'Bollywood Ladies Performance',
+    title: 'Girls Choreography',
     videoUrl: '/choreography/choreo-ladies.mp4',
     yPosition: 25,
     brightness: 1.0,
@@ -225,7 +225,7 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
                   onClick={() => {
                     const categoryName = activeModalVideo.title.includes('Kids')
                       ? 'Kids Dance'
-                      : activeModalVideo.title.includes('Bollywood')
+                      : activeModalVideo.title.includes('Bollywood') || activeModalVideo.title.includes('Girls') || activeModalVideo.title.includes('Ladies')
                       ? 'Bollywood Ladies'
                       : activeModalVideo.title.includes('Private')
                       ? 'Private Class'

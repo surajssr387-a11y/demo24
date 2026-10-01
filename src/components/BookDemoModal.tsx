@@ -51,7 +51,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
     if (lower.includes('senior') || lower.includes('beginner')) return activeCategories.find((c) => c.id === 'senior-beginner') || activeCategories[0];
     if (lower.includes('advance')) return activeCategories.find((c) => c.id === 'advance') || activeCategories[0];
     if (lower.includes('gym') || lower.includes('free') || lower.includes('style')) return activeCategories.find((c) => c.id === 'gymnastic') || activeCategories[0];
-    if (lower.includes('bollywood') || lower.includes('ladies')) return activeCategories.find((c) => c.id === 'bollywood-ladies') || activeCategories[0];
+    if (lower.includes('bollywood') || lower.includes('ladies') || lower.includes('girl')) return activeCategories.find((c) => c.id === 'bollywood-ladies') || activeCategories[0];
     if (lower.includes('private')) return activeCategories.find((c) => c.id === 'private-class') || activeCategories[0];
     if (lower.includes('home')) return activeCategories.find((c) => c.id === 'home-service') || activeCategories[0];
     if (lower.includes('job')) return activeCategories.find((c) => c.id === 'job-person') || activeCategories[0];
