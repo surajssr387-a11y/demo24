@@ -19,7 +19,7 @@ const DEFAULT_PERFORMANCES: ChoreographyPerformanceItem[] = [
   {
     id: 'choreo-1',
     title: 'Kids Dance Showcase',
-    videoUrl: '/uploads/IMG_3180_1790837931443.mp4',
+    videoUrl: '/choreography/choreo-kids.mp4',
     yPosition: 20,
     brightness: 1.1,
     contrast: 1.04,
@@ -27,7 +27,7 @@ const DEFAULT_PERFORMANCES: ChoreographyPerformanceItem[] = [
   {
     id: 'choreo-2',
     title: 'Senior/Beginner Routine',
-    videoUrl: '/uploads/choreo_user_perf.mp4',
+    videoUrl: '/choreography/choreo-senior.mp4',
     yPosition: 22,
     brightness: 1.05,
     contrast: 1.04,
@@ -35,7 +35,7 @@ const DEFAULT_PERFORMANCES: ChoreographyPerformanceItem[] = [
   {
     id: 'choreo-3',
     title: 'Advance Hip-Hop Choreography',
-    videoUrl: '/uploads/MANIKE-TAHNK-SnapYT_App_1790838393369.mp4',
+    videoUrl: '/choreography/choreo-advance.mp4',
     yPosition: 20,
     brightness: 1.05,
     contrast: 1.04,
@@ -43,7 +43,7 @@ const DEFAULT_PERFORMANCES: ChoreographyPerformanceItem[] = [
   {
     id: 'choreo-4',
     title: 'Bollywood Ladies Performance',
-    videoUrl: '/uploads/Timeline_1_1790839717927.mp4',
+    videoUrl: '/choreography/choreo-ladies.mp4',
     yPosition: 25,
     brightness: 1.0,
     contrast: 1.04,
@@ -51,7 +51,7 @@ const DEFAULT_PERFORMANCES: ChoreographyPerformanceItem[] = [
   {
     id: 'choreo-5',
     title: 'Gymnastic & Freestyle Routine',
-    videoUrl: '/uploads/Sharaab_____bestdanceclass__ramysdancestudio_1790840627163.mp4',
+    videoUrl: '/choreography/choreo-freestyle.mp4',
     yPosition: 20,
     brightness: 1.0,
     contrast: 1.04,
@@ -59,7 +59,7 @@ const DEFAULT_PERFORMANCES: ChoreographyPerformanceItem[] = [
   {
     id: 'choreo-6',
     title: 'Private Class Choreography',
-    videoUrl: '/uploads/vide_1790840771926.mp4',
+    videoUrl: '/choreography/choreo-private.mp4',
     yPosition: 18,
     brightness: 1.05,
     contrast: 1.04,
