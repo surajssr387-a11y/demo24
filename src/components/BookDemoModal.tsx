@@ -505,11 +505,6 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                       : `BOOK ADMISSION – ${activeFeeText}`}
                   </span>
                 </h2>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  {isHomeService
-                    ? 'Personalized doorstep dance coaching at your home in Ranchi.'
-                    : 'Select your program, plan, batch, and proceed to UPI payment.'}
-                </p>
               </div>
             </div>
 
