@@ -46,7 +46,7 @@ async function startServer() {
       overlayDarkness: 0.35,
       brightness: 0.95,
       contrast: 1.04,
-      topGapPx: 48,
+      topGapPx: 0,
     });
   });
 

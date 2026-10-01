@@ -16,7 +16,6 @@ export const Hero: React.FC<HeroProps> = () => {
     zoom: 1,
     brightness: 0.95,
     contrast: 1.04,
-    topGapPx: 48,
   };
 
   // Sync latest video URL from server if custom URL was set
@@ -94,7 +93,6 @@ export const Hero: React.FC<HeroProps> = () => {
             objectPosition: `${heroConfig.xPosition}% ${heroConfig.yPosition}%`,
             transform: `scale(${heroConfig.zoom})`,
             filter: `brightness(${heroConfig.brightness}) contrast(${heroConfig.contrast})`,
-            paddingTop: `${heroConfig.topGapPx}px`,
           }}
           className="w-full h-full object-cover transition-all duration-150 pointer-events-none"
         >
