@@ -67,13 +67,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
               >
                 RAMY&apos;S DANCE STUDIO
               </span>
-              <span
-                className={`text-[9px] sm:text-[10px] font-bold tracking-wider uppercase truncate transition-colors ${
-                  isScrolled ? 'text-neutral-500' : 'text-neutral-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]'
-                }`}
-              >
-                RANCHI • METRO MARKET
-              </span>
             </div>
           </a>
 

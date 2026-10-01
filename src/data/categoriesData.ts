@@ -70,7 +70,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
   },
   {
     id: "senior-beginner",
-    title: "Senior/Beginner",
+    title: "Beginner",
     imageUrl: "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?auto=format&fit=crop&w=1000&q=80",
     pillTag: "ALL AGES",
     levelLabel: "ZERO EXPERIENCE NEEDED",
