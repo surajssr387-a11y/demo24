@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CategoryItem, loadCategories } from '../data/categoriesData';
-import { resolvePlayableUrl, isDeviceMediaKey } from '../utils/mediaStorage';
+import { CategoryItem, DEFAULT_CATEGORIES, loadCategories } from '../data/categoriesData';
 
 interface CategoriesSectionProps {
   onSelectCategory: (categoryTitle: string) => void;
@@ -12,10 +11,8 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
   categories: propCategories,
 }) => {
   const [internalCategories, setInternalCategories] = useState<CategoryItem[]>(() => {
-    return propCategories || loadCategories();
+    return propCategories && propCategories.length > 0 ? propCategories : loadCategories();
   });
-
-  const [resolvedCategories, setResolvedCategories] = useState<CategoryItem[]>(internalCategories);
 
   // Sync internal state if propCategories changes
   useEffect(() => {
@@ -36,29 +33,9 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
       .catch(() => {});
   }, []);
 
-  // Resolve IndexedDB device media URLs for uploaded photos if needed
-  useEffect(() => {
-    let isMounted = true;
-    const resolveImages = async () => {
-      const resolved = await Promise.all(
-        internalCategories.map(async (cat) => {
-          let imageUrl = cat.imageUrl;
-          if (isDeviceMediaKey(imageUrl)) {
-            const resolvedImg = await resolvePlayableUrl(imageUrl);
-            if (resolvedImg) imageUrl = resolvedImg;
-          }
-          return { ...cat, imageUrl };
-        })
-      );
-      if (isMounted) {
-        setResolvedCategories(resolved);
-      }
-    };
-    resolveImages();
-    return () => {
-      isMounted = false;
-    };
-  }, [internalCategories]);
+  const displayCategories = internalCategories && internalCategories.length > 0
+    ? internalCategories
+    : DEFAULT_CATEGORIES;
 
   return (
     <section id="categories" className="relative bg-white text-neutral-900 overflow-hidden">
@@ -74,7 +51,7 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
 
         {/* 3x3 Grid Form (9 Categories arranged in 3 columns x 3 rows) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
-          {resolvedCategories.map((category: CategoryItem) => {
+          {displayCategories.map((category: CategoryItem) => {
             return (
               <div
                 key={category.id}
