@@ -119,7 +119,7 @@ export const Hero: React.FC<HeroProps> = () => {
         <div className="flex items-center justify-center mt-6">
           <button
             onClick={() => scrollToSection('categories')}
-            className="group flex items-center gap-2.5 bg-[#0066FF]/80 hover:bg-[#0066FF]/95 text-white font-extrabold text-sm md:text-base px-9 py-4 rounded-full backdrop-blur-xl border border-white/25 transition-all shadow-[0_8px_32px_rgba(0,102,255,0.35)] hover:shadow-[0_12px_40px_rgba(0,102,255,0.5)] hover:scale-105 active:scale-95 cursor-pointer tracking-wide"
+            className="group flex items-center gap-2.5 bg-white/20 hover:bg-white/30 active:bg-white/40 text-white font-extrabold text-sm md:text-base px-9 py-4 rounded-full backdrop-blur-xl border border-white/40 hover:border-white/60 transition-all shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)] hover:scale-105 active:scale-95 cursor-pointer tracking-wide"
           >
             <span>CATEGORIES</span>
             <ArrowDown className="w-4 h-4 stroke-[3] group-hover:translate-y-0.5 transition-transform" />
