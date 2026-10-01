@@ -198,9 +198,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
       : planType === 'monthly'
       ? 'Full Monthly Course'
       : 'Demo Class (Trial ₹49)';
-    const paymentStatusBadge = isPaymentConfirmed
-      ? `PAID ONLINE VIA UPI ${utrNumber ? `(UTR / Ref: ${utrNumber.trim()})` : '(Verified)'}`
-      : `Pay at Studio / UPI`;
+    const paymentStatusBadge = 'PAID ONLINE VIA UPI (Verified)';
 
     const formattedMessage =
 `🔔 *NEW BOOKING & PAYMENT RECEIVED - RAMY'S DANCE STUDIO*
@@ -469,35 +467,6 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                     </>
                   )}
                 </button>
-              </div>
-            </div>
-
-            {/* Payment Verification / UTR Input */}
-            <div className="bg-[#14161C] border border-[#2B2E39] rounded-2xl p-4 space-y-3">
-              <label className="flex items-start gap-2.5 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={isPaymentConfirmed}
-                  onChange={(e) => setIsPaymentConfirmed(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-600 text-[#0066FF] focus:ring-0 mt-0.5 cursor-pointer"
-                />
-                <span className="text-xs text-slate-300 leading-tight">
-                  <strong className="text-white block font-bold">Maine UPI se {activeFeeText} payment kar diya hai</strong>
-                  Payment hone ke baad niche button dabayein WhatsApp notification send karne ke liye.
-                </span>
-              </label>
-
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-400 mb-1">
-                  UPI Reference / UTR Number (Optional):
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. 12-digit UTR ya transaction ID"
-                  value={utrNumber}
-                  onChange={(e) => setUtrNumber(e.target.value)}
-                  className="w-full bg-[#0E0F12] border border-[#2B2E39] focus:border-[#0066FF] rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none transition-colors"
-                />
               </div>
             </div>
 
