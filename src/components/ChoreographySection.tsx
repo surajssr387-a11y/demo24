@@ -235,7 +235,7 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
                   }}
                   className="bg-[#0066FF] hover:bg-[#0052cc] text-white px-5 py-2 rounded-xl text-xs font-extrabold shadow-md transition-all active:scale-95 cursor-pointer"
                 >
-                  Join This Batch / Book Demo ₹99
+                  Join This Batch / Book Demo ₹49
                 </button>
               </div>
             </div>

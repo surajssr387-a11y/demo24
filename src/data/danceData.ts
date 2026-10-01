@@ -39,7 +39,7 @@ export const studioInfo: StudioInfo = {
     weekdays: "Mon – Sat: 10:00 AM – 7:00 PM",
     sunday: "Sunday: 8:00 AM – 5:00 PM"
   },
-  demoPriceText: "₹99",
+  demoPriceText: "₹49",
   upiId: "9692451182@fam",
   upiPayeeName: "sanjeev biruly"
 };

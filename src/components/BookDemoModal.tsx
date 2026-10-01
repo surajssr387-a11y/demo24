@@ -112,7 +112,11 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
       ];
 
   const activeBatch = currentBatches[selectedBatchIndex] || currentBatches[0];
-  const isDemoCategory = !['private-class', 'home-service', 'wedding-choreography'].includes(currentCategory.id);
+  const isHomeService = currentCategory.id === 'home-service';
+  const isPrivateClass = currentCategory.id === 'private-class';
+  const isWeddingChoreo = currentCategory.id === 'wedding-choreography';
+  const isSpecialCategory = isHomeService || isPrivateClass || isWeddingChoreo;
+  const isDemoCategory = !isSpecialCategory;
 
   // Helper to extract clean monthly price text (e.g. "₹1,500")
   const getMonthlyPriceText = (monthlyStr?: string): string => {
@@ -122,18 +126,22 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
   };
 
   const monthlyPriceText = getMonthlyPriceText(currentCategory.monthlyFee);
-  const demoPriceText = activeBatch?.price || currentCategory.demoPrice || '₹99';
+  const demoPriceText = activeBatch?.price || currentCategory.demoPrice || '₹49';
 
-  // Active price based on plan choice
-  const activeFeeText = planType === 'monthly' ? monthlyPriceText : demoPriceText;
+  // Active price based on plan choice or package choice
+  const activeFeeText = isSpecialCategory
+    ? (activeBatch?.price || currentCategory.demoPrice || currentCategory.monthlyFee || '₹6,000')
+    : (planType === 'monthly' ? monthlyPriceText : demoPriceText);
 
   // Numeric amount for UPI
-  const numericAmount = parseInt(activeFeeText.replace(/[^\d]/g, ''), 10) || (planType === 'monthly' ? 1500 : 99);
+  const numericAmount = parseInt(activeFeeText.replace(/[^\d]/g, ''), 10) || (planType === 'monthly' ? 1500 : 49);
 
   // Studio UPI details (sanjeev biruly / 9692451182@fam)
   const upiPayee = studioInfo.upiPayeeName || 'sanjeev biruly';
   const studioUpiId = studioInfo.upiId || '9692451182@fam';
-  const upiPayNote = `${currentCategory.title} ${planType === 'monthly' ? 'Monthly Course' : 'Demo Session'}`;
+  const upiPayNote = isSpecialCategory
+    ? `${currentCategory.title} ${activeBatch?.name || 'Package'}`
+    : `${currentCategory.title} ${planType === 'monthly' ? 'Monthly Course' : 'Demo ₹49'}`;
   const upiPayUrl = `upi://pay?pa=${studioUpiId}&pn=${encodeURIComponent(upiPayee)}&am=${numericAmount}&cu=INR&tn=${encodeURIComponent(upiPayNote)}`;
 
   // Dynamic QR Code image URL (with high resolution and proper margin)
@@ -185,7 +193,11 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
     const cleanPhone = phone.trim().replace(/\D/g, '');
     const scheduleBulletList = activeBatch.schedules.map((s) => `  • ${s}`).join('\n');
     const chosenDate = date ? date : 'Earliest Available Batch';
-    const planLabel = planType === 'monthly' ? 'Full Monthly Course' : (isDemoCategory ? 'Demo Class (Trial)' : 'Appointment Booking');
+    const planLabel = isSpecialCategory
+      ? `${currentCategory.title} (${activeBatch.name})`
+      : planType === 'monthly'
+      ? 'Full Monthly Course'
+      : 'Demo Class (Trial ₹49)';
     const paymentStatusBadge = isPaymentConfirmed
       ? `PAID ONLINE VIA UPI ${utrNumber ? `(UTR / Ref: ${utrNumber.trim()})` : '(Verified)'}`
       : `Pay at Studio / UPI`;
@@ -516,10 +528,18 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pr-8">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-display tracking-tight flex items-baseline gap-2">
-                  <span>BOOK ADMISSION – {activeFeeText}</span>
+                  <span>
+                    {isHomeService
+                      ? `HOME SERVICE – ${activeFeeText}`
+                      : isSpecialCategory
+                      ? `${currentCategory.title.toUpperCase()} – ${activeFeeText}`
+                      : `BOOK ADMISSION – ${activeFeeText}`}
+                  </span>
                 </h2>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Select your program, plan, batch, and proceed to UPI payment.
+                  {isHomeService
+                    ? 'Personalized doorstep dance coaching at your home in Ranchi.'
+                    : 'Select your program, plan, batch, and proceed to UPI payment.'}
                 </p>
               </div>
             </div>
@@ -530,8 +550,8 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                 <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider">
                   1. SELECT DANCE PROGRAM
                 </label>
-                <span className="text-[10px] text-emerald-400 font-mono">
-                  {currentCategory.demoPrice}
+                <span className="text-[10px] text-emerald-400 font-mono font-bold">
+                  {isSpecialCategory ? activeFeeText : `Demo ${currentCategory.demoPrice || '₹49'}`}
                 </span>
               </div>
               <div className="relative">
@@ -545,11 +565,14 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                   }}
                   className="w-full bg-[#14161C] border border-[#2B2E39] focus:border-[#0066FF] rounded-xl px-4 py-3 text-sm text-white focus:outline-none appearance-none cursor-pointer transition-colors"
                 >
-                  {activeCategories.map((program) => (
-                    <option key={program.id} value={program.id} className="bg-[#14161C] text-white">
-                      {program.title} (Trial: {program.demoPrice} | Monthly: {getMonthlyPriceText(program.monthlyFee)})
-                    </option>
-                  ))}
+                  {activeCategories.map((program) => {
+                    const isSpec = ['home-service', 'private-class', 'wedding-choreography'].includes(program.id);
+                    return (
+                      <option key={program.id} value={program.id} className="bg-[#14161C] text-white">
+                        {program.title} {isSpec ? `(Package: ${program.demoPrice || program.monthlyFee})` : `(Demo: ${program.demoPrice || '₹49'} | Monthly: ${getMonthlyPriceText(program.monthlyFee)})`}
+                      </option>
+                    );
+                  })}
                 </select>
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                   ▼
@@ -557,137 +580,205 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
               </div>
             </div>
 
-            {/* 2. SELECT COURSE PLAN (TRIAL DEMO VS FULL MONTHLY COURSE) */}
-            <div>
-              <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2">
-                2. CHOOSE YOUR PLAN (TRIAL OR MONTHLY COURSE)
-              </label>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Plan A: Trial Demo Session */}
-                <div
-                  onClick={() => setPlanType('demo')}
-                  className={`rounded-2xl p-4 transition-all border cursor-pointer relative flex flex-col justify-between ${
-                    planType === 'demo'
-                      ? 'border-[#0066FF] bg-blue-950/30 shadow-lg ring-1 ring-[#0066FF]/40'
-                      : 'border-[#262832] bg-[#13151A] hover:border-slate-500'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-black uppercase tracking-wider text-white">
-                      {isDemoCategory ? 'Trial Demo Class' : 'Single Session'}
-                    </span>
-                    <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                      planType === 'demo' ? 'border-[#0066FF] bg-[#0066FF]' : 'border-slate-600'
-                    }`}>
-                      {planType === 'demo' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
-                    </span>
-                  </div>
-
-                  <p className="text-[11px] text-slate-400 leading-snug">
-                    Experience the studio ambiance, meet coaches &amp; try 1 full class.
-                  </p>
-
-                  <div className="mt-3 pt-2.5 border-t border-white/10 flex items-baseline justify-between">
-                    <span className="text-[11px] text-slate-400">Fee:</span>
-                    <span className="text-xl font-extrabold text-emerald-400 font-display">
-                      {demoPriceText}
-                    </span>
-                  </div>
+            {/* 2. CHOOSE PLAN OR DIRECT PACKAGE SELECTION */}
+            {isSpecialCategory ? (
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider">
+                    {isHomeService ? '2. SELECT HOME SERVICE PACKAGE' : '2. SELECT PACKAGE / BATCH'}
+                  </label>
+                  <span className="text-xs font-black text-emerald-400 font-display">
+                    {activeFeeText}
+                  </span>
                 </div>
 
-                {/* Plan B: Full Monthly Course */}
-                <div
-                  onClick={() => setPlanType('monthly')}
-                  className={`rounded-2xl p-4 transition-all border cursor-pointer relative flex flex-col justify-between ${
-                    planType === 'monthly'
-                      ? 'border-[#0066FF] bg-blue-950/30 shadow-lg ring-1 ring-[#0066FF]/40'
-                      : 'border-[#262832] bg-[#13151A] hover:border-slate-500'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-black uppercase tracking-wider text-white">
-                        Monthly Course
-                      </span>
-                      <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                        POPULAR
-                      </span>
-                    </div>
-                    <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                      planType === 'monthly' ? 'border-[#0066FF] bg-[#0066FF]' : 'border-slate-600'
-                    }`}>
-                      {planType === 'monthly' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
-                    </span>
-                  </div>
+                <div className={`grid gap-3 ${currentBatches.length > 1 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
+                  {currentBatches.map((batch, idx) => {
+                    const isSelected = selectedBatchIndex === idx;
+                    return (
+                      <div
+                        key={batch.id || idx}
+                        onClick={() => setSelectedBatchIndex(idx)}
+                        className={`rounded-2xl p-4 transition-all border cursor-pointer relative flex flex-col justify-between ${
+                          isSelected
+                            ? 'border-[#0066FF] bg-blue-950/40 shadow-lg ring-1 ring-[#0066FF]/60'
+                            : 'border-[#262832] bg-[#13151A] hover:border-slate-500'
+                        }`}
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="text-sm font-bold text-white">
+                              {batch.name}
+                            </span>
+                            <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                              isSelected ? 'border-[#0066FF] bg-[#0066FF]' : 'border-slate-600'
+                            }`}>
+                              {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                            </span>
+                          </div>
 
-                  <p className="text-[11px] text-slate-400 leading-snug">
-                    Full 12 sessions comprehensive training with stage &amp; certificate track.
-                  </p>
-
-                  <div className="mt-3 pt-2.5 border-t border-white/10 flex items-baseline justify-between">
-                    <span className="text-[11px] text-slate-400">Course Fee:</span>
-                    <span className="text-xl font-extrabold text-emerald-400 font-display">
-                      {monthlyPriceText}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 3. SELECT BATCH & TIMINGS */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider">
-                  3. SELECT BATCH &amp; TIMINGS
-                </label>
-              </div>
-              <div className={`grid gap-2.5 ${currentBatches.length > 1 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
-                {currentBatches.map((batch, idx) => {
-                  const isSelected = selectedBatchIndex === idx;
-                  const isFull = batch.isFull;
-
-                  return (
-                    <div
-                      key={batch.id || idx}
-                      onClick={() => handleSelectBatch(idx)}
-                      className={`rounded-xl p-3.5 transition-all text-xs border relative ${
-                        isFull
-                          ? 'border-red-900/60 bg-red-950/20 opacity-80 cursor-not-allowed'
-                          : isSelected
-                          ? 'border-[#0066FF] bg-blue-950/20 cursor-pointer shadow-sm'
-                          : 'border-[#262832] bg-[#13151A] hover:border-slate-500 cursor-pointer'
-                      }`}
-                    >
-                      <div className="font-bold text-white text-xs sm:text-sm mb-1.5 flex items-center justify-between">
-                        <span className="flex items-center gap-1.5">
-                          <span>{batch.name}</span>
                           {batch.days && (
-                            <span className="text-[10px] text-slate-400 font-normal">
-                              ({batch.days})
+                            <span className="text-xs text-[#0066FF] font-semibold mb-2 block">
+                              {batch.days}
                             </span>
                           )}
-                        </span>
-                        {isFull ? (
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/30">
-                            FULL
-                          </span>
-                        ) : isSelected ? (
-                          <span className="w-2 h-2 rounded-full bg-[#0066FF]" />
-                        ) : null}
-                      </div>
-                      <div className="space-y-1 text-slate-300">
-                        {batch.schedules.map((schedule, sIdx) => (
-                          <div key={sIdx} className="leading-tight text-[11px] sm:text-xs">
-                            {schedule}
+
+                          <div className="space-y-1.5 my-2.5">
+                            {batch.schedules.map((schedule, sIdx) => (
+                              <p key={sIdx} className="text-xs text-slate-300 flex items-start gap-1.5 leading-snug">
+                                <span className="text-[#0066FF] font-bold shrink-0">•</span>
+                                <span>{schedule}</span>
+                              </p>
+                            ))}
                           </div>
-                        ))}
+                        </div>
+
+                        <div className="mt-3 pt-2.5 border-t border-white/10 flex items-baseline justify-between">
+                          <span className="text-xs text-slate-400">Total Fee:</span>
+                          <span className="text-xl font-black text-emerald-400 font-display">
+                            {batch.price || activeFeeText}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Standard Categories: 2. SELECT COURSE PLAN (TRIAL DEMO ₹49 VS FULL MONTHLY COURSE) */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2">
+                    2. CHOOSE YOUR PLAN (TRIAL OR MONTHLY COURSE)
+                  </label>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Plan A: Trial Demo Session ₹49 */}
+                    <div
+                      onClick={() => setPlanType('demo')}
+                      className={`rounded-2xl p-4 transition-all border cursor-pointer relative flex flex-col justify-between ${
+                        planType === 'demo'
+                          ? 'border-[#0066FF] bg-blue-950/30 shadow-lg ring-1 ring-[#0066FF]/40'
+                          : 'border-[#262832] bg-[#13151A] hover:border-slate-500'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-black uppercase tracking-wider text-white">
+                          Trial Demo Class
+                        </span>
+                        <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                          planType === 'demo' ? 'border-[#0066FF] bg-[#0066FF]' : 'border-slate-600'
+                        }`}>
+                          {planType === 'demo' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                        </span>
+                      </div>
+
+                      <p className="text-[11px] text-slate-400 leading-snug">
+                        Experience the studio ambiance, meet coaches &amp; try 1 full class.
+                      </p>
+
+                      <div className="mt-3 pt-2.5 border-t border-white/10 flex items-baseline justify-between">
+                        <span className="text-[11px] text-slate-400">Trial Fee:</span>
+                        <span className="text-xl font-extrabold text-emerald-400 font-display">
+                          {demoPriceText}
+                        </span>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
+
+                    {/* Plan B: Full Monthly Course */}
+                    <div
+                      onClick={() => setPlanType('monthly')}
+                      className={`rounded-2xl p-4 transition-all border cursor-pointer relative flex flex-col justify-between ${
+                        planType === 'monthly'
+                          ? 'border-[#0066FF] bg-blue-950/30 shadow-lg ring-1 ring-[#0066FF]/40'
+                          : 'border-[#262832] bg-[#13151A] hover:border-slate-500'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-black uppercase tracking-wider text-white">
+                            Monthly Course
+                          </span>
+                          <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            POPULAR
+                          </span>
+                        </div>
+                        <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                          planType === 'monthly' ? 'border-[#0066FF] bg-[#0066FF]' : 'border-slate-600'
+                        }`}>
+                          {planType === 'monthly' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                        </span>
+                      </div>
+
+                      <p className="text-[11px] text-slate-400 leading-snug">
+                        Full 12 sessions comprehensive training with stage &amp; certificate track.
+                      </p>
+
+                      <div className="mt-3 pt-2.5 border-t border-white/10 flex items-baseline justify-between">
+                        <span className="text-[11px] text-slate-400">Course Fee:</span>
+                        <span className="text-xl font-extrabold text-emerald-400 font-display">
+                          {monthlyPriceText}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. SELECT BATCH & TIMINGS */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider">
+                      3. SELECT BATCH &amp; TIMINGS
+                    </label>
+                  </div>
+                  <div className={`grid gap-2.5 ${currentBatches.length > 1 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
+                    {currentBatches.map((batch, idx) => {
+                      const isSelected = selectedBatchIndex === idx;
+                      const isFull = batch.isFull;
+
+                      return (
+                        <div
+                          key={batch.id || idx}
+                          onClick={() => handleSelectBatch(idx)}
+                          className={`rounded-xl p-3.5 transition-all text-xs border relative ${
+                            isFull
+                              ? 'border-red-900/60 bg-red-950/20 opacity-80 cursor-not-allowed'
+                              : isSelected
+                              ? 'border-[#0066FF] bg-blue-950/20 cursor-pointer shadow-sm'
+                              : 'border-[#262832] bg-[#13151A] hover:border-slate-500 cursor-pointer'
+                          }`}
+                        >
+                          <div className="font-bold text-white text-xs sm:text-sm mb-1.5 flex items-center justify-between">
+                            <span className="flex items-center gap-1.5">
+                              <span>{batch.name}</span>
+                              {batch.days && (
+                                <span className="text-[10px] text-slate-400 font-normal">
+                                  ({batch.days})
+                                </span>
+                              )}
+                            </span>
+                            {isFull ? (
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/30">
+                                FULL
+                              </span>
+                            ) : isSelected ? (
+                              <span className="w-2 h-2 rounded-full bg-[#0066FF]" />
+                            ) : null}
+                          </div>
+                          <div className="space-y-1 text-slate-300">
+                            {batch.schedules.map((schedule, sIdx) => (
+                              <div key={sIdx} className="leading-tight text-[11px] sm:text-xs">
+                                {schedule}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* 4. NAME & MOBILE INPUTS */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
