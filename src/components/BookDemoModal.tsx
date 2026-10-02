@@ -282,17 +282,17 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md animate-in fade-in duration-200 select-none"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 select-none"
       onClick={onClose}
     >
       <div 
-        className="relative w-full max-w-[640px] bg-[#0E0F12] border border-[#272932] rounded-2xl md:rounded-3xl p-6 sm:p-8 shadow-2xl text-white max-h-[92vh] overflow-y-auto"
+        className="relative w-full max-w-[640px] bg-white border border-slate-200/80 rounded-2xl md:rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-900 max-h-[92vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-[#1C1E24] hover:bg-[#2A2D36] text-white/80 hover:text-white flex items-center justify-center transition-colors border border-white/5 cursor-pointer z-10"
+          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors border border-slate-200 cursor-pointer z-10"
           aria-label="Close dialog"
         >
           <X className="w-4 h-4" />
@@ -303,59 +303,59 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
         {/* ============================================================== */}
         {step === 'success' && (
           <div className="text-center py-5 sm:py-7 space-y-4">
-            <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto text-emerald-400">
+            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-600 shadow-sm">
               <CheckCircle2 className="w-10 h-10" />
             </div>
-            <h3 className="text-2xl font-bold font-display text-white">Booking &amp; Payment Successful!</h3>
-            <p className="text-slate-300 text-sm max-w-md mx-auto leading-relaxed">
-              Aapka slot <span className="text-[#0066FF] font-semibold">{currentCategory.title}</span> ({planType === 'monthly' ? 'Monthly Course' : 'Trial Demo'}) ke liye register ho gaya hai.
+            <h3 className="text-2xl font-bold font-display text-slate-900">Booking &amp; Payment Successful!</h3>
+            <p className="text-slate-600 text-sm max-w-md mx-auto leading-relaxed">
+              Aapka slot <span className="text-blue-600 font-semibold">{currentCategory.title}</span> ({planType === 'monthly' ? 'Monthly Course' : 'Trial Demo'}) ke liye register ho gaya hai.
             </p>
 
-            {/* Direct WhatsApp Notification Button */}
+            {/* Direct WhatsApp Notification Button (Green) */}
             {lastWhatsAppUrl && (
               <a
                 href={lastWhatsAppUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#25D366] to-[#1ebe5d] hover:from-[#20ba59] hover:to-[#17a54f] text-white font-extrabold text-sm sm:text-base flex items-center justify-center gap-3 transition-all shadow-xl shadow-emerald-950/40 active:scale-95 cursor-pointer border border-emerald-300/40 relative overflow-hidden group"
+                className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#25D366] to-[#1ebe5d] hover:from-[#20ba59] hover:to-[#17a54f] text-white font-extrabold text-sm sm:text-base flex items-center justify-center gap-3 transition-all shadow-xl shadow-emerald-600/25 active:scale-95 cursor-pointer border border-emerald-400 relative overflow-hidden group"
               >
                 <MessageCircle className="w-5 h-5 fill-white shrink-0" />
                 <span>üì≤ Open WhatsApp &amp; Send Booking Notification ({studioInfo.phoneDisplay})</span>
               </a>
             )}
 
-            {/* Receipt Summary */}
-            <div className="bg-[#15161B] rounded-2xl p-4 text-left border border-white/10 space-y-2.5 text-xs text-slate-300 mt-3">
+            {/* Receipt Summary (Light White Card) */}
+            <div className="bg-slate-50 rounded-2xl p-4 text-left border border-slate-200 space-y-2.5 text-xs text-slate-700 mt-3 shadow-inner">
               <div className="flex justify-between">
-                <span>Student Name:</span>
-                <span className="font-semibold text-white">{name.trim()}</span>
+                <span className="text-slate-500">Student Name:</span>
+                <span className="font-semibold text-slate-900">{name.trim()}</span>
               </div>
               <div className="flex justify-between">
-                <span>Mobile Number:</span>
-                <span className="font-semibold text-white">{phone.trim()}</span>
+                <span className="text-slate-500">Mobile Number:</span>
+                <span className="font-semibold text-slate-900">{phone.trim()}</span>
               </div>
               <div className="flex justify-between">
-                <span>Dance Program:</span>
-                <span className="font-semibold text-[#0066FF]">{currentCategory.title}</span>
+                <span className="text-slate-500">Dance Program:</span>
+                <span className="font-semibold text-blue-600">{currentCategory.title}</span>
               </div>
               <div className="flex justify-between">
-                <span>Selected Plan:</span>
-                <span className="font-bold text-white">
+                <span className="text-slate-500">Selected Plan:</span>
+                <span className="font-bold text-slate-900">
                   {planType === 'monthly' ? 'Full Monthly Course' : 'Trial Demo Session'}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span>Selected Batch:</span>
-                <span className="font-medium text-white">{activeBatch.name}</span>
+                <span className="text-slate-500">Selected Batch:</span>
+                <span className="font-medium text-slate-900">{activeBatch.name}</span>
               </div>
               <div className="flex justify-between">
-                <span>Amount Paid:</span>
-                <span className="font-extrabold text-amber-400">{activeFeeText} (UPI Paid)</span>
+                <span className="text-slate-500">Amount Paid:</span>
+                <span className="font-extrabold text-emerald-600">{activeFeeText} (UPI Paid)</span>
               </div>
               {utrNumber && (
                 <div className="flex justify-between">
-                  <span>UPI Ref/UTR:</span>
-                  <span className="font-mono text-slate-200">{utrNumber.trim()}</span>
+                  <span className="text-slate-500">UPI Ref/UTR:</span>
+                  <span className="font-mono text-slate-800">{utrNumber.trim()}</span>
                 </div>
               )}
             </div>
@@ -363,7 +363,7 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
             <div className="pt-2">
               <button
                 onClick={onClose}
-                className="w-full py-3 px-6 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white font-bold text-xs sm:text-sm transition-all cursor-pointer"
+                className="w-full py-3 px-6 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition-all cursor-pointer border border-slate-200"
               >
                 Done / Close
               </button>
@@ -377,57 +377,57 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
         {step === 'payment' && (
           <div className="space-y-5 animate-in fade-in duration-150">
             {/* Payment Header with Back button */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-4">
               <button
                 type="button"
                 onClick={() => setStep('form')}
-                className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back to Details</span>
               </button>
               <div className="text-right">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
                   STEP 2 OF 2: PAYMENT
                 </span>
-                <span className="text-lg font-black text-amber-400 font-display">
+                <span className="text-lg font-black text-blue-600 font-display">
                   {activeFeeText}
                 </span>
               </div>
             </div>
 
             {/* Title & Order Summary Pill */}
-            <div className="bg-[#14161C] border border-[#262832] rounded-2xl p-3.5 flex items-center justify-between">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between shadow-xs">
               <div>
-                <span className="text-xs font-bold text-white block">
+                <span className="text-xs font-bold text-slate-900 block">
                   {currentCategory.title}
                 </span>
-                <span className="text-[11px] text-slate-400">
+                <span className="text-[11px] text-slate-500">
                   {planType === 'monthly'
                     ? (isGymnastic ? '4 Days / Week (16 Sessions)' : 'Full Monthly Course')
                     : 'Trial Demo Session'} ‚Ä¢ {activeBatch.name}
                 </span>
               </div>
               <div className="text-right">
-                <span className="text-xs font-semibold text-slate-300 block">{name}</span>
-                <span className="text-[11px] text-amber-400 font-bold">{activeFeeText} Payable</span>
+                <span className="text-xs font-semibold text-slate-700 block">{name}</span>
+                <span className="text-[11px] text-blue-600 font-bold">{activeFeeText} Payable</span>
               </div>
             </div>
 
-            {/* Main UPI QR Code Card (Styled exactly like user's FamApp QR poster) */}
-            <div className="bg-gradient-to-b from-[#181A20] via-[#101216] to-[#0A0B0E] border-2 border-[#0066FF]/60 rounded-3xl p-5 sm:p-6 flex flex-col items-center justify-center text-center relative overflow-hidden shadow-2xl">
-              {/* Payee Name & FamApp Pill */}
+            {/* Main UPI QR Code Card (Clean White with Blue Accent) */}
+            <div className="bg-gradient-to-b from-slate-50 to-slate-100/70 border-2 border-blue-500/40 rounded-3xl p-5 sm:p-6 flex flex-col items-center justify-center text-center relative overflow-hidden shadow-lg">
+              {/* Payee Name & UPI ID Pill */}
               <div className="mb-3 space-y-1.5 flex flex-col items-center">
-                <span className="text-lg sm:text-xl font-black text-white tracking-wide">
+                <span className="text-lg sm:text-xl font-black text-slate-900 tracking-wide">
                   {upiPayee}
                 </span>
-                <div className="inline-flex items-center gap-1.5 bg-black/60 border border-white/20 px-3.5 py-1 rounded-full text-xs font-mono font-semibold text-slate-200 shadow-inner">
+                <div className="inline-flex items-center gap-1.5 bg-white border border-slate-300 px-3.5 py-1 rounded-full text-xs font-mono font-semibold text-slate-800 shadow-xs">
                   <span>{studioUpiId}</span>
                 </div>
               </div>
 
-              {/* QR Code Container with Centered FamApp Logo Badge */}
-              <div className="relative bg-[#1A1D24] p-3 rounded-2xl shadow-2xl border-2 border-white/10 my-2 group">
+              {/* QR Code Container */}
+              <div className="relative bg-white p-3 rounded-2xl shadow-md border border-slate-200 my-2 group">
                 <div className="bg-white p-2.5 rounded-xl overflow-hidden relative">
                   <img
                     src={qrCodeImageUrl}
@@ -435,9 +435,9 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
                     className="w-48 h-48 sm:w-52 sm:h-52 object-contain rounded-lg"
                     loading="eager"
                   />
-                  {/* Central FamApp Bird Emblem Badge */}
+                  {/* Central Emblem Badge */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-10 h-10 rounded-full bg-[#181A20] border-2 border-[#FF9900] shadow-lg flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-white border-2 border-amber-500 shadow-md flex items-center justify-center">
                       <span className="text-base select-none">üïäÔ∏è</span>
                     </div>
                   </div>
@@ -445,24 +445,24 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
               </div>
 
               {/* Scan to pay caption */}
-              <span className="text-[11px] font-bold text-slate-300 tracking-wider uppercase mt-1">
+              <span className="text-[11px] font-bold text-slate-700 tracking-wider uppercase mt-1">
                 Scan to pay with any UPI app
               </span>
-              <span className="text-[10px] text-slate-400 mt-0.5">
+              <span className="text-[10px] text-slate-500 mt-0.5">
                 Google Pay ‚Ä¢ PhonePe ‚Ä¢ Paytm ‚Ä¢ FamApp ‚Ä¢ BHIM
               </span>
 
               {/* Amount reminder under QR */}
-              <div className="mt-2.5 px-4 py-1.5 bg-amber-950/40 border border-amber-500/30 rounded-full flex items-center gap-2">
-                <span className="text-xs text-slate-300 font-semibold">Payable:</span>
-                <span className="text-amber-400 text-sm font-extrabold">{activeFeeText}</span>
+              <div className="mt-2.5 px-4 py-1.5 bg-blue-50 border border-blue-200 rounded-full flex items-center gap-2">
+                <span className="text-xs text-slate-600 font-semibold">Payable:</span>
+                <span className="text-blue-700 text-sm font-extrabold">{activeFeeText}</span>
               </div>
 
-              {/* Direct UPI Apps Link Button (Mobile Users) */}
+              {/* Direct UPI Apps Link Button (Mobile Users) - Blue */}
               <div className="mt-3.5 w-full flex flex-wrap items-center justify-center gap-2">
                 <a
                   href={upiPayUrl}
-                  className="inline-flex items-center gap-2 bg-[#0066FF] hover:bg-[#0052cc] text-white px-5 py-2.5 rounded-xl text-xs font-extrabold shadow-md transition-all active:scale-95 cursor-pointer"
+                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-xs font-extrabold shadow-md shadow-blue-500/25 transition-all active:scale-95 cursor-pointer"
                 >
                   <CreditCard className="w-4 h-4" />
                   <span>Open in UPI App (Pay {activeFeeText})</span>
@@ -470,24 +470,24 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
               </div>
 
               {/* Copy UPI ID Row */}
-              <div className="mt-3 w-full max-w-sm flex items-center justify-between bg-black/60 border border-white/10 rounded-xl px-3.5 py-2 text-xs">
+              <div className="mt-3 w-full max-w-sm flex items-center justify-between bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs shadow-xs">
                 <div className="flex flex-col text-left">
-                  <span className="text-[10px] text-slate-400">UPI ID (Tap to copy):</span>
-                  <span className="font-mono font-bold text-white select-all">{studioUpiId}</span>
+                  <span className="text-[10px] text-slate-500">UPI ID (Tap to copy):</span>
+                  <span className="font-mono font-bold text-slate-800 select-all">{studioUpiId}</span>
                 </div>
                 <button
                   type="button"
                   onClick={handleCopyUpi}
-                  className="flex items-center gap-1 bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold transition-colors cursor-pointer"
+                  className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-colors cursor-pointer border border-slate-200"
                 >
                   {copiedUpi ? (
                     <>
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
-                      <span className="text-emerald-300">Copied</span>
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <span className="text-emerald-700">Copied</span>
                     </>
                   ) : (
                     <>
-                      <Copy className="w-3.5 h-3.5" />
+                      <Copy className="w-3.5 h-3.5 text-slate-600" />
                       <span>Copy</span>
                     </>
                   )}
@@ -495,19 +495,19 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
               </div>
             </div>
 
-            {/* Final Action Button: DONE - BOOK & SEND NOTIFICATION ON WHATSAPP */}
+            {/* Final Action Button: DONE - BOOK & SEND NOTIFICATION (Green as requested!) */}
             <button
               type="button"
               onClick={handleFinalSubmit}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-[#25D366] via-[#1ebe5d] to-[#128C7E] hover:from-[#20ba59] hover:to-[#0f7c6e] text-white font-extrabold text-sm sm:text-base flex items-center justify-center gap-2.5 transition-transform active:scale-[0.99] shadow-xl shadow-emerald-950/40 cursor-pointer border border-emerald-400/40"
+              className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-600 via-green-600 to-emerald-700 hover:from-emerald-700 hover:via-green-700 hover:to-emerald-800 text-white font-extrabold text-sm sm:text-base flex items-center justify-center gap-2.5 transition-transform active:scale-[0.99] shadow-xl shadow-emerald-600/30 cursor-pointer border border-emerald-500/40"
             >
               <Send className="w-4 h-4 text-white" />
               <span>DONE ‚Äî BOOK &amp; SEND NOTIFICATION ({activeFeeText})</span>
             </button>
 
             {/* Security Guarantee Notice */}
-            <div className="flex items-center justify-center gap-2 text-center text-[11px] text-slate-400">
-              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+            <div className="flex items-center justify-center gap-2 text-center text-[11px] text-slate-500">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>Direct Bank Payment to Ramy&apos;s Dance Studio ‚Ä¢ 100% Verified Admission</span>
             </div>
           </div>
@@ -521,7 +521,7 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
             {/* Header Lockup */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pr-8">
               <div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-display tracking-tight flex items-baseline gap-2">
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-display tracking-tight flex items-baseline gap-2">
                   <span>
                     {currentCategory.title}
                   </span>
@@ -532,10 +532,10 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
             {/* 1. SELECT DANCE PROGRAM */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider">
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
                   1. SELECT DANCE PROGRAM
                 </label>
-                <span className="text-[10px] text-amber-400 font-mono font-bold">
+                <span className="text-[10px] text-blue-600 font-mono font-bold">
                   {isSpecialCategory ? activeFeeText : `Demo ${currentCategory.demoPrice || '‚Çπ49'}`}
                 </span>
               </div>
@@ -550,18 +550,18 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
                     setSelectedBatchIndex(popIdx !== undefined && popIdx >= 0 ? popIdx : 0);
                     setErrorMessage('');
                   }}
-                  className="w-full bg-[#14161C] border border-[#2B2E39] focus:border-[#0066FF] rounded-xl px-4 py-3 text-sm text-white focus:outline-none appearance-none cursor-pointer transition-colors"
+                  className="w-full bg-slate-50 border border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none appearance-none cursor-pointer transition-colors shadow-xs"
                 >
                   {activeCategories.map((program) => {
                     const isSpec = ['home-service', 'private-class', 'wedding-choreography'].includes(program.id);
                     return (
-                      <option key={program.id} value={program.id} className="bg-[#14161C] text-white">
+                      <option key={program.id} value={program.id} className="bg-white text-slate-900">
                         {program.title} {isSpec ? `(Package: ${program.demoPrice || program.monthlyFee})` : `(Demo: ${program.demoPrice || '‚Çπ49'} | Monthly: ${getMonthlyPriceText(program.monthlyFee)})`}
                       </option>
                     );
                   })}
                 </select>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
                   ‚ñº
                 </div>
               </div>
@@ -571,10 +571,10 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
             {isSpecialCategory ? (
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider">
+                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
                     {isHomeService ? '2. SELECT HOME SERVICE PACKAGE' : '2. SELECT PACKAGE / BATCH'}
                   </label>
-                  <span className="text-xs font-black text-amber-400 font-display">
+                  <span className="text-xs font-black text-blue-600 font-display">
                     {activeFeeText}
                   </span>
                 </div>
@@ -588,41 +588,41 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
                         onClick={() => setSelectedBatchIndex(idx)}
                         className={`rounded-2xl p-4 transition-all border cursor-pointer relative flex flex-col justify-between ${
                           isSelected
-                            ? 'border-amber-400 bg-amber-500/15 shadow-lg shadow-amber-950/40 ring-1 ring-amber-400/60'
-                            : 'border-[#262832] bg-[#13151A] hover:border-slate-500'
+                            ? 'border-blue-600 bg-blue-50/70 shadow-md ring-2 ring-blue-500/20'
+                            : 'border-slate-200 bg-slate-50 hover:bg-slate-100/80 hover:border-slate-300'
                         }`}
                       >
                         <div>
                           <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-sm font-bold text-white">
+                            <span className="text-sm font-bold text-slate-900">
                               {batch.name}
                             </span>
                             <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                              isSelected ? 'border-amber-400 bg-amber-400' : 'border-slate-600'
+                              isSelected ? 'border-blue-600 bg-blue-600' : 'border-slate-300 bg-white'
                             }`}>
-                              {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-black" />}
+                              {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
                             </span>
                           </div>
 
                           {batch.days && (
-                            <span className="text-xs text-[#0066FF] font-semibold mb-2 block">
+                            <span className="text-xs text-blue-600 font-semibold mb-2 block">
                               {batch.days}
                             </span>
                           )}
 
                           <div className="space-y-1.5 my-2.5">
                             {batch.schedules.map((schedule, sIdx) => (
-                              <p key={sIdx} className="text-xs text-slate-300 flex items-start gap-1.5 leading-snug">
-                                <span className="text-[#0066FF] font-bold shrink-0">‚Ä¢</span>
+                              <p key={sIdx} className="text-xs text-slate-600 flex items-start gap-1.5 leading-snug">
+                                <span className="text-blue-600 font-bold shrink-0">‚Ä¢</span>
                                 <span>{schedule}</span>
                               </p>
                             ))}
                           </div>
                         </div>
 
-                        <div className="mt-3 pt-2.5 border-t border-white/10 flex items-baseline justify-between">
-                          <span className="text-xs text-slate-400">Total Fee:</span>
-                          <span className="text-xl font-black text-amber-400 font-display">
+                        <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-baseline justify-between">
+                          <span className="text-xs text-slate-500">Total Fee:</span>
+                          <span className="text-xl font-black text-blue-600 font-display">
                             {batch.price || activeFeeText}
                           </span>
                         </div>
@@ -633,9 +633,9 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
               </div>
             ) : (
               <>
-                {/* Standard Categories: 2. SELECT COURSE PLAN (TRIAL DEMO ‚Çπ49 VS FULL MONTHLY COURSE) */}
+                {/* Standard Categories: 2. SELECT COURSE PLAN */}
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-2">
                     2. CHOOSE YOUR PLAN (TRIAL OR MONTHLY COURSE)
                   </label>
 
@@ -645,28 +645,28 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
                       onClick={() => setPlanType('demo')}
                       className={`rounded-2xl p-4 transition-all border cursor-pointer relative flex flex-col justify-between ${
                         planType === 'demo'
-                          ? 'border-amber-400 bg-amber-500/15 shadow-lg shadow-amber-950/40 ring-1 ring-amber-400/60'
-                          : 'border-[#262832] bg-[#13151A] hover:border-slate-500'
+                          ? 'border-blue-600 bg-blue-50/70 shadow-md ring-2 ring-blue-500/20'
+                          : 'border-slate-200 bg-slate-50 hover:bg-slate-100/80 hover:border-slate-300'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-black uppercase tracking-wider text-white">
+                        <span className="text-xs font-black uppercase tracking-wider text-slate-900">
                           Trial Demo Class
                         </span>
                         <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                          planType === 'demo' ? 'border-amber-400 bg-amber-400' : 'border-slate-600'
+                          planType === 'demo' ? 'border-blue-600 bg-blue-600' : 'border-slate-300 bg-white'
                         }`}>
-                          {planType === 'demo' && <span className="w-1.5 h-1.5 rounded-full bg-black" />}
+                          {planType === 'demo' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
                         </span>
                       </div>
 
-                      <p className="text-[11px] text-slate-400 leading-snug">
+                      <p className="text-[11px] text-slate-600 leading-snug">
                         Experience the studio ambiance, meet coaches &amp; try 1 full class.
                       </p>
 
-                      <div className="mt-3 pt-2.5 border-t border-white/10 flex items-baseline justify-between">
-                        <span className="text-[11px] text-slate-400">Trial Fee:</span>
-                        <span className="text-xl font-extrabold text-amber-400 font-display">
+                      <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-baseline justify-between">
+                        <span className="text-[11px] text-slate-500">Trial Fee:</span>
+                        <span className="text-xl font-extrabold text-blue-600 font-display">
                           {demoPriceText}
                         </span>
                       </div>
@@ -677,29 +677,29 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
                       onClick={() => setPlanType('monthly')}
                       className={`rounded-2xl p-4 transition-all border cursor-pointer relative flex flex-col justify-between ${
                         planType === 'monthly'
-                          ? 'border-amber-400 bg-amber-500/15 shadow-lg shadow-amber-950/40 ring-1 ring-amber-400/60'
-                          : 'border-[#262832] bg-[#13151A] hover:border-slate-500'
+                          ? 'border-blue-600 bg-blue-50/70 shadow-md ring-2 ring-blue-500/20'
+                          : 'border-slate-200 bg-slate-50 hover:bg-slate-100/80 hover:border-slate-300'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-black uppercase tracking-wider text-white">
+                          <span className="text-xs font-black uppercase tracking-wider text-slate-900">
                             {isGymnastic ? (activeBatch?.name || '4 Days / Week') : 'Monthly Course'}
                           </span>
                           {((isGymnastic && (activeBatch?.badge === 'POPULAR' || !activeBatch?.badge)) || (!isGymnastic)) && (
-                            <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                            <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200">
                               POPULAR
                             </span>
                           )}
                         </div>
                         <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                          planType === 'monthly' ? 'border-amber-400 bg-amber-400' : 'border-slate-600'
+                          planType === 'monthly' ? 'border-blue-600 bg-blue-600' : 'border-slate-300 bg-white'
                         }`}>
-                          {planType === 'monthly' && <span className="w-1.5 h-1.5 rounded-full bg-black" />}
+                          {planType === 'monthly' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
                         </span>
                       </div>
 
-                      <p className="text-[11px] text-slate-400 leading-snug">
+                      <p className="text-[11px] text-slate-600 leading-snug">
                         {isGymnastic
                           ? (activeBatch?.name === '2 Days / Week'
                               ? 'Full total 8 sessions comprehensive training with stage & certificate track.'
@@ -709,11 +709,11 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
                           : 'Full 12 sessions comprehensive training with stage & certificate track.'}
                       </p>
 
-                      <div className="mt-3 pt-2.5 border-t border-white/10 flex items-baseline justify-between">
-                        <span className="text-[11px] text-slate-400">
+                      <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-baseline justify-between">
+                        <span className="text-[11px] text-slate-500">
                           {isGymnastic ? 'Plan Fee:' : 'Course Fee:'}
                         </span>
-                        <span className="text-xl font-extrabold text-amber-400 font-display">
+                        <span className="text-xl font-extrabold text-blue-600 font-display">
                           {activeBatch?.price || monthlyPriceText}
                         </span>
                       </div>
@@ -724,7 +724,7 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
                 {/* 3. SELECT BATCH & TIMINGS */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider">
+                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
                       3. SELECT BATCH &amp; TIMINGS
                     </label>
                   </div>
@@ -739,42 +739,42 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
                           onClick={() => handleSelectBatch(idx)}
                           className={`rounded-xl p-3.5 transition-all text-xs border relative ${
                             isFull
-                              ? 'border-red-900/60 bg-red-950/20 opacity-80 cursor-not-allowed'
+                              ? 'border-red-200 bg-red-50/60 opacity-80 cursor-not-allowed text-red-900'
                               : isSelected
-                              ? 'border-amber-400 bg-amber-500/15 ring-1 ring-amber-400/60 cursor-pointer shadow-md shadow-amber-950/40'
-                              : 'border-[#262832] bg-[#13151A] hover:border-slate-500 cursor-pointer'
+                              ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-500/20 cursor-pointer shadow-sm text-slate-900'
+                              : 'border-slate-200 bg-slate-50 hover:bg-slate-100/80 hover:border-slate-300 cursor-pointer text-slate-800'
                           }`}
                         >
-                          <div className="font-bold text-white text-xs sm:text-sm mb-1.5 flex items-center justify-between">
+                          <div className="font-bold text-slate-900 text-xs sm:text-sm mb-1.5 flex items-center justify-between">
                             <span className="flex items-center gap-1.5">
                               <span>{batch.name}</span>
                               {batch.days && (
-                                <span className="text-[10px] text-slate-400 font-normal">
+                                <span className="text-[10px] text-slate-500 font-normal">
                                   ({batch.days})
                                 </span>
                               )}
                             </span>
                             <div className="flex items-center gap-2">
                               {batch.badge === 'POPULAR' && (
-                                <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-amber-500/25 text-amber-300 border border-amber-500/40 tracking-wider">
+                                <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-blue-100 text-blue-700 border border-blue-200 tracking-wider">
                                   POPULAR
                                 </span>
                               )}
                               {batch.price && (
-                                <span className="text-[11px] font-extrabold text-amber-400 bg-amber-950/50 border border-amber-500/30 px-2 py-0.5 rounded-full">
+                                <span className="text-[11px] font-extrabold text-blue-700 bg-blue-100/80 border border-blue-200 px-2 py-0.5 rounded-full">
                                   {batch.price}
                                 </span>
                               )}
                               {isFull ? (
-                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/30">
+                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 border border-red-200">
                                   FULL
                                 </span>
                               ) : isSelected ? (
-                                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-xs shadow-amber-400/80" />
+                                <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shadow-xs shadow-blue-500/80" />
                               ) : null}
                             </div>
                           </div>
-                          <div className="space-y-1 text-slate-300">
+                          <div className="space-y-1 text-slate-600">
                             {batch.schedules
                               .filter((schedule) => !schedule.toLowerCase().startsWith('course fee'))
                               .map((schedule, sIdx) => (
@@ -794,7 +794,7 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
             {/* 4. NAME & MOBILE INPUTS */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
               <div>
-                <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                   YOUR FULL NAME *
                 </label>
                 <input
@@ -803,12 +803,12 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
                   placeholder="e.g. Rahul Sharma"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-[#14161C] border border-[#2B2E39] focus:border-[#0066FF] rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none transition-colors"
+                  className="w-full bg-slate-50 border border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none transition-colors shadow-xs"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                   MOBILE NUMBER *
                 </label>
                 <input
@@ -818,14 +818,14 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
                   placeholder="10-digit mobile number"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-[#14161C] border border-[#2B2E39] focus:border-[#0066FF] rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none transition-colors"
+                  className="w-full bg-slate-50 border border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none transition-colors shadow-xs"
                 />
               </div>
             </div>
 
             {/* 5. PREFERRED DATE INPUT */}
             <div>
-              <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                 PREFERRED STARTING DATE (OPTIONAL)
               </label>
               <div className="relative">
@@ -833,20 +833,20 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-full bg-[#14161C] border border-[#2B2E39] focus:border-[#0066FF] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors [color-scheme:dark]"
+                  className="w-full bg-slate-50 border border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none transition-colors shadow-xs [color-scheme:light]"
                 />
               </div>
             </div>
 
             {/* Error Message */}
             {errorMessage && (
-              <p className="text-red-400 text-xs font-semibold">{errorMessage}</p>
+              <p className="text-red-600 text-xs font-semibold">{errorMessage}</p>
             )}
 
-            {/* 6. PROCEED TO UPI PAYMENT BUTTON */}
+            {/* 6. PROCEED TO UPI PAYMENT BUTTON (Blue as requested!) */}
             <button
               type="submit"
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-[#0066FF] to-[#0052cc] hover:from-[#0052cc] hover:to-[#003d99] text-white font-extrabold text-sm sm:text-base flex items-center justify-center gap-2.5 transition-transform active:scale-[0.99] shadow-lg shadow-blue-600/25 cursor-pointer border border-blue-400/30"
+              className="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 via-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-extrabold text-sm sm:text-base flex items-center justify-center gap-2.5 transition-transform active:scale-[0.99] shadow-lg shadow-blue-600/30 cursor-pointer border border-blue-500/40"
             >
               <CreditCard className="w-4 h-4 text-white" />
               <span>PROCEED TO UPI PAYMENT ({activeFeeText})</span>
@@ -857,9 +857,9 @@ ${utrNumber.trim() ? `üî¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}‚
             <div className="text-center pt-1">
               <a
                 href={`tel:${studioInfo.phone}`}
-                className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 transition-colors"
               >
-                <Phone className="w-3.5 h-3.5 text-[#0066FF]" />
+                <Phone className="w-3.5 h-3.5 text-blue-600" />
                 <span>Prefer calling? {studioInfo.phoneDisplay}</span>
               </a>
             </div>
