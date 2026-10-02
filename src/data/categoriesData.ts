@@ -159,8 +159,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
         price: "₹1,249",
         schedules: [
           "Saturday — 5:00 PM",
-          "Sunday — 10:00 AM",
-          "Course Fee: ₹1,249 / month"
+          "Sunday — 10:00 AM"
         ]
       },
       {
@@ -171,8 +170,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
         schedules: [
           "Wednesday — 5:00 PM",
           "Friday — 5:00 PM",
-          "Saturday — 5:00 PM",
-          "Course Fee: ₹1,549 / month"
+          "Saturday — 5:00 PM"
         ]
       },
       {
@@ -185,8 +183,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
           "Wednesday — 5:00 PM",
           "Friday — 5:00 PM",
           "Saturday — 5:00 PM",
-          "Sunday — 10:00 AM",
-          "Course Fee: ₹1,950 / month"
+          "Sunday — 10:00 AM"
         ]
       }
     ]

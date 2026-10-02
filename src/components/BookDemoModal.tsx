@@ -144,8 +144,8 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
     return match ? match[0] : monthlyStr;
   };
 
-  const monthlyPriceText = (activeBatch?.price)
-    ? activeBatch.price
+  const monthlyPriceText = isGymnastic
+    ? '₹1,950'
     : getMonthlyPriceText(currentCategory.monthlyFee);
   const demoPriceText = currentCategory.demoPrice || '₹49';
 
@@ -756,7 +756,7 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                                   POPULAR
                                 </span>
                               )}
-                              {batch.price && planType === 'monthly' && (
+                              {batch.price && (
                                 <span className="text-[11px] font-extrabold text-amber-400 bg-amber-950/50 border border-amber-500/30 px-2 py-0.5 rounded-full">
                                   {batch.price}
                                 </span>
@@ -771,11 +771,13 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                             </div>
                           </div>
                           <div className="space-y-1 text-slate-300">
-                            {batch.schedules.map((schedule, sIdx) => (
-                              <div key={sIdx} className="leading-tight text-[11px] sm:text-xs">
-                                {schedule}
-                              </div>
-                            ))}
+                            {batch.schedules
+                              .filter((schedule) => !schedule.toLowerCase().startsWith('course fee'))
+                              .map((schedule, sIdx) => (
+                                <div key={sIdx} className="leading-tight text-[11px] sm:text-xs">
+                                  {schedule}
+                                </div>
+                              ))}
                           </div>
                         </div>
                       );
