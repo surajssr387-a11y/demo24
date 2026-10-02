@@ -4,7 +4,9 @@ import {
   Volume2,
   VolumeX,
   X,
+  Video,
 } from 'lucide-react';
+import { ChangeVideoModal } from './ChangeVideoModal';
 
 export interface ChoreographyPerformanceItem {
   id: string;
@@ -76,6 +78,28 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
   const [performances, setPerformances] = useState<ChoreographyPerformanceItem[]>(DEFAULT_PERFORMANCES);
   const [activeModalVideo, setActiveModalVideo] = useState<ChoreographyPerformanceItem | null>(null);
   const [modalIsMuted, setModalIsMuted] = useState<boolean>(false);
+  const [changingItem, setChangingItem] = useState<ChoreographyPerformanceItem | null>(null);
+
+  const handleSaveVideo = async (newVideoUrl: string) => {
+    if (!changingItem) return;
+    const updated = performances.map((p) =>
+      p.id === changingItem.id ? { ...p, videoUrl: newVideoUrl } : p
+    );
+    setPerformances(updated);
+    if (activeModalVideo && activeModalVideo.id === changingItem.id) {
+      setActiveModalVideo({ ...activeModalVideo, videoUrl: newVideoUrl });
+    }
+    try {
+      localStorage.setItem('ramys_choreography_performances_v1', JSON.stringify(updated));
+      await fetch('/api/choreography-performances', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated),
+      });
+    } catch (e) {
+      console.error('Error saving choreography video:', e);
+    }
+  };
 
   // Sync saved performances from server on mount
   useEffect(() => {
@@ -174,6 +198,22 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
                       <Play className="w-5 h-5 fill-neutral-950 ml-0.5" />
                     </div>
                   </button>
+
+                  {/* Change Video Button - SPECIFICALLY on Free Style Dance (Card 5) */}
+                  {item.id === 'choreo-5' && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setChangingItem(item);
+                      }}
+                      title="Change Video for Free Style Dance"
+                      className="absolute top-3 right-3 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/80 hover:bg-black text-white text-xs font-bold backdrop-blur-md border border-white/20 shadow-lg transition-all hover:scale-105 active:scale-95 cursor-pointer opacity-90 group-hover:opacity-100"
+                    >
+                      <Video className="w-3.5 h-3.5 text-[#0066FF]" />
+                      <span>Change Video</span>
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -195,6 +235,16 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
                   {activeModalVideo.title}
                 </span>
                 <span className="text-[11px] text-neutral-400">Studio Performance</span>
+                {activeModalVideo.id === 'choreo-5' && (
+                  <button
+                    type="button"
+                    onClick={() => setChangingItem(activeModalVideo)}
+                    className="flex items-center gap-1.5 text-[11px] font-bold text-slate-200 hover:text-white bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-lg transition-colors cursor-pointer ml-1 border border-white/10"
+                  >
+                    <Video className="w-3 h-3 text-blue-400" />
+                    <span>Change Video</span>
+                  </button>
+                )}
               </div>
               <button
                 onClick={() => setActiveModalVideo(null)}
@@ -255,6 +305,17 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
             </div>
           </div>
         </div>
+      )}
+
+      {/* Change Video Modal */}
+      {changingItem && (
+        <ChangeVideoModal
+          isOpen={!!changingItem}
+          onClose={() => setChangingItem(null)}
+          title={changingItem.title}
+          currentVideoUrl={changingItem.videoUrl}
+          onSave={handleSaveVideo}
+        />
       )}
     </section>
   );
