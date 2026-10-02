@@ -572,7 +572,7 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
-                    {isHomeService ? '2. SELECT HOME SERVICE PACKAGE' : '2. SELECT PACKAGE / BATCH'}
+                    {isHomeService ? '2. SELECT HOME SERVICE PACKAGE' : '2. SELECT PACKAGE'}
                   </label>
                   <span className="text-xs font-black text-blue-600 font-display">
                     {activeFeeText}
@@ -721,11 +721,11 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
                   </div>
                 </div>
 
-                {/* 3. SELECT BATCH & TIMINGS */}
+                {/* 3. SELECT TIMINGS */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
-                      3. SELECT BATCH &amp; TIMINGS
+                      3. SELECT TIMINGS
                     </label>
                   </div>
                   <div className={`grid gap-2.5 ${currentBatches.length > 1 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
