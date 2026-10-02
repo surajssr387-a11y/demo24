@@ -523,11 +523,7 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
               <div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-display tracking-tight flex items-baseline gap-2">
                   <span>
-                    {isHomeService
-                      ? `HOME SERVICE – ${activeFeeText}`
-                      : isSpecialCategory
-                      ? `${currentCategory.title.toUpperCase()} – ${activeFeeText}`
-                      : `BOOK ADMISSION – ${activeFeeText}`}
+                    {currentCategory.title}
                   </span>
                 </h2>
               </div>
