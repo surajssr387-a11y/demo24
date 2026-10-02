@@ -53,7 +53,7 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
           </h2>
         </div>
 
-        {/* Categories Grid (3 columns on desktop, Wedding spans full width) */}
+        {/* Categories Grid (3 columns on desktop, Wedding centered in its row with same size) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
           {displayCategories.map((category: CategoryItem) => {
             const isWedding = category.id === 'wedding-choreography' || category.title.toLowerCase().includes('wedding');
@@ -63,17 +63,13 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
                 key={category.id}
                 onClick={() => onSelectCategory(category.title)}
                 className={`group cursor-pointer flex flex-col select-none relative ${
-                  isWedding ? 'col-span-1 sm:col-span-2 lg:col-span-3' : ''
+                  isWedding
+                    ? 'sm:col-span-2 sm:w-full sm:max-w-[420px] sm:mx-auto lg:col-span-1 lg:col-start-2 lg:max-w-none lg:mx-0'
+                    : ''
                 }`}
               >
-                {/* Card Container (Wedding takes full width with sleek cinematic aspect ratio) */}
-                <div
-                  className={`relative w-full ${
-                    isWedding
-                      ? 'aspect-[16/9] sm:aspect-[21/9] lg:aspect-[3.2/1] min-h-[220px] max-h-[380px]'
-                      : 'aspect-[16/10.5]'
-                  } rounded-2xl overflow-hidden bg-neutral-100 border border-neutral-200/90 shadow-xs transition-all duration-300 group-hover:scale-[1.01] group-hover:shadow-md group-hover:border-neutral-300`}
-                >
+                {/* Card Container: Identical size & aspect-ratio across all cards */}
+                <div className="relative w-full aspect-[16/10.5] rounded-2xl overflow-hidden bg-neutral-100 border border-neutral-200/90 shadow-xs transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-md group-hover:border-neutral-300">
                   {/* Media: Video if present, else Image */}
                   {category.videoUrl ? (
                     <video
@@ -89,9 +85,7 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
                     <img
                       src={category.imageUrl}
                       alt={category.title}
-                      className={`w-full h-full object-cover ${
-                        isWedding ? 'object-[center_35%]' : 'object-center'
-                      } transition-all duration-300 group-hover:brightness-105`}
+                      className="w-full h-full object-cover object-center transition-all duration-300 group-hover:brightness-105"
                       loading="lazy"
                       referrerPolicy="no-referrer"
                     />
