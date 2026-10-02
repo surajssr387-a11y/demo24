@@ -214,21 +214,23 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
           <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
             <div className="relative w-full max-w-4xl bg-neutral-950 border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col">
               {/* Modal Header */}
-              <div className="flex items-center justify-between px-5 py-3.5 bg-neutral-900 border-b border-neutral-800 text-white">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="font-extrabold text-sm sm:text-base text-white font-display">
+              <div className="flex items-center justify-between px-5 py-4 bg-neutral-900 border-b border-neutral-800 text-white">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="font-extrabold text-base sm:text-lg md:text-xl text-white font-display tracking-tight">
                     {displayModalTitle}
                   </span>
-                  <span className="text-[11px] text-neutral-400">Studio Performance</span>
+                  <span className="hidden sm:inline text-xs sm:text-sm text-neutral-300 font-semibold bg-neutral-800/80 px-2.5 py-0.5 rounded-full border border-neutral-700">
+                    Studio Performance
+                  </span>
                 </div>
                 <button
                   onClick={() => setActiveModalVideo(null)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-200 hover:text-white text-xs sm:text-sm font-bold transition-all border border-neutral-700 active:scale-95 cursor-pointer shadow-xs"
-                  title="Back"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-sm sm:text-base font-black transition-all border-2 border-neutral-600 active:scale-95 cursor-pointer shadow-md"
+                  title="Back to Choreography"
                 >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span>Back</span>
+                  <ArrowLeft className="w-5 h-5 text-amber-300 stroke-[2.5]" />
+                  <span className="tracking-wide uppercase text-xs sm:text-sm">Back</span>
                 </button>
               </div>
 
@@ -249,20 +251,20 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
               </div>
 
               {/* Modal Footer with Actions */}
-              <div className="px-5 py-3.5 bg-neutral-900/90 border-t border-neutral-800 flex flex-wrap items-center justify-between gap-3 text-white">
-                <div className="flex items-center gap-2.5">
+              <div className="px-5 py-4 bg-neutral-900 border-t border-neutral-800 flex flex-wrap items-center justify-between gap-3 text-white">
+                <div className="flex items-center gap-3">
                   <button
                     onClick={() => setActiveModalVideo(null)}
-                    className="flex items-center gap-1.5 text-xs font-bold text-neutral-300 hover:text-white bg-neutral-800 hover:bg-neutral-700 px-3 py-1.5 rounded-lg border border-neutral-700 cursor-pointer transition-colors"
+                    className="flex items-center gap-2 text-sm sm:text-base font-extrabold text-white bg-neutral-800 hover:bg-neutral-700 px-4 py-2.5 rounded-xl border border-neutral-600 cursor-pointer transition-colors shadow-sm"
                   >
-                    <ArrowLeft className="w-4 h-4" />
+                    <ArrowLeft className="w-5 h-5 text-amber-300 stroke-[2.5]" />
                     <span>Back</span>
                   </button>
                   <button
                     onClick={() => setModalIsMuted(!modalIsMuted)}
-                    className="flex items-center gap-1.5 text-xs font-bold text-neutral-300 hover:text-white bg-neutral-800 hover:bg-neutral-700 px-3 py-1.5 rounded-lg border border-neutral-700 cursor-pointer transition-colors"
+                    className="flex items-center gap-2 text-sm sm:text-base font-bold text-neutral-200 hover:text-white bg-neutral-800 hover:bg-neutral-700 px-4 py-2.5 rounded-xl border border-neutral-700 cursor-pointer transition-colors"
                   >
-                    {modalIsMuted ? <VolumeX className="w-4 h-4 text-amber-400" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
+                    {modalIsMuted ? <VolumeX className="w-5 h-5 text-amber-400" /> : <Volume2 className="w-5 h-5 text-emerald-400" />}
                     <span>{modalIsMuted ? 'Unmute Sound' : 'Mute Sound'}</span>
                   </button>
                 </div>
@@ -284,7 +286,7 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
                       setActiveModalVideo(null);
                       onOpenBooking?.(categoryName);
                     }}
-                    className="bg-[#0066FF] hover:bg-[#0052cc] text-white px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold shadow-md transition-all active:scale-95 cursor-pointer"
+                    className="bg-[#0066FF] hover:bg-[#0052cc] text-white px-6 py-2.5 rounded-xl text-sm sm:text-base font-extrabold shadow-md transition-all active:scale-95 cursor-pointer"
                   >
                     {isWedding ? 'Book Wedding Choreography' : 'Join This Batch / Book Demo ₹49'}
                   </button>
