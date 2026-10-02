@@ -79,7 +79,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
   });
 
   // Course Plan: 'demo' (Trial) vs 'monthly' (Full Course)
-  const [planType, setPlanType] = useState<'demo' | 'monthly'>('demo');
+  const [planType, setPlanType] = useState<'demo' | 'monthly'>('monthly');
 
   // Multi-step booking flow: 'form' -> 'payment' -> 'success'
   const [step, setStep] = useState<'form' | 'payment' | 'success'>('form');
@@ -103,7 +103,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
       setSelectedCatId(cat.id);
       const popIdx = cat.batches?.findIndex((b) => b.badge === 'POPULAR');
       setSelectedBatchIndex(popIdx !== undefined && popIdx >= 0 ? popIdx : 0);
-      setPlanType('demo');
+      setPlanType('monthly');
       setStep('form');
       setErrorMessage('');
       setLastWhatsAppUrl('');
@@ -176,9 +176,8 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
     }
     setErrorMessage('');
     setSelectedBatchIndex(index);
-    if (target?.price) {
-      setPlanType('monthly');
-    }
+    // Always activate monthly course so the batch fee is displayed in Proceed to Payment
+    setPlanType('monthly');
   };
 
   const handleCopyUpi = () => {
