@@ -4,7 +4,7 @@ import { studioInfo } from '../data/danceData';
 import { RealInstagramIcon, RealYoutubeIcon, RealWhatsappIcon } from './BrandIcons';
 
 interface FooterSectionProps {
-  onOpenBooking: () => void;
+  onOpenBooking: (category?: string) => void;
 }
 
 export const FooterSection: React.FC<FooterSectionProps> = ({ onOpenBooking }) => {
@@ -41,7 +41,8 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ onOpenBooking }) =
             {/* CTAs with clean matte styling */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <button
-                onClick={onOpenBooking}
+                type="button"
+                onClick={() => onOpenBooking('Kids Dance')}
                 className="bg-[#0066FF] hover:bg-[#0052cc] text-white font-extrabold text-xs sm:text-sm px-6 py-2.5 rounded-full transition-all shadow-sm active:scale-95 cursor-pointer"
               >
                 BOOK DEMO {studioInfo.demoPriceText}

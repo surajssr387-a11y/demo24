@@ -35,9 +35,11 @@ export default function App() {
       });
   }, []);
 
-  const handleOpenBooking = (category?: string) => {
-    if (category) {
-      setSelectedCategoryForBooking(category);
+  const handleOpenBooking = (category?: unknown) => {
+    if (typeof category === 'string' && category.trim()) {
+      setSelectedCategoryForBooking(category.trim());
+    } else {
+      setSelectedCategoryForBooking('Kids Dance');
     }
     setBookingModalOpen(true);
   };

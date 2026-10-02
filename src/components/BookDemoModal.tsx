@@ -34,30 +34,44 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
     : loadCategories();
 
   // Helper to find category from string
-  const findCategory = (rawName?: string): CategoryItem => {
-    if (!rawName) return activeCategories[0];
+  const findCategory = (rawName?: unknown): CategoryItem => {
+    const fallback = (activeCategories && activeCategories[0]) || {
+      id: 'kids-dance',
+      title: 'Kids dance',
+      imageUrl: '/kids-dance.jpg',
+      pillTag: 'FOUNDATIONAL',
+      levelLabel: 'LEVEL 1',
+      description: 'Rhythm, Coordination & Confidence',
+      demoPrice: '₹49',
+      feeLabel: 'Demo Registration Fee',
+      monthlyFee: '₹1,500 / month (12 sessions)',
+      trialInfo: 'Trial Class Available',
+      batches: []
+    };
+
+    if (typeof rawName !== 'string' || !rawName.trim()) return fallback;
     const lower = rawName.trim().toLowerCase();
 
     // Exact title match
-    const byTitle = activeCategories.find((c) => c.title.toLowerCase() === lower);
+    const byTitle = activeCategories.find((c) => c && c.title && c.title.toLowerCase() === lower);
     if (byTitle) return byTitle;
 
     // Exact id match
-    const byId = activeCategories.find((c) => c.id.toLowerCase() === lower);
+    const byId = activeCategories.find((c) => c && c.id && c.id.toLowerCase() === lower);
     if (byId) return byId;
 
     // Partial keywords
-    if (lower.includes('kid')) return activeCategories.find((c) => c.id === 'kids-dance') || activeCategories[0];
-    if (lower.includes('senior') || lower.includes('beginner')) return activeCategories.find((c) => c.id === 'senior-beginner') || activeCategories[0];
-    if (lower.includes('advance')) return activeCategories.find((c) => c.id === 'advance') || activeCategories[0];
-    if (lower.includes('gym') || lower.includes('free') || lower.includes('style')) return activeCategories.find((c) => c.id === 'gymnastic') || activeCategories[0];
-    if (lower.includes('bollywood') || lower.includes('ladies') || lower.includes('girl')) return activeCategories.find((c) => c.id === 'bollywood-ladies') || activeCategories[0];
-    if (lower.includes('private')) return activeCategories.find((c) => c.id === 'private-class') || activeCategories[0];
-    if (lower.includes('home')) return activeCategories.find((c) => c.id === 'home-service') || activeCategories[0];
-    if (lower.includes('job')) return activeCategories.find((c) => c.id === 'job-person') || activeCategories[0];
-    if (lower.includes('wedding') || lower.includes('weeding')) return activeCategories.find((c) => c.id === 'wedding-choreography') || activeCategories[0];
+    if (lower.includes('kid')) return activeCategories.find((c) => c && c.id === 'kids-dance') || fallback;
+    if (lower.includes('senior') || lower.includes('beginner')) return activeCategories.find((c) => c && c.id === 'senior-beginner') || fallback;
+    if (lower.includes('advance')) return activeCategories.find((c) => c && c.id === 'advance') || fallback;
+    if (lower.includes('gym') || lower.includes('free') || lower.includes('style')) return activeCategories.find((c) => c && c.id === 'gymnastic') || fallback;
+    if (lower.includes('bollywood') || lower.includes('ladies') || lower.includes('girl')) return activeCategories.find((c) => c && c.id === 'bollywood-ladies') || fallback;
+    if (lower.includes('private')) return activeCategories.find((c) => c && c.id === 'private-class') || fallback;
+    if (lower.includes('home')) return activeCategories.find((c) => c && c.id === 'home-service') || fallback;
+    if (lower.includes('job')) return activeCategories.find((c) => c && c.id === 'job-person') || fallback;
+    if (lower.includes('wedding') || lower.includes('weeding')) return activeCategories.find((c) => c && c.id === 'wedding-choreography') || fallback;
 
-    return activeCategories[0];
+    return fallback;
   };
 
   const [selectedCatId, setSelectedCatId] = useState<string>(() => {
@@ -99,8 +113,11 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
 
   if (!isOpen) return null;
 
-  const currentCategory = activeCategories.find((c) => c.id === selectedCatId) || activeCategories[0];
-  const currentBatches = currentCategory.batches && currentCategory.batches.length > 0
+  const currentCategory =
+    (activeCategories && activeCategories.find((c) => c && c.id === selectedCatId)) ||
+    (activeCategories && activeCategories[0]) ||
+    DEFAULT_CATEGORIES[0];
+  const currentBatches = currentCategory?.batches && currentCategory.batches.length > 0
     ? currentCategory.batches
     : [
         {
