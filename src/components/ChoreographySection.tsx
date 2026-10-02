@@ -43,7 +43,7 @@ const DEFAULT_PERFORMANCES: ChoreographyPerformanceItem[] = [
   },
   {
     id: 'choreo-4',
-    title: 'Girls Choreography',
+    title: 'Wedding Choreography',
     videoUrl: '/choreography/choreo-ladies.mp4',
     xPosition: 50,
     yPosition: 25,
@@ -60,7 +60,7 @@ const DEFAULT_PERFORMANCES: ChoreographyPerformanceItem[] = [
   },
   {
     id: 'choreo-6',
-    title: 'Wedding Choreography',
+    title: 'Private Class Choreography',
     videoUrl: '/choreography/choreo-private.mp4',
     yPosition: 18,
     brightness: 1.05,
@@ -84,6 +84,13 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
           const cleaned = data.map((item, idx) => {
+            // Strictly enforce Wedding Choreography for card 4 or if previously labeled Girls Choreography
+            if (item.id === 'choreo-4' || (item.title && item.title.toLowerCase().includes('girl'))) {
+              return { ...item, title: 'Wedding Choreography' };
+            }
+            if (item.id === 'choreo-6') {
+              return { ...item, title: 'Private Class Choreography' };
+            }
             if (!item.videoUrl || item.videoUrl.startsWith('blob:')) {
               const fallback = DEFAULT_PERFORMANCES[idx] || DEFAULT_PERFORMANCES[0];
               return { ...item, videoUrl: fallback.videoUrl };
@@ -128,6 +135,9 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
         {/* 3x3 / 3-Column Grid of Dance Performance Videos */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
           {performances.map((item) => {
+            const isItemWedding = item.id === 'choreo-4' || item.title.toLowerCase().includes('wedding');
+            const itemTitle = isItemWedding ? 'Wedding Choreography' : item.title;
+
             return (
               <div
                 key={item.id}
@@ -164,7 +174,10 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
                   {/* Play Overlay Button (Opens Theater Modal with sound) */}
                   <button
                     onClick={() => {
-                      setActiveModalVideo(item);
+                      setActiveModalVideo({
+                        ...item,
+                        title: itemTitle,
+                      });
                       setModalIsMuted(false);
                     }}
                     title="Watch performance video with sound"
@@ -175,6 +188,11 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
                     </div>
                   </button>
                 </div>
+
+                {/* Performance Title Label */}
+                <h3 className="mt-3 text-center font-bold text-neutral-950 text-sm sm:text-base md:text-lg tracking-tight group-hover:text-[#0066FF] transition-colors">
+                  {itemTitle}
+                </h3>
               </div>
             );
           })}
@@ -184,83 +202,88 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
       {/* ========================================================= */}
       {/* FULL THEATER VIDEO PLAYER MODAL (WITH SOUND & FULLSCREEN) */}
       {/* ========================================================= */}
-      {activeModalVideo && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="relative w-full max-w-4xl bg-neutral-950 border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 bg-neutral-900 border-b border-neutral-800 text-white">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="font-extrabold text-sm sm:text-base text-white font-display">
-                  {activeModalVideo.title}
-                </span>
-                <span className="text-[11px] text-neutral-400">Studio Performance</span>
-              </div>
-              <button
-                onClick={() => setActiveModalVideo(null)}
-                className="text-neutral-400 hover:text-white p-1 rounded-lg hover:bg-neutral-800 transition-colors cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+      {activeModalVideo && (() => {
+        const isWedding =
+          activeModalVideo.id === 'choreo-4' ||
+          activeModalVideo.title.toLowerCase().includes('wedding') ||
+          activeModalVideo.title.toLowerCase().includes('girl');
+        const displayModalTitle = isWedding ? 'Wedding Choreography' : activeModalVideo.title;
 
-            {/* Video Player */}
-            <div className="relative w-full aspect-video bg-black flex items-center justify-center overflow-hidden">
-              <video
-                src={activeModalVideo.videoUrl}
-                autoPlay
-                controls
-                playsInline
-                muted={modalIsMuted}
-                style={{
-                  objectPosition: `${activeModalVideo.xPosition ?? 50}% ${activeModalVideo.yPosition}%`,
-                  filter: `brightness(${activeModalVideo.brightness}) contrast(${activeModalVideo.contrast || 1.04})`,
-                }}
-                className="w-full h-full object-contain"
-              />
-            </div>
-
-            {/* Modal Footer with Actions */}
-            <div className="px-5 py-3.5 bg-neutral-900/90 border-t border-neutral-800 flex flex-wrap items-center justify-between gap-3 text-white">
-              <div className="flex items-center gap-3">
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+            <div className="relative w-full max-w-4xl bg-neutral-950 border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+              {/* Modal Header */}
+              <div className="flex items-center justify-between px-5 py-3.5 bg-neutral-900 border-b border-neutral-800 text-white">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="font-extrabold text-sm sm:text-base text-white font-display">
+                    {displayModalTitle}
+                  </span>
+                  <span className="text-[11px] text-neutral-400">Studio Performance</span>
+                </div>
                 <button
-                  onClick={() => setModalIsMuted(!modalIsMuted)}
-                  className="flex items-center gap-1.5 text-xs font-bold text-neutral-300 hover:text-white bg-neutral-800 px-3 py-1.5 rounded-lg cursor-pointer"
+                  onClick={() => setActiveModalVideo(null)}
+                  className="text-neutral-400 hover:text-white p-1 rounded-lg hover:bg-neutral-800 transition-colors cursor-pointer"
                 >
-                  {modalIsMuted ? <VolumeX className="w-4 h-4 text-amber-400" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
-                  <span>{modalIsMuted ? 'Unmute Sound' : 'Mute Sound'}</span>
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => {
-                    const isWedding = activeModalVideo.title.toLowerCase().includes('wedding');
-                    const categoryName = isWedding
-                      ? 'Wedding Choreography'
-                      : activeModalVideo.title.includes('Kids')
-                      ? 'Kids Dance'
-                      : activeModalVideo.title.includes('Bollywood') || activeModalVideo.title.includes('Girls') || activeModalVideo.title.includes('Ladies')
-                      ? 'Bollywood Ladies'
-                      : activeModalVideo.title.includes('Private')
-                      ? 'Private Class'
-                      : activeModalVideo.title.includes('Style') || activeModalVideo.title.includes('Free')
-                      ? 'Gymnastic'
-                      : 'Advance';
-                    setActiveModalVideo(null);
-                    onOpenBooking?.(categoryName);
+              {/* Video Player */}
+              <div className="relative w-full aspect-video bg-black flex items-center justify-center overflow-hidden">
+                <video
+                  src={activeModalVideo.videoUrl}
+                  autoPlay
+                  controls
+                  playsInline
+                  muted={modalIsMuted}
+                  style={{
+                    objectPosition: `${activeModalVideo.xPosition ?? 50}% ${activeModalVideo.yPosition}%`,
+                    filter: `brightness(${activeModalVideo.brightness}) contrast(${activeModalVideo.contrast || 1.04})`,
                   }}
-                  className="bg-[#0066FF] hover:bg-[#0052cc] text-white px-5 py-2 rounded-xl text-xs font-extrabold shadow-md transition-all active:scale-95 cursor-pointer"
-                >
-                  {activeModalVideo.title.toLowerCase().includes('wedding')
-                    ? 'Book Wedding Choreography'
-                    : 'Join This Batch / Book Demo ₹49'}
-                </button>
+                  className="w-full h-full object-contain"
+                />
+              </div>
+
+              {/* Modal Footer with Actions */}
+              <div className="px-5 py-3.5 bg-neutral-900/90 border-t border-neutral-800 flex flex-wrap items-center justify-between gap-3 text-white">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setModalIsMuted(!modalIsMuted)}
+                    className="flex items-center gap-1.5 text-xs font-bold text-neutral-300 hover:text-white bg-neutral-800 px-3 py-1.5 rounded-lg cursor-pointer"
+                  >
+                    {modalIsMuted ? <VolumeX className="w-4 h-4 text-amber-400" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
+                    <span>{modalIsMuted ? 'Unmute Sound' : 'Mute Sound'}</span>
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      const categoryName = isWedding
+                        ? 'Wedding Choreography'
+                        : activeModalVideo.title.includes('Kids')
+                        ? 'Kids Dance'
+                        : activeModalVideo.title.includes('Bollywood') || activeModalVideo.title.includes('Ladies')
+                        ? 'Bollywood Ladies'
+                        : activeModalVideo.title.includes('Private')
+                        ? 'Private Class'
+                        : activeModalVideo.title.includes('Style') || activeModalVideo.title.includes('Free')
+                        ? 'Gymnastic'
+                        : 'Advance';
+                      setActiveModalVideo(null);
+                      onOpenBooking?.(categoryName);
+                    }}
+                    className="bg-[#0066FF] hover:bg-[#0052cc] text-white px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold shadow-md transition-all active:scale-95 cursor-pointer"
+                  >
+                    {isWedding ? 'Book Wedding Choreography' : 'Join This Batch / Book Demo ₹49'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </section>
   );
 };

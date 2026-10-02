@@ -25,7 +25,7 @@
   },
   {
     "id": "choreo-4",
-    "title": "Girls Choreography",
+    "title": "Wedding Choreography",
     "videoUrl": "/choreography/choreo-ladies.mp4",
     "xPosition": 50,
     "yPosition": 25,
@@ -42,7 +42,7 @@
   },
   {
     "id": "choreo-6",
-    "title": "Wedding Choreography",
+    "title": "Private Class Choreography",
     "videoUrl": "/choreography/choreo-private.mp4",
     "yPosition": 18,
     "brightness": 1.05,
