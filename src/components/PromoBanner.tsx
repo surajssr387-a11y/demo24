@@ -1,4 +1,5 @@
 import React from 'react';
+import { studioInfo } from '../data/danceData';
 
 interface PromoBannerProps {
   onOpenBooking: (category?: string) => void;
@@ -41,20 +42,20 @@ export const PromoBanner: React.FC<PromoBannerProps> = ({ onOpenBooking }) => {
           title="Open Location on Google Maps: 2nd Floor, Metro Market, Ranchi"
         />
 
-        {/* 2. Phone Call Link -> tel:9692451182 */}
+        {/* 2. Phone Call Link -> tel:8340158178 */}
         <a
-          href="tel:9692451182"
+          href={`tel:${studioInfo.phone}`}
           className="absolute bottom-[8%] right-0 w-[18%] h-[8%] cursor-pointer z-10"
-          title="Call 9692451182"
+          title={`Call ${studioInfo.phoneDisplay}`}
         />
 
-        {/* 3. WhatsApp Link -> wa.me/919692451182 */}
+        {/* 3. WhatsApp Link -> wa.me/918340158178 */}
         <a
-          href="https://wa.me/919692451182?text=Hello%20Ramy's%20Dance%20Studio,%20I%20want%20to%20inquire%20about%20dance%20classes."
+          href={`https://wa.me/${studioInfo.whatsappNumber}?text=Hello%20Ramy's%20Dance%20Studio,%20I%20want%20to%20inquire%20about%20dance%20classes.`}
           target="_blank"
           rel="noopener noreferrer"
           className="absolute bottom-0 right-0 w-[18%] h-[8%] cursor-pointer z-10"
-          title="Chat on WhatsApp: 9692451182"
+          title={`Chat on WhatsApp: ${studioInfo.phoneDisplay}`}
         />
       </div>
     </section>

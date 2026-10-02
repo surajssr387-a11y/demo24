@@ -161,9 +161,9 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
   // Numeric amount for UPI
   const numericAmount = parseInt(activeFeeText.replace(/[^\d]/g, ''), 10) || (planType === 'monthly' ? 1950 : 49);
 
-  // Studio UPI details (sanjeev biruly / 9692451182@fam)
-  const upiPayee = studioInfo.upiPayeeName || 'sanjeev biruly';
-  const studioUpiId = studioInfo.upiId || '9692451182@fam';
+  // Studio UPI details (RAM SINGH BABLU / 8340158178@ybi)
+  const upiPayee = studioInfo.upiPayeeName || 'RAM SINGH BABLU';
+  const studioUpiId = studioInfo.upiId || '8340158178@ybi';
   const upiPayNote = isSpecialCategory
     ? `${currentCategory.title} ${activeBatch?.name || 'Package'}`
     : `${currentCategory.title} ${planType === 'monthly' ? (isGymnastic ? `${activeBatch?.name || 'Course'} (${activeFeeText})` : 'Monthly Course') : 'Demo ₹49'}`;
@@ -443,10 +443,10 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                     className="w-48 h-48 sm:w-52 sm:h-52 object-contain rounded-lg"
                     loading="eager"
                   />
-                  {/* Central Emblem Badge */}
+                  {/* Central Emblem Badge - PhonePe */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-10 h-10 rounded-full bg-white border-2 border-amber-500 shadow-md flex items-center justify-center">
-                      <span className="text-base select-none">🕊️</span>
+                    <div className="w-9 h-9 rounded-full bg-[#5f259f] border-2 border-white shadow-md flex items-center justify-center">
+                      <span className="text-white font-extrabold text-sm select-none">पे</span>
                     </div>
                   </div>
                 </div>

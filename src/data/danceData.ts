@@ -25,9 +25,9 @@ export const studioInfo: StudioInfo = {
   name: "RAMY'S DANCE STUDIO",
   brandKicker: "RAMY'S",
   brandMain: "DANCE STUDIO",
-  phone: "9692451182",
-  phoneDisplay: "9692451182",
-  whatsappNumber: "919692451182",
+  phone: "8340158178",
+  phoneDisplay: "8340158178",
+  whatsappNumber: "918340158178",
   address: "2nd Floor, Metro Market, Kutchery Road, Ranchi - 834002, Jharkhand, India",
   googleMapsUrl: "https://maps.google.com/?q=Metro+Market+Kutchery+Road+Ranchi+Jharkhand+834002",
   instagramHandle: "@ramysdancestudio",
@@ -40,6 +40,6 @@ export const studioInfo: StudioInfo = {
     sunday: "Sunday: 8:00 AM – 5:00 PM"
   },
   demoPriceText: "₹49",
-  upiId: "9692451182@fam",
-  upiPayeeName: "sanjeev biruly"
+  upiId: "8340158178@ybi",
+  upiPayeeName: "RAM SINGH BABLU"
 };
