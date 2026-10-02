@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, X, ZoomIn, Sliders } from 'lucide-react';
-import { MediaCustomizationModal, MediaCustomizationConfig } from './MediaCustomizationModal';
+import { Play, X, ZoomIn } from 'lucide-react';
 
 export interface AchievementMediaItem {
   id: string;
@@ -93,27 +92,6 @@ export const AchievementsSection: React.FC = () => {
   const [items, setItems] = useState<AchievementMediaItem[]>(DEFAULT_ACHIEVEMENTS);
   const [activeVideo, setActiveVideo] = useState<AchievementMediaItem | null>(null);
   const [activePhoto, setActivePhoto] = useState<AchievementMediaItem | null>(null);
-  const [customizingItem, setCustomizingItem] = useState<AchievementMediaItem | null>(null);
-
-  const handleSaveCustomization = async (newConfig: MediaCustomizationConfig) => {
-    if (!customizingItem) return;
-    const updated = items.map((it) =>
-      it.id === customizingItem.id
-        ? { ...it, ...newConfig }
-        : it
-    );
-    setItems(updated);
-    try {
-      localStorage.setItem('ramys_achievements_config_v1', JSON.stringify(updated));
-      await fetch('/api/achievements', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updated),
-      });
-    } catch (e) {
-      console.error('Failed to save achievements customization:', e);
-    }
-  };
 
   // Sync latest achievements from server if available
   useEffect(() => {
@@ -172,20 +150,6 @@ export const AchievementsSection: React.FC = () => {
 
                   {/* Gentle hover overlay */}
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/25 transition-colors" />
-
-                  {/* Quick Customize / Adjust Button */}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setCustomizingItem(item);
-                    }}
-                    title="Customize framing & brightness (left-right, upar-niche, brightness)"
-                    className="absolute bottom-3 right-3 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-black/75 hover:bg-black text-white text-xs font-bold backdrop-blur-md border border-white/20 shadow-md transition-all hover:scale-105 active:scale-95 cursor-pointer opacity-90 group-hover:opacity-100"
-                  >
-                    <Sliders className="w-3.5 h-3.5 text-[#0066FF]" />
-                    <span>Customize</span>
-                  </button>
 
                   {/* Video Badge / Play Indicator */}
                   {isVideo ? (
@@ -251,8 +215,8 @@ export const AchievementsSection: React.FC = () => {
               />
             </div>
             {activeVideo.title && (
-              <div className="w-full p-4 bg-neutral-950 border-t border-white/10 text-center">
-                <h3 className="text-base sm:text-lg font-bold text-white font-display">
+              <div className="p-4 text-center">
+                <h3 className="text-base sm:text-xl font-bold text-white font-display">
                   {activeVideo.title}
                 </h3>
               </div>
@@ -295,24 +259,6 @@ export const AchievementsSection: React.FC = () => {
             )}
           </div>
         </div>
-      )}
-
-      {/* Media Customization Modal */}
-      {customizingItem && (
-        <MediaCustomizationModal
-          isOpen={!!customizingItem}
-          onClose={() => setCustomizingItem(null)}
-          title={customizingItem.title || 'Studio Achievement Photo'}
-          mediaType={customizingItem.type === 'video' ? 'video' : 'image'}
-          mediaUrl={customizingItem.type === 'video' ? (customizingItem.videoUrl || customizingItem.imageUrl) : customizingItem.imageUrl}
-          initialConfig={{
-            xPosition: customizingItem.xPosition ?? 50,
-            yPosition: customizingItem.yPosition ?? 50,
-            brightness: customizingItem.brightness ?? 1.0,
-            contrast: customizingItem.contrast ?? 1.0,
-          }}
-          onSave={handleSaveCustomization}
-        />
       )}
     </section>
   );
