@@ -18,15 +18,72 @@ async function startServer() {
   const CHOREOGRAPHY_PERFORMANCES_FILE = path.join(DATA_DIR, 'choreography-performances.json');
   const BOOKINGS_FILE = path.join(DATA_DIR, 'bookings.json');
 
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
+  const UPLOADS_DIR = path.join(__dirname, 'public', 'uploads');
+  if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
   }
 
-  app.use(express.json({ limit: '50mb' }));
+  // Raw body parser for binary media upload
+  app.use(
+    '/api/upload-media',
+    express.raw({
+      type: ['image/*', 'video/*', 'application/octet-stream', '*/*'],
+      limit: '250mb',
+    })
+  );
+
+  app.use(express.json({ limit: '100mb' }));
 
   const PUBLIC_DIR = path.join(__dirname, 'public');
-  // Serve static public assets
+  // Serve static public assets and uploads
   app.use(express.static(PUBLIC_DIR));
+  app.use('/uploads', express.static(UPLOADS_DIR));
+
+  // --- Upload Media Endpoint ---
+  app.post('/api/upload-media', (req, res) => {
+    try {
+      let buffer: Buffer | null = null;
+      let originalName =
+        (req.query.name as string) ||
+        (req.headers['x-filename'] as string) ||
+        'uploaded_video.mp4';
+      try {
+        originalName = decodeURIComponent(originalName);
+      } catch {}
+
+      if (Buffer.isBuffer(req.body) && req.body.length > 0) {
+        buffer = req.body;
+      } else if (req.body && req.body.dataUrl) {
+        const matches = req.body.dataUrl.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+        if (matches && matches.length === 3) {
+          buffer = Buffer.from(matches[2], 'base64');
+        }
+        if (req.body.name) originalName = req.body.name;
+      }
+
+      if (!buffer || buffer.length === 0) {
+        return res.status(400).json({ error: 'No media data received' });
+      }
+
+      const safeExt = path.extname(originalName) || '.mp4';
+      const cleanBase = path.basename(originalName, safeExt).replace(/[^a-zA-Z0-9_-]/g, '_');
+      const filename = `media_${Date.now()}_${cleanBase}${safeExt}`;
+      const targetPath = path.join(UPLOADS_DIR, filename);
+
+      fs.writeFileSync(targetPath, buffer);
+
+      const publicUrl = `/uploads/${filename}`;
+      return res.json({
+        success: true,
+        url: publicUrl,
+        filename,
+        size: buffer.length,
+      });
+    } catch (err) {
+      console.error('Error in /api/upload-media:', err);
+      return res.status(500).json({ error: 'Server error saving uploaded media' });
+    }
+  });
 
   // --- Hero Video Config ---
   app.get('/api/hero-config', (_req, res) => {

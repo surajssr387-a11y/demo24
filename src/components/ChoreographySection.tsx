@@ -5,6 +5,7 @@ import {
   VolumeX,
   X,
   Sliders,
+  Video,
 } from 'lucide-react';
 import { MediaCustomizationModal, MediaCustomizationConfig } from './MediaCustomizationModal';
 
@@ -84,12 +85,23 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
     if (!customizingItem) return;
     const updated = performances.map((p) =>
       p.id === customizingItem.id
-        ? { ...p, ...newConfig }
+        ? {
+            ...p,
+            xPosition: newConfig.xPosition,
+            yPosition: newConfig.yPosition,
+            brightness: newConfig.brightness,
+            contrast: newConfig.contrast ?? p.contrast ?? 1.04,
+            videoUrl: newConfig.mediaUrl || p.videoUrl,
+          }
         : p
     );
     setPerformances(updated);
     if (activeModalVideo && activeModalVideo.id === customizingItem.id) {
-      setActiveModalVideo({ ...activeModalVideo, ...newConfig });
+      setActiveModalVideo({
+        ...activeModalVideo,
+        ...newConfig,
+        videoUrl: newConfig.mediaUrl || activeModalVideo.videoUrl,
+      });
     }
     try {
       localStorage.setItem('ramys_choreography_performances_v1', JSON.stringify(updated));
@@ -201,7 +213,21 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
                     </div>
                   </button>
 
-                  {/* Quick Customize / Adjust Button */}
+                  {/* Change Video Button (Top Left) */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCustomizingItem(item);
+                    }}
+                    title="Change video or upload new routine"
+                    className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-black/75 hover:bg-black text-white text-xs font-bold backdrop-blur-md border border-white/20 shadow-md transition-all hover:scale-105 active:scale-95 cursor-pointer opacity-90 group-hover:opacity-100"
+                  >
+                    <Video className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Change Video</span>
+                  </button>
+
+                  {/* Quick Customize / Adjust Button (Top Right) */}
                   <button
                     type="button"
                     onClick={(e) => {
@@ -238,10 +264,10 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
                 <button
                   type="button"
                   onClick={() => setCustomizingItem(activeModalVideo)}
-                  className="flex items-center gap-1 text-[11px] font-bold text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-lg transition-colors cursor-pointer ml-1"
+                  className="flex items-center gap-1.5 text-[11px] font-bold text-slate-200 hover:text-white bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-lg transition-colors cursor-pointer ml-1 border border-white/10"
                 >
-                  <Sliders className="w-3 h-3 text-[#0066FF]" />
-                  <span>Customize</span>
+                  <Video className="w-3 h-3 text-blue-400" />
+                  <span>Change / Customize Video</span>
                 </button>
               </div>
               <button

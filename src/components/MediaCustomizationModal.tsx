@@ -1,11 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { X, Check, RotateCcw, Sliders, Sun, MoveHorizontal, MoveVertical } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  X,
+  Check,
+  RotateCcw,
+  Sliders,
+  Sun,
+  MoveHorizontal,
+  MoveVertical,
+  Video,
+  Upload,
+  Link,
+  Film,
+  Sparkles,
+} from 'lucide-react';
 
 export interface MediaCustomizationConfig {
   xPosition: number;
   yPosition: number;
   brightness: number;
   contrast?: number;
+  mediaUrl?: string;
+  title?: string;
 }
 
 interface MediaCustomizationModalProps {
@@ -18,6 +33,16 @@ interface MediaCustomizationModalProps {
   onSave: (newConfig: MediaCustomizationConfig) => Promise<void> | void;
 }
 
+const STUDIO_VIDEO_PRESETS = [
+  { label: 'Girls Choreography', url: '/choreography/choreo-ladies.mp4' },
+  { label: 'Advance Hip-Hop', url: '/choreography/choreo-advance.mp4' },
+  { label: 'Free Style Dance', url: '/choreography/choreo-freestyle.mp4' },
+  { label: 'Kids Performance', url: '/choreography/choreo-kids.mp4' },
+  { label: 'Beginner Routine', url: '/choreography/choreo-senior.mp4' },
+  { label: 'Private Class Routine', url: '/choreography/choreo-private.mp4' },
+  { label: 'Hero Studio Video', url: '/hero-uploaded.mp4' },
+];
+
 export const MediaCustomizationModal: React.FC<MediaCustomizationModalProps> = ({
   isOpen,
   onClose,
@@ -27,6 +52,7 @@ export const MediaCustomizationModal: React.FC<MediaCustomizationModalProps> = (
   initialConfig,
   onSave,
 }) => {
+  const [currentUrl, setCurrentUrl] = useState<string>(mediaUrl);
   const [xPosition, setXPosition] = useState<number>(initialConfig.xPosition ?? 50);
   const [yPosition, setYPosition] = useState<number>(initialConfig.yPosition ?? 50);
   const [brightness, setBrightness] = useState<number>(initialConfig.brightness ?? 1.0);
@@ -34,24 +60,82 @@ export const MediaCustomizationModal: React.FC<MediaCustomizationModalProps> = (
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
 
+  // Video change & upload states
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+  const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
+  const [customUrlValue, setCustomUrlValue] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   // Sync state whenever initialConfig changes or modal opens
   useEffect(() => {
     if (isOpen) {
+      setCurrentUrl(initialConfig.mediaUrl || mediaUrl);
       setXPosition(initialConfig.xPosition ?? 50);
-      setYPosition(initialConfig.yPosition ?? 50);
+      setYPosition(initialConfig.yPosition ?? (mediaType === 'video' ? 25 : 50));
       setBrightness(initialConfig.brightness ?? 1.0);
       setContrast(initialConfig.contrast ?? 1.04);
       setSaveSuccess(false);
+      setUploadStatus(null);
+      setShowUrlInput(false);
+      setCustomUrlValue('');
     }
-  }, [isOpen, initialConfig]);
+  }, [isOpen, initialConfig, mediaUrl, mediaType]);
 
   if (!isOpen) return null;
 
   const handleReset = () => {
+    setCurrentUrl(mediaUrl);
     setXPosition(50);
     setYPosition(mediaType === 'video' ? 25 : 50);
     setBrightness(1.0);
     setContrast(1.04);
+    setUploadStatus(null);
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setUploadStatus(`Uploading ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)...`);
+
+    // Immediate local object URL for instant preview
+    const previewUrl = URL.createObjectURL(file);
+    setCurrentUrl(previewUrl);
+
+    try {
+      const res = await fetch(`/api/upload-media?name=${encodeURIComponent(file.name)}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': file.type || (mediaType === 'video' ? 'video/mp4' : 'image/jpeg'),
+          'x-filename': encodeURIComponent(file.name),
+        },
+        body: file,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.url) {
+          setCurrentUrl(data.url);
+          setUploadStatus('Video uploaded & applied successfully!');
+        }
+      } else {
+        setUploadStatus('Using local preview video (ready to save)');
+      }
+    } catch {
+      // Fallback: preview URL is already playing
+      setUploadStatus('Using local preview video (ready to save)');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleApplyCustomUrl = () => {
+    if (!customUrlValue.trim()) return;
+    setCurrentUrl(customUrlValue.trim());
+    setUploadStatus('Video URL applied!');
+    setShowUrlInput(false);
   };
 
   const handleSave = async () => {
@@ -62,6 +146,7 @@ export const MediaCustomizationModal: React.FC<MediaCustomizationModalProps> = (
         yPosition,
         brightness,
         contrast,
+        mediaUrl: currentUrl,
       });
       setSaveSuccess(true);
       setTimeout(() => {
@@ -81,21 +166,30 @@ export const MediaCustomizationModal: React.FC<MediaCustomizationModalProps> = (
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-[620px] bg-[#0E1015] border border-[#272A34] rounded-3xl p-5 sm:p-7 shadow-2xl text-white max-h-[94vh] overflow-y-auto"
+        className="relative w-full max-w-[640px] bg-[#0E1015] border border-[#272A34] rounded-3xl p-5 sm:p-7 shadow-2xl text-white max-h-[94vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Hidden File Input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={mediaType === 'video' ? 'video/mp4,video/webm,video/quicktime,video/*' : 'image/*'}
+          onChange={handleFileUpload}
+          className="hidden"
+        />
+
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-white/10">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-[#0066FF]/20 border border-[#0066FF]/40 flex items-center justify-center text-[#0066FF]">
-              <Sliders className="w-4 h-4" />
+              {mediaType === 'video' ? <Video className="w-4 h-4" /> : <Sliders className="w-4 h-4" />}
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-extrabold text-white tracking-tight">
-                Customize Framing &amp; Brightness
+                {mediaType === 'video' ? 'Change Video & Customize Framing' : 'Customize Framing & Brightness'}
               </h3>
               <p className="text-[11px] text-slate-400 truncate max-w-[280px] sm:max-w-md">
-                {title || 'Adjust left-right, upar-niche &amp; brightness'}
+                {title || 'Adjust video, left-right, upar-niche & brightness'}
               </p>
             </div>
           </div>
@@ -109,11 +203,93 @@ export const MediaCustomizationModal: React.FC<MediaCustomizationModalProps> = (
           </button>
         </div>
 
+        {/* Video / Media Source Selection (Change Video Options) */}
+        {mediaType === 'video' && (
+          <div className="mt-4 p-4 bg-[#14161E] border border-[#272A35] rounded-2xl space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                <Film className="w-3.5 h-3.5 text-[#0066FF]" />
+                Change Video Source (Video Badle)
+              </span>
+              {uploadStatus && (
+                <span className="text-[10px] text-emerald-400 font-semibold truncate max-w-[240px]">
+                  {uploadStatus}
+                </span>
+              )}
+            </div>
+
+            {/* Quick Action Buttons: Upload Video or Preset */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+                className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#0066FF] hover:bg-[#0052cc] text-white text-xs font-bold shadow-md transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                <span>{isUploading ? 'Uploading...' : 'Upload Video File'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowUrlInput(!showUrlInput)}
+                className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-semibold transition-colors cursor-pointer"
+              >
+                <Link className="w-3.5 h-3.5 text-blue-400" />
+                <span>Paste Video Link</span>
+              </button>
+
+              <div className="col-span-2 sm:col-span-1 relative">
+                <select
+                  value={STUDIO_VIDEO_PRESETS.some((p) => p.url === currentUrl) ? currentUrl : ''}
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      setCurrentUrl(e.target.value);
+                      setUploadStatus('Preset video selected!');
+                    }
+                  }}
+                  className="w-full h-full px-2.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-semibold border border-white/10 transition-colors cursor-pointer appearance-none"
+                >
+                  <option value="" disabled className="bg-neutral-900 text-slate-400">
+                    Choose Preset Routine...
+                  </option>
+                  {STUDIO_VIDEO_PRESETS.map((preset) => (
+                    <option key={preset.url} value={preset.url} className="bg-neutral-900 text-white">
+                      {preset.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Paste Video URL Bar */}
+            {showUrlInput && (
+              <div className="flex items-center gap-2 pt-2 animate-in fade-in duration-150">
+                <input
+                  type="text"
+                  placeholder="https://.../dance-video.mp4 or /choreography/..."
+                  value={customUrlValue}
+                  onChange={(e) => setCustomUrlValue(e.target.value)}
+                  className="flex-1 bg-black/60 border border-white/20 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#0066FF]"
+                />
+                <button
+                  type="button"
+                  onClick={handleApplyCustomUrl}
+                  className="px-3.5 py-2 bg-[#0066FF] hover:bg-[#0052cc] text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
+                >
+                  Apply
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Live Preview Card */}
         <div className="my-5">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-              Live Preview
+            <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-[#0066FF]" />
+              Live Preview (Real-Time Playback)
             </span>
             <span className="text-[11px] text-[#0066FF] font-semibold">
               X: {xPosition}% • Y: {yPosition}% • Brightness: {Math.round(brightness * 100)}%
@@ -123,7 +299,8 @@ export const MediaCustomizationModal: React.FC<MediaCustomizationModalProps> = (
           <div className="relative w-full aspect-[16/10.5] rounded-2xl overflow-hidden bg-neutral-950 border-2 border-white/20 shadow-xl">
             {mediaType === 'video' ? (
               <video
-                src={mediaUrl}
+                key={currentUrl}
+                src={currentUrl}
                 autoPlay
                 loop
                 muted
@@ -136,7 +313,8 @@ export const MediaCustomizationModal: React.FC<MediaCustomizationModalProps> = (
               />
             ) : (
               <img
-                src={mediaUrl}
+                key={currentUrl}
+                src={currentUrl}
                 alt={title || 'Preview'}
                 style={{
                   objectPosition: `${xPosition}% ${yPosition}%`,

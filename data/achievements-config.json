@@ -47,8 +47,9 @@
     "title": "",
     "imageUrl": "/achievements/studio-photo-2.png",
     "xPosition": 50,
-    "yPosition": 50,
-    "brightness": 1.0
+    "yPosition": 1,
+    "brightness": 1.04,
+    "contrast": 1
   },
   {
     "id": "img-5",
@@ -56,8 +57,9 @@
     "title": "",
     "imageUrl": "/achievements/studio-photo-3.png",
     "xPosition": 50,
-    "yPosition": 50,
-    "brightness": 1.0
+    "yPosition": 0,
+    "brightness": 1,
+    "contrast": 1
   },
   {
     "id": "img-6",
