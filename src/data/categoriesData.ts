@@ -29,6 +29,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     id: "kids-dance",
     title: "Kids dance",
     imageUrl: "/kids-dance.jpg",
+    videoUrl: "/kids-dance.mp4",
     pillTag: "FOUNDATIONAL",
     levelLabel: "LEVEL 1",
     description: "Rhythm, Coordination & Confidence",
