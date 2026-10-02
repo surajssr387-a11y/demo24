@@ -35,7 +35,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     description: "Rhythm, Coordination & Confidence",
     demoPrice: "₹49",
     feeLabel: "Demo Registration Fee",
-    monthlyFee: "₹1,500 / month (12 sessions)",
+    monthlyFee: "₹1,549 / month (12 sessions)",
     trialInfo: "Trial Class Available",
     batches: [
       {
@@ -79,7 +79,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     description: "Step-by-Step Fundamentals",
     demoPrice: "₹49",
     feeLabel: "Demo Registration Fee",
-    monthlyFee: "₹1,600 / month (12 sessions)",
+    monthlyFee: "₹1,649 / month (12 sessions)",
     trialInfo: "Custom Packages",
     batches: [
       {
@@ -113,7 +113,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     description: "Intensive Technique & Choreography",
     demoPrice: "₹49",
     feeLabel: "Demo Registration Fee",
-    monthlyFee: "₹2,200 / month (12 sessions)",
+    monthlyFee: "₹2,249 / month (12 sessions)",
     trialInfo: "Trial Class Available",
     batches: [
       {
@@ -149,7 +149,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     description: "Flexibility, Acrobatics & Core Balance",
     demoPrice: "₹49",
     feeLabel: "Demo Registration Fee",
-    monthlyFee: "₹1,800 / month (12 sessions)",
+    monthlyFee: "₹1,849 / month (12 sessions)",
     trialInfo: "Trial Class Available",
     batches: [
       {
@@ -174,7 +174,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     description: "Vibrant Beats, Expression & Fitness",
     demoPrice: "₹49",
     feeLabel: "Demo Registration Fee",
-    monthlyFee: "₹1,500 / month (12 sessions)",
+    monthlyFee: "₹1,549 / month (12 sessions)",
     trialInfo: "Trial Class Available",
     batches: [
       {
@@ -197,7 +197,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     pillTag: "ONE-ON-ONE",
     levelLabel: "PERSONALIZED",
     description: "Exclusive 1-on-1 Certified Mentorship",
-    demoPrice: "₹500",
+    demoPrice: "₹549",
     feeLabel: "Per Class Fee",
     monthlyFee: "Custom packages based on hours",
     trialInfo: "Dedicated Schedule",
@@ -206,11 +206,11 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
         id: "batch-1",
         name: "1-on-1 Private Mentorship",
         days: "Flexible (Mon to Sun)",
-        price: "₹500",
+        price: "₹549",
         schedules: [
           "Customize your days and time according to you",
           "Dedicated master instructor coaching",
-          "Per class — ₹500"
+          "Per class — ₹549"
         ]
       }
     ]
@@ -222,49 +222,49 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     pillTag: "SANGEET SPECIAL",
     levelLabel: "CUSTOM ROUTINES",
     description: "Family Sangeet & Couple Dance Preparation",
-    demoPrice: "₹3,000",
+    demoPrice: "₹3,049",
     feeLabel: "Choreography Package",
-    monthlyFee: "From ₹3,000 to ₹10,000 full sangeet",
+    monthlyFee: "From ₹3,049 to ₹10,049 full sangeet",
     trialInfo: "Custom Package",
     batches: [
       {
         id: "batch-1",
         name: "1 Choreography",
         days: "Flexible schedule (Studio / Home / Venue)",
-        price: "₹3,000",
+        price: "₹3,049",
         schedules: [
           "1 customized dance routine",
           "Bride & Groom or Solo / Duo",
-          "Fee — ₹3,000"
+          "Fee — ₹3,049"
         ]
       },
       {
         id: "batch-2",
         name: "2 Choreography",
         days: "Flexible schedule (Studio / Home / Venue)",
-        price: "₹2,500/ea",
+        price: "₹2,549/ea",
         schedules: [
           "2 customized dance routines",
           "Couple & family special",
-          "Fee — ₹2,500 each (₹5,000)"
+          "Fee — ₹2,549 each (₹5,049)"
         ]
       },
       {
         id: "batch-3",
         name: "5 Choreography (Full Sangeet)",
         days: "Full family crash rehearsal",
-        price: "₹10,000",
+        price: "₹10,049",
         schedules: [
           "5 complete Sangeet routines",
           "Full family flashmob + audio edits",
-          "Total Package — ₹10,000"
+          "Total Package — ₹10,049"
         ]
       }
     ]
   }
 ];
 
-export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v4';
+export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v5';
 
 export function loadCategories(): CategoryItem[] {
   try {
@@ -275,8 +275,8 @@ export function loadCategories(): CategoryItem[] {
         return parsed;
       }
     }
-  } catch (err) {
-    console.error('Failed to load categories from localStorage:', err);
+  } catch (e) {
+    console.error('Failed to load categories from local storage:', e);
   }
   return DEFAULT_CATEGORIES;
 }
@@ -284,16 +284,7 @@ export function loadCategories(): CategoryItem[] {
 export function saveCategories(categories: CategoryItem[]): void {
   try {
     localStorage.setItem(CATEGORIES_STORAGE_KEY, JSON.stringify(categories));
-  } catch (err) {
-    console.error('Failed to save categories to localStorage:', err);
+  } catch (e) {
+    console.error('Failed to save categories to local storage:', e);
   }
-}
-
-export function resetCategories(): CategoryItem[] {
-  try {
-    localStorage.removeItem(CATEGORIES_STORAGE_KEY);
-  } catch (err) {
-    console.error('Failed to reset categories:', err);
-  }
-  return DEFAULT_CATEGORIES;
 }

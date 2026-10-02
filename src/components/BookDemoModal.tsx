@@ -44,7 +44,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
       description: 'Rhythm, Coordination & Confidence',
       demoPrice: '₹49',
       feeLabel: 'Demo Registration Fee',
-      monthlyFee: '₹1,500 / month (12 sessions)',
+      monthlyFee: '₹1,549 / month (12 sessions)',
       trialInfo: 'Trial Class Available',
       batches: []
     };
@@ -135,9 +135,9 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
   const isSpecialCategory = isHomeService || isPrivateClass || isWeddingChoreo;
   const isDemoCategory = !isSpecialCategory;
 
-  // Helper to extract clean monthly price text (e.g. "₹1,500")
+  // Helper to extract clean monthly price text (e.g. "₹1,549")
   const getMonthlyPriceText = (monthlyStr?: string): string => {
-    if (!monthlyStr) return '₹1,500';
+    if (!monthlyStr) return '₹1,549';
     const match = monthlyStr.match(/₹[\d,]+/);
     return match ? match[0] : monthlyStr;
   };
@@ -151,7 +151,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
     : (planType === 'monthly' ? monthlyPriceText : demoPriceText);
 
   // Numeric amount for UPI
-  const numericAmount = parseInt(activeFeeText.replace(/[^\d]/g, ''), 10) || (planType === 'monthly' ? 1500 : 49);
+  const numericAmount = parseInt(activeFeeText.replace(/[^\d]/g, ''), 10) || (planType === 'monthly' ? 1549 : 49);
 
   // Studio UPI details (sanjeev biruly / 9692451182@fam)
   const upiPayee = studioInfo.upiPayeeName || 'sanjeev biruly';
