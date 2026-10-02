@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Play, X, ZoomIn } from 'lucide-react';
+import { Play, X, ZoomIn, Sliders } from 'lucide-react';
+import { MediaCustomizationModal, MediaCustomizationConfig } from './MediaCustomizationModal';
 
 export interface AchievementMediaItem {
   id: string;
@@ -8,6 +9,10 @@ export interface AchievementMediaItem {
   imageUrl: string;
   videoUrl?: string;
   badge?: string;
+  xPosition?: number; // 0 to 100% (Left - Right)
+  yPosition?: number; // 0 to 100% (Upar - Niche)
+  brightness?: number; // 0.5 to 2.0
+  contrast?: number;
 }
 
 export const DEFAULT_ACHIEVEMENTS: AchievementMediaItem[] = [
@@ -63,12 +68,18 @@ export const DEFAULT_ACHIEVEMENTS: AchievementMediaItem[] = [
     type: 'photo',
     title: '',
     imageUrl: '/achievements/studio-photo-2.png',
+    xPosition: 50,
+    yPosition: 50,
+    brightness: 1.0,
   },
   {
     id: 'img-5',
     type: 'photo',
     title: '',
     imageUrl: '/achievements/studio-photo-3.png',
+    xPosition: 50,
+    yPosition: 50,
+    brightness: 1.0,
   },
   {
     id: 'img-6',
@@ -82,6 +93,27 @@ export const AchievementsSection: React.FC = () => {
   const [items, setItems] = useState<AchievementMediaItem[]>(DEFAULT_ACHIEVEMENTS);
   const [activeVideo, setActiveVideo] = useState<AchievementMediaItem | null>(null);
   const [activePhoto, setActivePhoto] = useState<AchievementMediaItem | null>(null);
+  const [customizingItem, setCustomizingItem] = useState<AchievementMediaItem | null>(null);
+
+  const handleSaveCustomization = async (newConfig: MediaCustomizationConfig) => {
+    if (!customizingItem) return;
+    const updated = items.map((it) =>
+      it.id === customizingItem.id
+        ? { ...it, ...newConfig }
+        : it
+    );
+    setItems(updated);
+    try {
+      localStorage.setItem('ramys_achievements_config_v1', JSON.stringify(updated));
+      await fetch('/api/achievements', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated),
+      });
+    } catch (e) {
+      console.error('Failed to save achievements customization:', e);
+    }
+  };
 
   // Sync latest achievements from server if available
   useEffect(() => {
@@ -130,12 +162,30 @@ export const AchievementsSection: React.FC = () => {
                   <img
                     src={item.imageUrl}
                     alt={item.title || 'Studio Achievement'}
-                    className="w-full h-full object-cover object-center transition-all duration-500 group-hover:scale-105"
+                    style={{
+                      objectPosition: `${item.xPosition ?? 50}% ${item.yPosition ?? 50}%`,
+                      filter: `brightness(${item.brightness ?? 1.0}) contrast(${item.contrast ?? 1.0})`,
+                    }}
+                    className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
                     loading="lazy"
                   />
 
                   {/* Gentle hover overlay */}
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/25 transition-colors" />
+
+                  {/* Quick Customize / Adjust Button */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCustomizingItem(item);
+                    }}
+                    title="Customize framing & brightness (left-right, upar-niche, brightness)"
+                    className="absolute bottom-3 right-3 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-black/75 hover:bg-black text-white text-xs font-bold backdrop-blur-md border border-white/20 shadow-md transition-all hover:scale-105 active:scale-95 cursor-pointer opacity-90 group-hover:opacity-100"
+                  >
+                    <Sliders className="w-3.5 h-3.5 text-[#0066FF]" />
+                    <span>Customize</span>
+                  </button>
 
                   {/* Video Badge / Play Indicator */}
                   {isVideo ? (
@@ -245,6 +295,24 @@ export const AchievementsSection: React.FC = () => {
             )}
           </div>
         </div>
+      )}
+
+      {/* Media Customization Modal */}
+      {customizingItem && (
+        <MediaCustomizationModal
+          isOpen={!!customizingItem}
+          onClose={() => setCustomizingItem(null)}
+          title={customizingItem.title || 'Studio Achievement Photo'}
+          mediaType={customizingItem.type === 'video' ? 'video' : 'image'}
+          mediaUrl={customizingItem.type === 'video' ? (customizingItem.videoUrl || customizingItem.imageUrl) : customizingItem.imageUrl}
+          initialConfig={{
+            xPosition: customizingItem.xPosition ?? 50,
+            yPosition: customizingItem.yPosition ?? 50,
+            brightness: customizingItem.brightness ?? 1.0,
+            contrast: customizingItem.contrast ?? 1.0,
+          }}
+          onSave={handleSaveCustomization}
+        />
       )}
     </section>
   );

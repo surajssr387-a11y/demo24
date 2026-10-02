@@ -4,15 +4,18 @@ import {
   Volume2,
   VolumeX,
   X,
+  Sliders,
 } from 'lucide-react';
+import { MediaCustomizationModal, MediaCustomizationConfig } from './MediaCustomizationModal';
 
 export interface ChoreographyPerformanceItem {
   id: string;
   title: string;
   videoUrl: string;
-  yPosition: number; // 0 to 100%
-  brightness: number; // 0.5 to 1.6
-  contrast: number; // e.g. 1.04
+  xPosition?: number; // 0 to 100% (Left - Right)
+  yPosition: number; // 0 to 100% (Upar - Niche)
+  brightness: number; // 0.5 to 2.0
+  contrast?: number; // e.g. 1.04
 }
 
 const DEFAULT_PERFORMANCES: ChoreographyPerformanceItem[] = [
@@ -44,6 +47,7 @@ const DEFAULT_PERFORMANCES: ChoreographyPerformanceItem[] = [
     id: 'choreo-4',
     title: 'Girls Choreography',
     videoUrl: '/choreography/choreo-ladies.mp4',
+    xPosition: 50,
     yPosition: 25,
     brightness: 1.0,
     contrast: 1.04,
@@ -74,6 +78,30 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
   const [performances, setPerformances] = useState<ChoreographyPerformanceItem[]>(DEFAULT_PERFORMANCES);
   const [activeModalVideo, setActiveModalVideo] = useState<ChoreographyPerformanceItem | null>(null);
   const [modalIsMuted, setModalIsMuted] = useState<boolean>(false);
+  const [customizingItem, setCustomizingItem] = useState<ChoreographyPerformanceItem | null>(null);
+
+  const handleSaveCustomization = async (newConfig: MediaCustomizationConfig) => {
+    if (!customizingItem) return;
+    const updated = performances.map((p) =>
+      p.id === customizingItem.id
+        ? { ...p, ...newConfig }
+        : p
+    );
+    setPerformances(updated);
+    if (activeModalVideo && activeModalVideo.id === customizingItem.id) {
+      setActiveModalVideo({ ...activeModalVideo, ...newConfig });
+    }
+    try {
+      localStorage.setItem('ramys_choreography_performances_v1', JSON.stringify(updated));
+      await fetch('/api/choreography-performances', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated),
+      });
+    } catch (e) {
+      console.error('Failed to save choreography customization:', e);
+    }
+  };
 
   // Sync saved performances from server on mount
   useEffect(() => {
@@ -153,7 +181,7 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
                       v.play().catch(() => {});
                     }}
                     style={{
-                      objectPosition: `center ${item.yPosition}%`,
+                      objectPosition: `${item.xPosition ?? 50}% ${item.yPosition}%`,
                       filter: `brightness(${item.brightness}) contrast(${item.contrast || 1.04})`,
                     }}
                     className="w-full h-full object-cover transition-all duration-200 pointer-events-none"
@@ -171,6 +199,20 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
                     <div className="w-12 h-12 rounded-full bg-white/90 hover:bg-white text-neutral-950 shadow-xl flex items-center justify-center transform group-hover:scale-110 active:scale-95 transition-all">
                       <Play className="w-5 h-5 fill-neutral-950 ml-0.5" />
                     </div>
+                  </button>
+
+                  {/* Quick Customize / Adjust Button */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCustomizingItem(item);
+                    }}
+                    title="Customize framing & brightness (left-right, upar-niche, brightness)"
+                    className="absolute top-3 right-3 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-black/75 hover:bg-black text-white text-xs font-bold backdrop-blur-md border border-white/20 shadow-md transition-all hover:scale-105 active:scale-95 cursor-pointer opacity-90 group-hover:opacity-100"
+                  >
+                    <Sliders className="w-3.5 h-3.5 text-[#0066FF]" />
+                    <span>Customize</span>
                   </button>
                 </div>
               </div>
@@ -193,6 +235,14 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
                   {activeModalVideo.title}
                 </span>
                 <span className="text-[11px] text-neutral-400">Studio Performance</span>
+                <button
+                  type="button"
+                  onClick={() => setCustomizingItem(activeModalVideo)}
+                  className="flex items-center gap-1 text-[11px] font-bold text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-lg transition-colors cursor-pointer ml-1"
+                >
+                  <Sliders className="w-3 h-3 text-[#0066FF]" />
+                  <span>Customize</span>
+                </button>
               </div>
               <button
                 onClick={() => setActiveModalVideo(null)}
@@ -211,7 +261,7 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
                 playsInline
                 muted={modalIsMuted}
                 style={{
-                  objectPosition: `center ${activeModalVideo.yPosition}%`,
+                  objectPosition: `${activeModalVideo.xPosition ?? 50}% ${activeModalVideo.yPosition}%`,
                   filter: `brightness(${activeModalVideo.brightness}) contrast(${activeModalVideo.contrast || 1.04})`,
                 }}
                 className="w-full h-full object-contain"
@@ -253,6 +303,24 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
             </div>
           </div>
         </div>
+      )}
+
+      {/* Media Customization Modal */}
+      {customizingItem && (
+        <MediaCustomizationModal
+          isOpen={!!customizingItem}
+          onClose={() => setCustomizingItem(null)}
+          title={customizingItem.title}
+          mediaType="video"
+          mediaUrl={customizingItem.videoUrl}
+          initialConfig={{
+            xPosition: customizingItem.xPosition ?? 50,
+            yPosition: customizingItem.yPosition ?? 25,
+            brightness: customizingItem.brightness ?? 1.0,
+            contrast: customizingItem.contrast ?? 1.04,
+          }}
+          onSave={handleSaveCustomization}
+        />
       )}
     </section>
   );

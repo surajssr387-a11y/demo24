@@ -27,6 +27,7 @@
     "id": "choreo-4",
     "title": "Girls Choreography",
     "videoUrl": "/choreography/choreo-ladies.mp4",
+    "xPosition": 50,
     "yPosition": 25,
     "brightness": 1,
     "contrast": 1.04

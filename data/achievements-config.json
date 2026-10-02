@@ -45,13 +45,19 @@
     "id": "img-4",
     "type": "photo",
     "title": "",
-    "imageUrl": "/achievements/studio-photo-2.png"
+    "imageUrl": "/achievements/studio-photo-2.png",
+    "xPosition": 50,
+    "yPosition": 50,
+    "brightness": 1.0
   },
   {
     "id": "img-5",
     "type": "photo",
     "title": "",
-    "imageUrl": "/achievements/studio-photo-3.png"
+    "imageUrl": "/achievements/studio-photo-3.png",
+    "xPosition": 50,
+    "yPosition": 50,
+    "brightness": 1.0
   },
   {
     "id": "img-6",
