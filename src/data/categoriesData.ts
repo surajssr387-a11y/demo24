@@ -149,18 +149,43 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     description: "Flexibility, Acrobatics & Core Balance",
     demoPrice: "₹49",
     feeLabel: "Demo Registration Fee",
-    monthlyFee: "₹1,849 / month (12 sessions)",
+    monthlyFee: "₹1,249 – ₹1,950 / month",
     trialInfo: "Trial Class Available",
     batches: [
       {
-        id: "batch-1",
-        name: "Batch 1 (4 Days/Week)",
-        days: "Wed, Fri, Sat, Sun",
+        id: "gym-batch-2days",
+        name: "2 Days / Week",
+        days: "Sat, Sun",
+        price: "₹1,249",
+        schedules: [
+          "Saturday — 5:00 PM",
+          "Sunday — 10:00 AM",
+          "Course Fee: ₹1,249 / month"
+        ]
+      },
+      {
+        id: "gym-batch-3days",
+        name: "3 Days / Week",
+        days: "Wed, Fri, Sat",
+        price: "₹1,549",
         schedules: [
           "Wednesday — 5:00 PM",
           "Friday — 5:00 PM",
           "Saturday — 5:00 PM",
-          "Sunday — 10:00 AM"
+          "Course Fee: ₹1,549 / month"
+        ]
+      },
+      {
+        id: "gym-batch-4days",
+        name: "4 Days / Week",
+        days: "Wed, Fri, Sat, Sun",
+        price: "₹1,950",
+        schedules: [
+          "Wednesday — 5:00 PM",
+          "Friday — 5:00 PM",
+          "Saturday — 5:00 PM",
+          "Sunday — 10:00 AM",
+          "Course Fee: ₹1,950 / month"
         ]
       }
     ]
@@ -264,7 +289,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
   }
 ];
 
-export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v5';
+export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v6';
 
 export function loadCategories(): CategoryItem[] {
   try {

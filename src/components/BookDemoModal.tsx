@@ -142,8 +142,10 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
     return match ? match[0] : monthlyStr;
   };
 
-  const monthlyPriceText = getMonthlyPriceText(currentCategory.monthlyFee);
-  const demoPriceText = activeBatch?.price || currentCategory.demoPrice || '₹49';
+  const monthlyPriceText = (planType === 'monthly' && activeBatch?.price)
+    ? activeBatch.price
+    : getMonthlyPriceText(currentCategory.monthlyFee);
+  const demoPriceText = currentCategory.demoPrice || '₹49';
 
   // Active price based on plan choice or package choice
   const activeFeeText = isSpecialCategory
@@ -738,13 +740,20 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                                 </span>
                               )}
                             </span>
-                            {isFull ? (
-                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/30">
-                                FULL
-                              </span>
-                            ) : isSelected ? (
-                              <span className="w-2 h-2 rounded-full bg-[#0066FF]" />
-                            ) : null}
+                            <div className="flex items-center gap-2">
+                              {batch.price && planType === 'monthly' && (
+                                <span className="text-[11px] font-extrabold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                                  {batch.price}
+                                </span>
+                              )}
+                              {isFull ? (
+                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/30">
+                                  FULL
+                                </span>
+                              ) : isSelected ? (
+                                <span className="w-2 h-2 rounded-full bg-[#0066FF]" />
+                              ) : null}
+                            </div>
                           </div>
                           <div className="space-y-1 text-slate-300">
                             {batch.schedules.map((schedule, sIdx) => (
