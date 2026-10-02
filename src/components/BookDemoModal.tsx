@@ -232,8 +232,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📋 *Booking Type:* ${planLabel}
 💃 *Dance Program:* ${currentCategory.title}
-🎯 *Skill Level:* ${selectedLevel}
-🏷️ *Selected Batch:* ${activeBatch.name}${activeBatch.days ? ` (${activeBatch.days})` : ''}
+${isSpecialCategory ? '' : `🎯 *Skill Level:* ${selectedLevel}\n`}🏷️ *Selected Batch:* ${activeBatch.name}${activeBatch.days ? ` (${activeBatch.days})` : ''}
 🕒 *Schedule & Timings:*
 ${scheduleBulletList}
 
