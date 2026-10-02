@@ -152,7 +152,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
   // Active price based on plan choice or package choice
   const activeFeeText = isSpecialCategory
     ? (activeBatch?.price || currentCategory.demoPrice || currentCategory.monthlyFee || '₹6,000')
-    : (planType === 'monthly' ? monthlyPriceText : demoPriceText);
+    : (planType === 'monthly' ? (activeBatch?.price || monthlyPriceText) : demoPriceText);
 
   // Numeric amount for UPI
   const numericAmount = parseInt(activeFeeText.replace(/[^\d]/g, ''), 10) || (planType === 'monthly' ? 1950 : 49);
@@ -162,7 +162,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
   const studioUpiId = studioInfo.upiId || '9692451182@fam';
   const upiPayNote = isSpecialCategory
     ? `${currentCategory.title} ${activeBatch?.name || 'Package'}`
-    : `${currentCategory.title} ${planType === 'monthly' ? (isGymnastic ? '4 Days Week (16 Sessions)' : 'Monthly Course') : 'Demo ₹49'}`;
+    : `${currentCategory.title} ${planType === 'monthly' ? (isGymnastic ? `${activeBatch?.name || 'Course'} (${activeFeeText})` : 'Monthly Course') : 'Demo ₹49'}`;
   const upiPayUrl = `upi://pay?pa=${studioUpiId}&pn=${encodeURIComponent(upiPayee)}&am=${numericAmount}&cu=INR&tn=${encodeURIComponent(upiPayNote)}`;
 
   // Dynamic QR Code image URL (with high resolution and proper margin)
@@ -176,6 +176,9 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
     }
     setErrorMessage('');
     setSelectedBatchIndex(index);
+    if (target?.price) {
+      setPlanType('monthly');
+    }
   };
 
   const handleCopyUpi = () => {
@@ -686,11 +689,13 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-1.5">
                           <span className="text-xs font-black uppercase tracking-wider text-white">
-                            {isGymnastic ? '4 Days / Week' : 'Monthly Course'}
+                            {isGymnastic ? (activeBatch?.name || '4 Days / Week') : 'Monthly Course'}
                           </span>
-                          <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                            POPULAR
-                          </span>
+                          {((isGymnastic && (activeBatch?.badge === 'POPULAR' || !activeBatch?.badge)) || (!isGymnastic)) && (
+                            <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                              POPULAR
+                            </span>
+                          )}
                         </div>
                         <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${
                           planType === 'monthly' ? 'border-amber-400 bg-amber-400' : 'border-slate-600'
@@ -701,7 +706,11 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
 
                       <p className="text-[11px] text-slate-400 leading-snug">
                         {isGymnastic
-                          ? 'Full total 16 sessions comprehensive training with stage & certificate track.'
+                          ? (activeBatch?.name === '2 Days / Week'
+                              ? 'Full total 8 sessions comprehensive training with stage & certificate track.'
+                              : activeBatch?.name === '3 Days / Week'
+                              ? 'Full total 12 sessions comprehensive training with stage & certificate track.'
+                              : 'Full total 16 sessions comprehensive training with stage & certificate track.')
                           : 'Full 12 sessions comprehensive training with stage & certificate track.'}
                       </p>
 
@@ -710,7 +719,7 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                           {isGymnastic ? 'Plan Fee:' : 'Course Fee:'}
                         </span>
                         <span className="text-xl font-extrabold text-amber-400 font-display">
-                          {monthlyPriceText}
+                          {activeBatch?.price || monthlyPriceText}
                         </span>
                       </div>
                     </div>
