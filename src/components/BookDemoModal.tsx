@@ -565,7 +565,7 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                     const isSpec = ['home-service', 'private-class', 'wedding-choreography'].includes(program.id);
                     return (
                       <option key={program.id} value={program.id} className="bg-white text-slate-900">
-                        {program.title} {isSpec ? `(Package: ${program.demoPrice || program.monthlyFee})` : `(Demo: ${program.demoPrice || '₹49'} | Monthly: ${getMonthlyPriceText(program.monthlyFee)})`}
+                        {program.title} {isSpec ? (program.id === 'private-class' ? '(Studio: ₹549 | Home: ₹849)' : `(Package: ${program.demoPrice || program.monthlyFee})`) : `(Demo: ${program.demoPrice || '₹49'} | Monthly: ${getMonthlyPriceText(program.monthlyFee)})`}
                       </option>
                     );
                   })}

@@ -219,10 +219,10 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     imageUrl: "/private-class.jpg",
     pillTag: "ONE-ON-ONE",
     levelLabel: "PERSONALIZED",
-    description: "Exclusive 1-on-1 Certified Mentorship",
+    description: "Exclusive 1-on-1 Certified Mentorship & Home Training",
     demoPrice: "₹549",
     feeLabel: "Per Class Fee",
-    monthlyFee: "Custom packages based on hours",
+    monthlyFee: "Studio: ₹549 / Home: ₹849",
     trialInfo: "Dedicated Schedule",
     batches: [
       {
@@ -234,6 +234,18 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
           "Customize your days and time according to you",
           "Dedicated master instructor coaching",
           "Per class — ₹549"
+        ]
+      },
+      {
+        id: "batch-2",
+        name: "Home Service",
+        days: "Flexible (At Your Home / Doorstep)",
+        price: "₹849",
+        schedules: [
+          "Instructor visits directly to your home",
+          "Personalized 1-on-1 dance training at your doorstep",
+          "Flexible timing according to your convenience",
+          "Per class — ₹849"
         ]
       }
     ]
@@ -287,7 +299,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
   }
 ];
 
-export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v7';
+export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v8';
 
 export function loadCategories(): CategoryItem[] {
   try {
