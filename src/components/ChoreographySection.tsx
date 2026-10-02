@@ -4,6 +4,7 @@ import {
   Volume2,
   VolumeX,
   X,
+  ArrowLeft,
 } from 'lucide-react';
 
 export interface ChoreographyPerformanceItem {
@@ -223,9 +224,11 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
                 </div>
                 <button
                   onClick={() => setActiveModalVideo(null)}
-                  className="text-neutral-400 hover:text-white p-1 rounded-lg hover:bg-neutral-800 transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-200 hover:text-white text-xs sm:text-sm font-bold transition-all border border-neutral-700 active:scale-95 cursor-pointer shadow-xs"
+                  title="Back"
                 >
-                  <X className="w-5 h-5" />
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Back</span>
                 </button>
               </div>
 
@@ -247,10 +250,17 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
 
               {/* Modal Footer with Actions */}
               <div className="px-5 py-3.5 bg-neutral-900/90 border-t border-neutral-800 flex flex-wrap items-center justify-between gap-3 text-white">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
+                  <button
+                    onClick={() => setActiveModalVideo(null)}
+                    className="flex items-center gap-1.5 text-xs font-bold text-neutral-300 hover:text-white bg-neutral-800 hover:bg-neutral-700 px-3 py-1.5 rounded-lg border border-neutral-700 cursor-pointer transition-colors"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>Back</span>
+                  </button>
                   <button
                     onClick={() => setModalIsMuted(!modalIsMuted)}
-                    className="flex items-center gap-1.5 text-xs font-bold text-neutral-300 hover:text-white bg-neutral-800 px-3 py-1.5 rounded-lg cursor-pointer"
+                    className="flex items-center gap-1.5 text-xs font-bold text-neutral-300 hover:text-white bg-neutral-800 hover:bg-neutral-700 px-3 py-1.5 rounded-lg border border-neutral-700 cursor-pointer transition-colors"
                   >
                     {modalIsMuted ? <VolumeX className="w-4 h-4 text-amber-400" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
                     <span>{modalIsMuted ? 'Unmute Sound' : 'Mute Sound'}</span>
