@@ -101,7 +101,8 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
     if (initialCategory && isOpen) {
       const cat = findCategory(initialCategory);
       setSelectedCatId(cat.id);
-      setSelectedBatchIndex(0);
+      const popIdx = cat.batches?.findIndex((b) => b.badge === 'POPULAR');
+      setSelectedBatchIndex(popIdx !== undefined && popIdx >= 0 ? popIdx : 0);
       setPlanType('demo');
       setStep('form');
       setErrorMessage('');
@@ -142,7 +143,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
     return match ? match[0] : monthlyStr;
   };
 
-  const monthlyPriceText = (planType === 'monthly' && activeBatch?.price)
+  const monthlyPriceText = (activeBatch?.price)
     ? activeBatch.price
     : getMonthlyPriceText(currentCategory.monthlyFee);
   const demoPriceText = currentCategory.demoPrice || 'â‚¹49';
@@ -153,7 +154,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
     : (planType === 'monthly' ? monthlyPriceText : demoPriceText);
 
   // Numeric amount for UPI
-  const numericAmount = parseInt(activeFeeText.replace(/[^\d]/g, ''), 10) || (planType === 'monthly' ? 1549 : 49);
+  const numericAmount = parseInt(activeFeeText.replace(/[^\d]/g, ''), 10) || (planType === 'monthly' ? 1950 : 49);
 
   // Studio UPI details (sanjeev biruly / 9692451182@fam)
   const upiPayee = studioInfo.upiPayeeName || 'sanjeev biruly';
@@ -346,7 +347,7 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
               </div>
               <div className="flex justify-between">
                 <span>Amount Paid:</span>
-                <span className="font-extrabold text-emerald-400">{activeFeeText} (UPI Paid)</span>
+                <span className="font-extrabold text-amber-400">{activeFeeText} (UPI Paid)</span>
               </div>
               {utrNumber && (
                 <div className="flex justify-between">
@@ -386,7 +387,7 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                   STEP 2 OF 2: PAYMENT
                 </span>
-                <span className="text-lg font-black text-emerald-400 font-display">
+                <span className="text-lg font-black text-amber-400 font-display">
                   {activeFeeText}
                 </span>
               </div>
@@ -404,7 +405,7 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
               </div>
               <div className="text-right">
                 <span className="text-xs font-semibold text-slate-300 block">{name}</span>
-                <span className="text-[11px] text-emerald-400 font-bold">{activeFeeText} Payable</span>
+                <span className="text-[11px] text-amber-400 font-bold">{activeFeeText} Payable</span>
               </div>
             </div>
 
@@ -447,9 +448,9 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
               </span>
 
               {/* Amount reminder under QR */}
-              <div className="mt-2.5 px-4 py-1.5 bg-emerald-950/40 border border-emerald-500/30 rounded-full flex items-center gap-2">
+              <div className="mt-2.5 px-4 py-1.5 bg-amber-950/40 border border-amber-500/30 rounded-full flex items-center gap-2">
                 <span className="text-xs text-slate-300 font-semibold">Payable:</span>
-                <span className="text-emerald-400 text-sm font-extrabold">{activeFeeText}</span>
+                <span className="text-amber-400 text-sm font-extrabold">{activeFeeText}</span>
               </div>
 
               {/* Direct UPI Apps Link Button (Mobile Users) */}
@@ -533,7 +534,7 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
                 <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider">
                   1. SELECT DANCE PROGRAM
                 </label>
-                <span className="text-[10px] text-emerald-400 font-mono font-bold">
+                <span className="text-[10px] text-amber-400 font-mono font-bold">
                   {isSpecialCategory ? activeFeeText : `Demo ${currentCategory.demoPrice || 'â‚¹49'}`}
                 </span>
               </div>
@@ -543,7 +544,9 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
                   onChange={(e) => {
                     const newCatId = e.target.value;
                     setSelectedCatId(newCatId);
-                    setSelectedBatchIndex(0);
+                    const targetCat = activeCategories.find((c) => c && c.id === newCatId);
+                    const popIdx = targetCat?.batches?.findIndex((b) => b.badge === 'POPULAR');
+                    setSelectedBatchIndex(popIdx !== undefined && popIdx >= 0 ? popIdx : 0);
                     setErrorMessage('');
                   }}
                   className="w-full bg-[#14161C] border border-[#2B2E39] focus:border-[#0066FF] rounded-xl px-4 py-3 text-sm text-white focus:outline-none appearance-none cursor-pointer transition-colors"
@@ -570,7 +573,7 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
                   <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider">
                     {isHomeService ? '2. SELECT HOME SERVICE PACKAGE' : '2. SELECT PACKAGE / BATCH'}
                   </label>
-                  <span className="text-xs font-black text-emerald-400 font-display">
+                  <span className="text-xs font-black text-amber-400 font-display">
                     {activeFeeText}
                   </span>
                 </div>
@@ -618,7 +621,7 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
 
                         <div className="mt-3 pt-2.5 border-t border-white/10 flex items-baseline justify-between">
                           <span className="text-xs text-slate-400">Total Fee:</span>
-                          <span className="text-xl font-black text-emerald-400 font-display">
+                          <span className="text-xl font-black text-amber-400 font-display">
                             {batch.price || activeFeeText}
                           </span>
                         </div>
@@ -662,7 +665,7 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
 
                       <div className="mt-3 pt-2.5 border-t border-white/10 flex items-baseline justify-between">
                         <span className="text-[11px] text-slate-400">Trial Fee:</span>
-                        <span className="text-xl font-extrabold text-emerald-400 font-display">
+                        <span className="text-xl font-extrabold text-amber-400 font-display">
                           {demoPriceText}
                         </span>
                       </div>
@@ -682,7 +685,7 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
                           <span className="text-xs font-black uppercase tracking-wider text-white">
                             Monthly Course
                           </span>
-                          <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
                             POPULAR
                           </span>
                         </div>
@@ -699,7 +702,7 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
 
                       <div className="mt-3 pt-2.5 border-t border-white/10 flex items-baseline justify-between">
                         <span className="text-[11px] text-slate-400">Course Fee:</span>
-                        <span className="text-xl font-extrabold text-emerald-400 font-display">
+                        <span className="text-xl font-extrabold text-amber-400 font-display">
                           {monthlyPriceText}
                         </span>
                       </div>
@@ -741,8 +744,13 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
                               )}
                             </span>
                             <div className="flex items-center gap-2">
+                              {batch.badge === 'POPULAR' && (
+                                <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-amber-500/25 text-amber-300 border border-amber-500/40 tracking-wider">
+                                  POPULAR
+                                </span>
+                              )}
                               {batch.price && planType === 'monthly' && (
-                                <span className="text-[11px] font-extrabold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                                <span className="text-[11px] font-extrabold text-amber-400 bg-amber-950/50 border border-amber-500/30 px-2 py-0.5 rounded-full">
                                   {batch.price}
                                 </span>
                               )}

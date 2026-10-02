@@ -123,7 +123,7 @@
     "description": "Flexibility, Acrobatics & Core Balance",
     "demoPrice": "₹49",
     "feeLabel": "Demo Registration Fee",
-    "monthlyFee": "₹1,249 – ₹1,950 / month",
+    "monthlyFee": "₹1,950 / month (4 Days - Popular)",
     "trialInfo": "Trial Class Available",
     "batches": [
       {
@@ -154,6 +154,7 @@
         "name": "4 Days / Week",
         "days": "Wed, Fri, Sat, Sun",
         "price": "₹1,950",
+        "badge": "POPULAR",
         "schedules": [
           "Wednesday — 5:00 PM",
           "Friday — 5:00 PM",
