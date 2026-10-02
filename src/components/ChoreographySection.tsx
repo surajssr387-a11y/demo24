@@ -26,7 +26,7 @@ const DEFAULT_PERFORMANCES: ChoreographyPerformanceItem[] = [
   },
   {
     id: 'choreo-2',
-    title: 'Senior/Beginner Routine',
+    title: 'Beginner Routine',
     videoUrl: '/choreography/choreo-senior.mp4',
     yPosition: 22,
     brightness: 1.05,
