@@ -216,66 +216,6 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     ]
   },
   {
-    id: "home-service",
-    title: "Home service",
-    imageUrl: "/home-service.jpg",
-    pillTag: "DOORSTEP",
-    levelLabel: "AT YOUR PLACE",
-    description: "Personalized Dance Coaching at Your Home",
-    demoPrice: "₹6,000",
-    feeLabel: "Package Fee",
-    monthlyFee: "₹6,000 (8 classes) / ₹7,000 (12 classes)",
-    trialInfo: "Home Visit Available",
-    batches: [
-      {
-        id: "batch-1",
-        name: "8 Classes Package",
-        days: "Choose your days (2-3 days/week)",
-        price: "₹6,000",
-        schedules: [
-          "8 personalized dance classes",
-          "At your doorstep anywhere in Ranchi",
-          "Fee — ₹6,000"
-        ]
-      },
-      {
-        id: "batch-2",
-        name: "12 Classes Package",
-        days: "Choose your days (3-4 days/week)",
-        price: "₹7,000",
-        schedules: [
-          "12 comprehensive dance classes",
-          "At your doorstep anywhere in Ranchi",
-          "Fee — ₹7,000"
-        ]
-      }
-    ]
-  },
-  {
-    id: "job-person",
-    title: "Job person",
-    imageUrl: "/job-person.jpg",
-    pillTag: "EVENING BATCH",
-    levelLabel: "WORKING PROFESSIONALS",
-    description: "Evening De-stress & Skill Building",
-    demoPrice: "₹49",
-    feeLabel: "Demo Registration Fee",
-    monthlyFee: "₹1,600 / month (12 sessions)",
-    trialInfo: "Trial Class Available",
-    batches: [
-      {
-        id: "batch-1",
-        name: "Evening Professional Batch",
-        days: "Monday to Thursday",
-        schedules: [
-          "Monday – Thursday (7:00 PM – 8:00 PM)",
-          "Desk posture revival & cardio choreo",
-          "Kutchery Road studio"
-        ]
-      }
-    ]
-  },
-  {
     id: "wedding-choreography",
     title: "Wedding choreography",
     imageUrl: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1000&q=80",
