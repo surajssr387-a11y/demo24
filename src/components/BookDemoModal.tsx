@@ -96,6 +96,9 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
   const [utrNumber, setUtrNumber] = useState('');
   const [copiedUpi, setCopiedUpi] = useState(false);
 
+  // Skill Level: Level 1, Level 2, Level 3
+  const [selectedLevel, setSelectedLevel] = useState<string>('Level 1');
+
   // Sync selected program when initialCategory changes or modal opens
   useEffect(() => {
     if (initialCategory && isOpen) {
@@ -104,6 +107,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
       const popIdx = cat.batches?.findIndex((b) => b.badge === 'POPULAR');
       setSelectedBatchIndex(popIdx !== undefined && popIdx >= 0 ? popIdx : 0);
       setPlanType('monthly');
+      setSelectedLevel('Level 1');
       setStep('form');
       setErrorMessage('');
       setLastWhatsAppUrl('');
@@ -228,6 +232,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📋 *Booking Type:* ${planLabel}
 💃 *Dance Program:* ${currentCategory.title}
+🎯 *Skill Level:* ${selectedLevel}
 🏷️ *Selected Batch:* ${activeBatch.name}${activeBatch.days ? ` (${activeBatch.days})` : ''}
 🕒 *Schedule & Timings:*
 ${scheduleBulletList}
@@ -239,7 +244,6 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
 • *Full Name:* ${name.trim()}
 • *Mobile Number:* ${cleanPhone}
 • *Preferred Starting Date:* ${chosenDate}
-• *Studio Branch:* 2nd Floor, Metro Market, Kutchery Road, Ranchi
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ *Admin Action:* Payment received. Please verify batch slot and reply with admission confirmation.`;
 
@@ -264,6 +268,7 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
             name: name.trim(),
             phone: cleanPhone,
             program: currentCategory.title,
+            level: selectedLevel,
             plan: planLabel,
             batch: activeBatch.name,
             schedule: activeBatch.schedules,
@@ -339,6 +344,10 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                 <span className="font-semibold text-blue-600">{currentCategory.title}</span>
               </div>
               <div className="flex justify-between">
+                <span className="text-slate-500">Selected Level:</span>
+                <span className="font-semibold text-slate-900">{selectedLevel}</span>
+              </div>
+              <div className="flex justify-between">
                 <span className="text-slate-500">Selected Plan:</span>
                 <span className="font-bold text-slate-900">
                   {planType === 'monthly' ? 'Full Monthly Course' : 'Trial Demo Session'}
@@ -403,7 +412,7 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                   {currentCategory.title}
                 </span>
                 <span className="text-[11px] text-slate-500">
-                  {planType === 'monthly'
+                  {selectedLevel} • {planType === 'monthly'
                     ? (isGymnastic ? '4 Days / Week (16 Sessions)' : 'Full Monthly Course')
                     : 'Trial Demo Session'} • {activeBatch.name}
                 </span>
@@ -721,11 +730,47 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                   </div>
                 </div>
 
-                {/* 3. SELECT TIMINGS */}
+                {/* 3. SELECT LEVEL */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
-                      3. SELECT TIMINGS
+                      3. SELECT LEVEL
+                    </label>
+                    <span className="text-[10px] text-blue-600 font-semibold uppercase">
+                      {selectedLevel}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2.5">
+                    {['Level 1', 'Level 2', 'Level 3'].map((lvl) => {
+                      const isSelected = selectedLevel === lvl;
+                      return (
+                        <button
+                          key={lvl}
+                          type="button"
+                          onClick={() => setSelectedLevel(lvl)}
+                          className={`py-2.5 px-3 rounded-xl border text-center transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                            isSelected
+                              ? 'border-blue-600 bg-blue-50/70 shadow-xs ring-2 ring-blue-500/20 text-slate-900 font-bold'
+                              : 'border-slate-200 bg-slate-50 hover:bg-slate-100/80 text-slate-700 hover:border-slate-300 font-medium'
+                          }`}
+                        >
+                          <span className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center shrink-0 ${
+                            isSelected ? 'border-blue-600 bg-blue-600' : 'border-slate-300 bg-white'
+                          }`}>
+                            {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                          </span>
+                          <span className="text-xs sm:text-sm font-semibold">{lvl}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 4. SELECT TIMINGS */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+                      4. SELECT TIMINGS
                     </label>
                   </div>
                   <div className={`grid gap-2.5 ${currentBatches.length > 1 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
