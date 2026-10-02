@@ -60,7 +60,7 @@ const DEFAULT_PERFORMANCES: ChoreographyPerformanceItem[] = [
   },
   {
     id: 'choreo-6',
-    title: 'Private Class Choreography',
+    title: 'Wedding Choreography',
     videoUrl: '/choreography/choreo-private.mp4',
     yPosition: 18,
     brightness: 1.05,
@@ -235,7 +235,10 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
-                    const categoryName = activeModalVideo.title.includes('Kids')
+                    const isWedding = activeModalVideo.title.toLowerCase().includes('wedding');
+                    const categoryName = isWedding
+                      ? 'Wedding Choreography'
+                      : activeModalVideo.title.includes('Kids')
                       ? 'Kids Dance'
                       : activeModalVideo.title.includes('Bollywood') || activeModalVideo.title.includes('Girls') || activeModalVideo.title.includes('Ladies')
                       ? 'Bollywood Ladies'
@@ -249,7 +252,9 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
                   }}
                   className="bg-[#0066FF] hover:bg-[#0052cc] text-white px-5 py-2 rounded-xl text-xs font-extrabold shadow-md transition-all active:scale-95 cursor-pointer"
                 >
-                  Join This Batch / Book Demo ₹49
+                  {activeModalVideo.title.toLowerCase().includes('wedding')
+                    ? 'Book Wedding Choreography'
+                    : 'Join This Batch / Book Demo ₹49'}
                 </button>
               </div>
             </div>
