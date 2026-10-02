@@ -14,7 +14,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { studioInfo } from '../data/danceData';
-import { CategoryItem, loadCategories } from '../data/categoriesData';
+import { CategoryItem, loadCategories, DEFAULT_CATEGORIES } from '../data/categoriesData';
 
 interface BookDemoModalProps {
   isOpen: boolean;
