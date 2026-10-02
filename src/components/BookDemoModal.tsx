@@ -134,6 +134,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
   const isPrivateClass = currentCategory.id === 'private-class';
   const isWeddingChoreo = currentCategory.id === 'wedding-choreography';
   const isSpecialCategory = isHomeService || isPrivateClass || isWeddingChoreo;
+  const isGymnastic = currentCategory.id === 'gymnastic';
   const isDemoCategory = !isSpecialCategory;
 
   // Helper to extract clean monthly price text (e.g. "â‚¹1,549")
@@ -161,7 +162,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
   const studioUpiId = studioInfo.upiId || '9692451182@fam';
   const upiPayNote = isSpecialCategory
     ? `${currentCategory.title} ${activeBatch?.name || 'Package'}`
-    : `${currentCategory.title} ${planType === 'monthly' ? 'Monthly Course' : 'Demo â‚¹49'}`;
+    : `${currentCategory.title} ${planType === 'monthly' ? (isGymnastic ? '4 Days Week (16 Sessions)' : 'Monthly Course') : 'Demo â‚¹49'}`;
   const upiPayUrl = `upi://pay?pa=${studioUpiId}&pn=${encodeURIComponent(upiPayee)}&am=${numericAmount}&cu=INR&tn=${encodeURIComponent(upiPayNote)}`;
 
   // Dynamic QR Code image URL (with high resolution and proper margin)
@@ -216,7 +217,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
     const planLabel = isSpecialCategory
       ? `${currentCategory.title} (${activeBatch.name})`
       : planType === 'monthly'
-      ? 'Full Monthly Course'
+      ? (isGymnastic ? '4 Days / Week (16 Sessions Course)' : 'Full Monthly Course')
       : 'Demo Class (Trial â‚¹49)';
     const paymentStatusBadge = 'PAID ONLINE VIA UPI (Verified)';
 
@@ -400,7 +401,9 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
                   {currentCategory.title}
                 </span>
                 <span className="text-[11px] text-slate-400">
-                  {planType === 'monthly' ? 'Full Monthly Course' : 'Trial Demo Session'} â€¢ {activeBatch.name}
+                  {planType === 'monthly'
+                    ? (isGymnastic ? '4 Days / Week (16 Sessions)' : 'Full Monthly Course')
+                    : 'Trial Demo Session'} â€¢ {activeBatch.name}
                 </span>
               </div>
               <div className="text-right">
@@ -587,7 +590,7 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
                         onClick={() => setSelectedBatchIndex(idx)}
                         className={`rounded-2xl p-4 transition-all border cursor-pointer relative flex flex-col justify-between ${
                           isSelected
-                            ? 'border-[#0066FF] bg-blue-950/40 shadow-lg ring-1 ring-[#0066FF]/60'
+                            ? 'border-amber-400 bg-amber-500/15 shadow-lg shadow-amber-950/40 ring-1 ring-amber-400/60'
                             : 'border-[#262832] bg-[#13151A] hover:border-slate-500'
                         }`}
                       >
@@ -597,9 +600,9 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
                               {batch.name}
                             </span>
                             <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                              isSelected ? 'border-[#0066FF] bg-[#0066FF]' : 'border-slate-600'
+                              isSelected ? 'border-amber-400 bg-amber-400' : 'border-slate-600'
                             }`}>
-                              {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                              {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-black" />}
                             </span>
                           </div>
 
@@ -644,7 +647,7 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
                       onClick={() => setPlanType('demo')}
                       className={`rounded-2xl p-4 transition-all border cursor-pointer relative flex flex-col justify-between ${
                         planType === 'demo'
-                          ? 'border-[#0066FF] bg-blue-950/30 shadow-lg ring-1 ring-[#0066FF]/40'
+                          ? 'border-amber-400 bg-amber-500/15 shadow-lg shadow-amber-950/40 ring-1 ring-amber-400/60'
                           : 'border-[#262832] bg-[#13151A] hover:border-slate-500'
                       }`}
                     >
@@ -653,9 +656,9 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
                           Trial Demo Class
                         </span>
                         <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                          planType === 'demo' ? 'border-[#0066FF] bg-[#0066FF]' : 'border-slate-600'
+                          planType === 'demo' ? 'border-amber-400 bg-amber-400' : 'border-slate-600'
                         }`}>
-                          {planType === 'demo' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                          {planType === 'demo' && <span className="w-1.5 h-1.5 rounded-full bg-black" />}
                         </span>
                       </div>
 
@@ -671,37 +674,41 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
                       </div>
                     </div>
 
-                    {/* Plan B: Full Monthly Course */}
+                    {/* Plan B: Full Monthly Course / 4 Days / Week for Gymnastic */}
                     <div
                       onClick={() => setPlanType('monthly')}
                       className={`rounded-2xl p-4 transition-all border cursor-pointer relative flex flex-col justify-between ${
                         planType === 'monthly'
-                          ? 'border-[#0066FF] bg-blue-950/30 shadow-lg ring-1 ring-[#0066FF]/40'
+                          ? 'border-amber-400 bg-amber-500/15 shadow-lg shadow-amber-950/40 ring-1 ring-amber-400/60'
                           : 'border-[#262832] bg-[#13151A] hover:border-slate-500'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-1.5">
                           <span className="text-xs font-black uppercase tracking-wider text-white">
-                            Monthly Course
+                            {isGymnastic ? '4 Days / Week' : 'Monthly Course'}
                           </span>
                           <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
                             POPULAR
                           </span>
                         </div>
                         <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                          planType === 'monthly' ? 'border-[#0066FF] bg-[#0066FF]' : 'border-slate-600'
+                          planType === 'monthly' ? 'border-amber-400 bg-amber-400' : 'border-slate-600'
                         }`}>
-                          {planType === 'monthly' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                          {planType === 'monthly' && <span className="w-1.5 h-1.5 rounded-full bg-black" />}
                         </span>
                       </div>
 
                       <p className="text-[11px] text-slate-400 leading-snug">
-                        Full 12 sessions comprehensive training with stage &amp; certificate track.
+                        {isGymnastic
+                          ? 'Full total 16 sessions comprehensive training with stage & certificate track.'
+                          : 'Full 12 sessions comprehensive training with stage & certificate track.'}
                       </p>
 
                       <div className="mt-3 pt-2.5 border-t border-white/10 flex items-baseline justify-between">
-                        <span className="text-[11px] text-slate-400">Course Fee:</span>
+                        <span className="text-[11px] text-slate-400">
+                          {isGymnastic ? 'Plan Fee:' : 'Course Fee:'}
+                        </span>
                         <span className="text-xl font-extrabold text-amber-400 font-display">
                           {monthlyPriceText}
                         </span>
@@ -730,7 +737,7 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
                             isFull
                               ? 'border-red-900/60 bg-red-950/20 opacity-80 cursor-not-allowed'
                               : isSelected
-                              ? 'border-[#0066FF] bg-blue-950/20 cursor-pointer shadow-sm'
+                              ? 'border-amber-400 bg-amber-500/15 ring-1 ring-amber-400/60 cursor-pointer shadow-md shadow-amber-950/40'
                               : 'border-[#262832] bg-[#13151A] hover:border-slate-500 cursor-pointer'
                           }`}
                         >
@@ -759,7 +766,7 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
                                   FULL
                                 </span>
                               ) : isSelected ? (
-                                <span className="w-2 h-2 rounded-full bg-[#0066FF]" />
+                                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-xs shadow-amber-400/80" />
                               ) : null}
                             </div>
                           </div>
