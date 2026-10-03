@@ -1231,17 +1231,6 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
               <span>BOOK YOUR APPOINTMENT</span>
               <ArrowRight className="w-5 h-5 text-white" />
             </button>
-
-            {/* 7. PREFER CALLING FOOTER */}
-            <div className="text-center pt-1.5">
-              <a
-                href={`tel:${studioInfo.phone}`}
-                className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-700 hover:text-slate-950 transition-colors"
-              >
-                <Phone className="w-4 h-4 text-blue-600" />
-                <span>Prefer calling? {studioInfo.phoneDisplay}</span>
-              </a>
-            </div>
           </form>
         )}
         </div>
