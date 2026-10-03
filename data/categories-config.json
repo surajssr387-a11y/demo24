@@ -185,6 +185,17 @@
           "Thursday — 11:00 AM",
           "Friday — 11:00 AM"
         ]
+      },
+      {
+        "id": "batch-2",
+        "name": "Evening Ladies Batch",
+        "days": "Mon, Tue, Wed, Thu",
+        "schedules": [
+          "Monday — 7:00 PM - 8:00 PM",
+          "Tuesday — 7:00 PM - 8:00 PM",
+          "Wednesday — 7:00 PM - 8:00 PM",
+          "Thursday — 7:00 PM - 8:00 PM"
+        ]
       }
     ],
     "videoUrl": "/bollywood-ladies.mp4"
