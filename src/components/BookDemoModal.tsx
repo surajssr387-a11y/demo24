@@ -184,6 +184,9 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
         setSelectedCatId(nextCat.id);
         const popIdx = nextCat.batches?.findIndex((b) => b.badge === 'POPULAR');
         setSelectedBatchIndex(popIdx !== undefined && popIdx >= 0 ? popIdx : 0);
+        if (nextCat.id !== 'private-class' && nextCat.id !== 'home-service' && nextCat.id !== 'wedding-choreography') {
+          setTime('');
+        }
         setErrorMessage('');
         setSlideAnim(null);
       }, 160);
@@ -199,6 +202,9 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
         setSelectedCatId(prevCat.id);
         const popIdx = prevCat.batches?.findIndex((b) => b.badge === 'POPULAR');
         setSelectedBatchIndex(popIdx !== undefined && popIdx >= 0 ? popIdx : 0);
+        if (prevCat.id !== 'private-class' && prevCat.id !== 'home-service' && prevCat.id !== 'wedding-choreography') {
+          setTime('');
+        }
         setErrorMessage('');
         setSlideAnim(null);
       }, 160);
@@ -1012,11 +1018,41 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
               </div>
             </div>
 
-            {/* 5. PREFERRED DATE & TIME INPUTS (Flexible Mon to Sun) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* 5. PREFERRED DATE & TIME INPUTS */}
+            {isSpecialCategory ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider mb-1.5">
+                    PREFERRED DATE *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      className="w-full bg-slate-50 border-2 border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 rounded-xl px-4 py-3 text-sm sm:text-base font-medium text-slate-900 focus:outline-none transition-colors shadow-xs [color-scheme:light]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider mb-1.5">
+                    PREFERRED TIME (MON - SUN) *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="time"
+                      value={time}
+                      onChange={(e) => setTime(e.target.value)}
+                      className="w-full bg-slate-50 border-2 border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 rounded-xl px-4 py-3 text-sm sm:text-base font-medium text-slate-900 focus:outline-none transition-colors shadow-xs [color-scheme:light]"
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : (
               <div>
                 <label className="block text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider mb-1.5">
-                  {isPrivateClass || isHomeService ? 'PREFERRED DATE *' : 'PREFERRED DATE (OPTIONAL)'}
+                  PREFERRED STARTING DATE (OPTIONAL)
                 </label>
                 <div className="relative">
                   <input
@@ -1027,21 +1063,7 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
                   />
                 </div>
               </div>
-
-              <div>
-                <label className="block text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider mb-1.5">
-                  {isPrivateClass || isHomeService ? 'PREFERRED TIME (MON - SUN) *' : 'PREFERRED TIME (OPTIONAL)'}
-                </label>
-                <div className="relative">
-                  <input
-                    type="time"
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                    className="w-full bg-slate-50 border-2 border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 rounded-xl px-4 py-3 text-sm sm:text-base font-medium text-slate-900 focus:outline-none transition-colors shadow-xs [color-scheme:light]"
-                  />
-                </div>
-              </div>
-            </div>
+            )}
 
             {/* Quick Time Slots for Private Class & Home Service */}
             {(isPrivateClass || isHomeService) && (
