@@ -911,26 +911,26 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
                         }`}
                       >
                         <div>
-                          <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-sm font-bold text-slate-900">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm sm:text-base font-black text-slate-950 tracking-tight">
                               {batch.name}
                             </span>
-                            <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                            <span className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
                               isSelected ? 'border-blue-600 bg-blue-600' : 'border-slate-300 bg-white'
                             }`}>
                               {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
                             </span>
                           </div>
 
-                          <div className="space-y-1.5 my-2.5">
+                          <div className="space-y-2 my-3">
                             {batch.schedules
                               .filter((schedule) => {
                                 const lower = schedule.toLowerCase();
                                 return !lower.includes('fee') && !lower.startsWith('total package') && !lower.startsWith('per class');
                               })
                               .map((schedule, sIdx) => (
-                              <p key={sIdx} className="text-xs text-slate-600 flex items-start gap-1.5 leading-snug">
-                                <span className="text-blue-600 font-bold shrink-0">•</span>
+                              <p key={sIdx} className="text-xs sm:text-sm text-slate-800 font-semibold flex items-start gap-2 leading-snug">
+                                <span className="text-blue-600 font-black text-sm shrink-0 leading-tight">•</span>
                                 <span>{schedule}</span>
                               </p>
                             ))}
@@ -939,7 +939,7 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
 
                         {isCustomBatch ? (
                           <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-center justify-between">
-                            <span className="text-xs font-semibold text-slate-500">
+                            <span className="text-xs sm:text-sm font-semibold text-slate-600">
                               Package Fee:
                             </span>
                             <span className="text-xs font-black text-emerald-700 bg-emerald-100/90 border border-emerald-300 px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-xs">
@@ -949,10 +949,10 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
                           </div>
                         ) : (
                           <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-baseline justify-between">
-                            <span className="text-xs text-slate-500">
+                            <span className="text-xs sm:text-sm font-semibold text-slate-600">
                               Total Fee:
                             </span>
-                            <span className="text-xl font-black text-blue-600 font-display">
+                            <span className="text-xl sm:text-2xl font-black text-blue-600 font-display">
                               {displayPrice}
                             </span>
                           </div>
@@ -1192,16 +1192,16 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
                               : 'border-slate-300 bg-slate-50 hover:bg-slate-100/80 hover:border-slate-400 cursor-pointer text-slate-800'
                           }`}
                         >
-                          <div className="font-bold text-slate-900 text-xs sm:text-sm mb-1.5 flex items-center justify-between">
-                            <span className="flex items-center gap-1.5">
-                              <span className="font-extrabold">{batch.name.replace(/\s*\/\s*week/i, '')}</span>
+                          <div className="font-extrabold text-slate-950 text-sm sm:text-base mb-2 flex items-center justify-between">
+                            <span className="flex items-center gap-1.5 flex-wrap">
+                              <span className="font-black text-slate-950">{batch.name.replace(/\s*\/\s*week/i, '')}</span>
                               {batch.days && (
-                                <span className="text-xs text-slate-600 font-medium">
+                                <span className="text-xs sm:text-sm text-slate-700 font-semibold">
                                   ({batch.days})
                                 </span>
                               )}
                             </span>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 shrink-0">
                               {batch.badge === 'POPULAR' && (
                                 <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-blue-100 text-blue-700 border border-blue-200 tracking-wider">
                                   POPULAR
@@ -1221,11 +1221,11 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
                               ) : null}
                             </div>
                           </div>
-                          <div className="space-y-1 text-slate-700">
+                          <div className="space-y-1.5 text-slate-800">
                             {batch.schedules
                               .filter((schedule) => !schedule.toLowerCase().startsWith('course fee'))
                               .map((schedule, sIdx) => (
-                                <div key={sIdx} className="leading-tight text-xs sm:text-sm font-medium">
+                                <div key={sIdx} className="leading-snug text-xs sm:text-sm font-semibold text-slate-800">
                                   {schedule}
                                 </div>
                               ))}
