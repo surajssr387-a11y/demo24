@@ -45,7 +45,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
         schedules: [
           "Thursday — 5:00 PM",
           "Saturday — 5:00 PM",
-          "Sunday — 11:00 AM"
+          "Sunday — 9:00 AM"
         ]
       },
       {
@@ -307,7 +307,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
   }
 ];
 
-export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v15';
+export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v16';
 
 export function loadCategories(): CategoryItem[] {
   try {
