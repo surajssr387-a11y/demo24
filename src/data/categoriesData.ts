@@ -80,7 +80,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     description: "Step-by-Step Fundamentals",
     demoPrice: "₹49",
     feeLabel: "Demo Registration Fee",
-    monthlyFee: "₹1,649 / month (12 sessions)",
+    monthlyFee: "₹1,549 / month (12 sessions)",
     trialInfo: "Custom Packages",
     batches: [
       {
@@ -114,7 +114,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     description: "Intensive Technique & Choreography",
     demoPrice: "₹49",
     feeLabel: "Demo Registration Fee",
-    monthlyFee: "₹2,249 / month (12 sessions)",
+    monthlyFee: "₹1,549 / month (12 sessions)",
     trialInfo: "Trial Class Available",
     batches: [
       {
@@ -307,12 +307,12 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
   }
 ];
 
-export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v19';
+export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v20';
 
 export function loadCategories(): CategoryItem[] {
   try {
     // Clear old versions to prevent stale batch timings
-    ['ramys_categories_config_v14', 'ramys_categories_config_v15', 'ramys_categories_config_v16', 'ramys_categories_config_v17'].forEach((k) => {
+    ['ramys_categories_config_v14', 'ramys_categories_config_v15', 'ramys_categories_config_v16', 'ramys_categories_config_v17', 'ramys_categories_config_v18', 'ramys_categories_config_v19'].forEach((k) => {
       try { localStorage.removeItem(k); } catch {}
     });
 
