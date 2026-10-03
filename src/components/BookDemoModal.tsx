@@ -1054,14 +1054,6 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
                         className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-white border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder:text-slate-400 text-slate-900"
                       />
                     </div>
-
-                    {/* WhatsApp enquiry callout */}
-                    <div className="mt-3 p-3 rounded-xl bg-emerald-100/70 border border-emerald-300 text-emerald-950 text-xs flex items-start gap-2.5">
-                      <MessageCircle className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5 fill-emerald-600/30" />
-                      <p className="leading-snug">
-                        <strong className="font-extrabold text-emerald-900">Submit Enquiry to WhatsApp:</strong> Niche diye gaye button par click karein. Aapki details ke sath WhatsApp open hoga jahan admin aapse direct connect karke customized pricing aur songs finalize karenge.
-                      </p>
-                    </div>
                   </div>
                 )}
               </div>
