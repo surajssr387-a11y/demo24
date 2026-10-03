@@ -51,9 +51,6 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-neutral-950 font-display tracking-tight uppercase">
             Categories
           </h2>
-          <p className="text-xs sm:text-sm text-neutral-500 mt-1">
-            Select a category to view schedules, batches &amp; book demo
-          </p>
         </div>
 
         {/* Categories Grid (3 columns on desktop, Wedding centered in its row with same size) */}
