@@ -111,6 +111,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     title: "Advance",
     imageUrl: "https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=1000&q=80",
     videoUrl: "/uploads/media_1791043494707_IMG_3161.mp4",
+    videoYPosition: 15,
     pillTag: "INTENSIVE",
     levelLabel: "PROFESSIONAL TRACK",
     description: "Intensive Technique & Choreography",
