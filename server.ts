@@ -14,10 +14,9 @@ async function startServer() {
   // Security: Disable X-Powered-By header to prevent fingerprinting
   app.disable('x-powered-by');
 
-  // Security: Core HTTP Security Headers
+  // Security: Core HTTP Security Headers (without blocking studio iframe)
   app.use((_req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.setHeader('X-XSS-Protection', '1; mode=block');
     next();
