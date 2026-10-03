@@ -277,7 +277,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
         id: "batch-2",
         name: "2 Choreography",
         days: "Flexible schedule (Studio / Home / Venue)",
-        price: "₹2,549/ea",
+        price: "₹5,549",
         schedules: [
           "2 customized dance routines",
           "Couple & family special"
@@ -297,7 +297,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
   }
 ];
 
-export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v12';
+export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v13';
 
 export function loadCategories(): CategoryItem[] {
   try {
