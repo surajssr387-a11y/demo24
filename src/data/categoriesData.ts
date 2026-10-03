@@ -154,7 +154,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     batches: [
       {
         id: "gym-batch-2days",
-        name: "2 Days / Week",
+        name: "2 Days",
         days: "Sat, Sun",
         price: "₹1,249",
         schedules: [
@@ -164,7 +164,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
       },
       {
         id: "gym-batch-3days",
-        name: "3 Days / Week",
+        name: "3 Days",
         days: "Wed, Fri, Sat",
         price: "₹1,549",
         schedules: [
@@ -175,7 +175,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
       },
       {
         id: "gym-batch-4days",
-        name: "4 Days / Week",
+        name: "4 Days",
         days: "Wed, Fri, Sat, Sun",
         price: "₹1,950",
         badge: "POPULAR",
@@ -299,7 +299,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
   }
 ];
 
-export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v8';
+export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v9';
 
 export function loadCategories(): CategoryItem[] {
   try {
@@ -307,7 +307,18 @@ export function loadCategories(): CategoryItem[] {
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+        return parsed.map((cat: CategoryItem) => {
+          if (cat.batches) {
+            return {
+              ...cat,
+              batches: cat.batches.map((b) => ({
+                ...b,
+                name: b.name ? b.name.replace(/\s*\/\s*week/i, '') : b.name,
+              })),
+            };
+          }
+          return cat;
+        });
       }
     }
   } catch (e) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   X,
   CreditCard,
@@ -12,9 +12,71 @@ import {
   Copy,
   Check,
   ShieldCheck,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { studioInfo } from '../data/danceData';
-import { CategoryItem, loadCategories, DEFAULT_CATEGORIES } from '../data/categoriesData';
+import { CategoryItem, BatchSchedule, loadCategories, DEFAULT_CATEGORIES } from '../data/categoriesData';
+
+// Kids Dance specific batch timings for Level 1, Level 2, Level 3
+const KIDS_LEVEL_BATCHES: Record<string, BatchSchedule[]> = {
+  'Level 1': [
+    {
+      id: 'batch-1',
+      name: 'Batch 1',
+      days: 'Thu, Sat, Sun',
+      schedules: [
+        'Thursday — 5:00 PM',
+        'Saturday — 5:00 PM',
+        'Sunday — 11:00 AM'
+      ]
+    },
+    {
+      id: 'batch-2',
+      name: 'Batch 2',
+      days: 'Sat, Sun',
+      schedules: [
+        'Saturday — 5:00 PM',
+        'Sunday — 5:00 PM',
+        'Sunday — 9:00 AM'
+      ]
+    },
+    {
+      id: 'batch-3',
+      name: 'Batch 3',
+      days: 'Tue, Sat, Sun',
+      schedules: [
+        'Tuesday — 4:30 PM',
+        'Saturday — 4:00 PM',
+        'Sunday — 11:00 AM'
+      ]
+    }
+  ],
+  'Level 2': [
+    {
+      id: 'kids-l2-b1',
+      name: 'Batch 1',
+      days: 'Thu, Sat, Sun',
+      schedules: [
+        'Thursday — 4:00 PM',
+        'Saturday — 4:00 PM',
+        'Sunday — 12:00 PM'
+      ]
+    }
+  ],
+  'Level 3': [
+    {
+      id: 'kids-l3-b1',
+      name: 'Batch 1',
+      days: 'Thu, Fri, Sun',
+      schedules: [
+        'Thursday — 4:30 PM',
+        'Friday — 4:30 PM',
+        'Sunday — 9:00 AM'
+      ]
+    }
+  ]
+};
 
 interface BookDemoModalProps {
   isOpen: boolean;
@@ -88,6 +150,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [lastWhatsAppUrl, setLastWhatsAppUrl] = useState('');
 
@@ -98,6 +161,85 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
 
   // Skill Level: Level 1, Level 2, Level 3 (Used specifically for Kids Dance)
   const [selectedLevel, setSelectedLevel] = useState<string>('Level 1');
+
+  // Category slide helpers with real animation & swipe/drag
+  const validCategories = activeCategories.filter(
+    (c) => c && c.id !== 'home-service' && c.id !== 'job-person'
+  );
+
+  const currentCategoryIndex = Math.max(0, validCategories.findIndex((c) => c.id === selectedCatId));
+
+  const [slideAnim, setSlideAnim] = useState<'slide-left' | 'slide-right' | null>(null);
+  const [dragOffset, setDragOffset] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const isDraggingRef = useRef(false);
+  const startXRef = useRef(0);
+
+  const goToNextCategory = () => {
+    setSlideAnim('slide-left');
+    const nextIdx = (currentCategoryIndex + 1) % validCategories.length;
+    const nextCat = validCategories[nextIdx];
+    if (nextCat) {
+      setTimeout(() => {
+        setSelectedCatId(nextCat.id);
+        const popIdx = nextCat.batches?.findIndex((b) => b.badge === 'POPULAR');
+        setSelectedBatchIndex(popIdx !== undefined && popIdx >= 0 ? popIdx : 0);
+        setErrorMessage('');
+        setSlideAnim(null);
+      }, 160);
+    }
+  };
+
+  const goToPrevCategory = () => {
+    setSlideAnim('slide-right');
+    const prevIdx = (currentCategoryIndex - 1 + validCategories.length) % validCategories.length;
+    const prevCat = validCategories[prevIdx];
+    if (prevCat) {
+      setTimeout(() => {
+        setSelectedCatId(prevCat.id);
+        const popIdx = prevCat.batches?.findIndex((b) => b.badge === 'POPULAR');
+        setSelectedBatchIndex(popIdx !== undefined && popIdx >= 0 ? popIdx : 0);
+        setErrorMessage('');
+        setSlideAnim(null);
+      }, 160);
+    }
+  };
+
+  const nextCategory = validCategories[(currentCategoryIndex + 1) % validCategories.length];
+  const prevCategory = validCategories[(currentCategoryIndex - 1 + validCategories.length) % validCategories.length];
+
+  // Drag and Swipe Handlers (Mouse & Touch)
+  const handlePointerDown = (clientX: number, target: EventTarget) => {
+    const el = target as HTMLElement;
+    if (el.tagName === 'INPUT' || el.tagName === 'BUTTON' || el.closest('button') || el.closest('input')) {
+      return;
+    }
+    isDraggingRef.current = true;
+    startXRef.current = clientX;
+  };
+
+  const handlePointerMove = (clientX: number) => {
+    if (!isDraggingRef.current) return;
+    const diff = clientX - startXRef.current;
+    if (Math.abs(diff) > 4) {
+      setIsDragging(true);
+      setDragOffset(diff);
+    }
+  };
+
+  const handlePointerUp = () => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    const diff = dragOffset;
+    setDragOffset(0);
+    setIsDragging(false);
+
+    if (diff < -45) {
+      goToNextCategory();
+    } else if (diff > 45) {
+      goToPrevCategory();
+    }
+  };
 
   // Sync selected program when initialCategory changes or modal opens
   useEffect(() => {
@@ -113,6 +255,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
       setLastWhatsAppUrl('');
       setIsPaymentConfirmed(true);
       setUtrNumber('');
+      setTime('');
     }
   }, [initialCategory, isOpen]);
 
@@ -122,19 +265,30 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
     (activeCategories && activeCategories.find((c) => c && c.id === selectedCatId)) ||
     (activeCategories && activeCategories[0]) ||
     DEFAULT_CATEGORIES[0];
-  const currentBatches = currentCategory?.batches && currentCategory.batches.length > 0
+  const isKidsDance = currentCategory.id === 'kids-dance' || currentCategory.title.toLowerCase().includes('kids');
+
+  const kidsLevel1Batches = currentCategory?.batches && currentCategory.batches.length > 0
     ? currentCategory.batches
-    : [
-        {
-          id: 'b1',
-          name: 'Regular Batch',
-          days: 'Thu, Sat, Sun',
-          schedules: ['Thursday — 5:00 PM', 'Saturday — 5:00 PM']
-        }
-      ];
+    : KIDS_LEVEL_BATCHES['Level 1'];
+
+  const currentBatches = isKidsDance
+    ? (selectedLevel === 'Level 2'
+        ? KIDS_LEVEL_BATCHES['Level 2']
+        : selectedLevel === 'Level 3'
+        ? KIDS_LEVEL_BATCHES['Level 3']
+        : kidsLevel1Batches)
+    : (currentCategory?.batches && currentCategory.batches.length > 0
+        ? currentCategory.batches
+        : [
+            {
+              id: 'b1',
+              name: 'Regular Batch',
+              days: 'Thu, Sat, Sun',
+              schedules: ['Thursday — 5:00 PM', 'Saturday — 5:00 PM']
+            }
+          ]);
 
   const activeBatch = currentBatches[selectedBatchIndex] || currentBatches[0];
-  const isKidsDance = currentCategory.id === 'kids-dance' || currentCategory.title.toLowerCase().includes('kids');
   const isHomeService = currentCategory.id === 'home-service';
   const isPrivateClass = currentCategory.id === 'private-class';
   const isWeddingChoreo = currentCategory.id === 'wedding-choreography';
@@ -220,11 +374,12 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
   const handleFinalSubmit = () => {
     const cleanPhone = phone.trim().replace(/\D/g, '');
     const scheduleBulletList = activeBatch.schedules.map((s) => `  • ${s}`).join('\n');
-    const chosenDate = date ? date : 'Earliest Available Batch';
+    const chosenDate = date ? date : 'Flexible (Earliest Available)';
+    const chosenTime = time ? time : 'Flexible (Mon to Sun)';
     const planLabel = isSpecialCategory
       ? `${currentCategory.title} (${activeBatch.name})`
       : planType === 'monthly'
-      ? (isGymnastic ? '4 Days / Week (16 Sessions Course)' : 'Full Monthly Course')
+      ? (isGymnastic ? `${(activeBatch?.name || '4 Days').replace(/\s*\/\s*week/i, '')} (16 Sessions Course)` : 'Full Monthly Course')
       : 'Demo Class (Trial ₹49)';
     const paymentStatusBadge = 'PAID ONLINE VIA UPI (Verified)';
 
@@ -244,7 +399,7 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
 • *Full Name:* ${name.trim()}
 • *Mobile Number:* ${cleanPhone}
 • *Preferred Starting Date:* ${chosenDate}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTime} (Flexible Mon to Sun)\n` : ''}━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ *Admin Action:* Payment received. Please verify batch slot and reply with admission confirmation.`;
 
     const whatsappUrl = `https://wa.me/${studioInfo.whatsappNumber}?text=${encodeURIComponent(formattedMessage)}`;
@@ -274,6 +429,7 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
             schedule: activeBatch.schedules,
             fee: activeFeeText,
             preferredDate: chosenDate,
+            preferredTime: chosenTime,
             paymentStatus: paymentStatusBadge,
             utrNumber: utrNumber.trim(),
             isDemo: planType === 'demo',
@@ -287,21 +443,48 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 select-none"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-14 bg-black/65 backdrop-blur-sm animate-in fade-in duration-200 select-none"
       onClick={onClose}
     >
       <div 
-        className="relative w-full max-w-[640px] bg-white border border-slate-200/80 rounded-2xl md:rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-900 max-h-[92vh] overflow-y-auto"
+        className="relative w-full max-w-[640px] flex items-center justify-center"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors border border-slate-200 cursor-pointer z-10"
-          aria-label="Close dialog"
+        {/* Left Side Slide Arrow (Outside modal card on the side) */}
+        {step === 'form' && currentCategoryIndex > 0 && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              goToPrevCategory();
+            }}
+            className="absolute -left-3 sm:-left-12 md:-left-14 top-1/2 -translate-y-1/2 z-50 p-2 text-white hover:text-blue-300 opacity-90 hover:opacity-100 transition-all hover:scale-125 active:scale-95 border-none outline-none cursor-pointer group"
+            title={`Slide to previous: ${prevCategory?.title || 'Previous'}`}
+            aria-label="Slide to previous dance program"
+          >
+            <ChevronLeft className="w-8 h-8 sm:w-10 sm:h-10 stroke-[3] animate-slide-left drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]" />
+          </button>
+        )}
+
+        {/* The White Modal Card */}
+        <div 
+          className="relative w-full bg-white border border-slate-200/80 rounded-2xl md:rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-900 max-h-[90vh] overflow-y-auto overflow-x-hidden"
+          onTouchStart={(e) => handlePointerDown(e.touches[0].clientX, e.target)}
+          onTouchMove={(e) => handlePointerMove(e.touches[0].clientX)}
+          onTouchEnd={handlePointerUp}
+          onMouseDown={(e) => handlePointerDown(e.clientX, e.target)}
+          onMouseMove={(e) => handlePointerMove(e.clientX)}
+          onMouseUp={handlePointerUp}
+          onMouseLeave={handlePointerUp}
         >
-          <X className="w-4 h-4" />
-        </button>
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors border border-slate-200 cursor-pointer z-20"
+            aria-label="Close dialog"
+          >
+            <X className="w-4 h-4" />
+          </button>
 
         {/* ============================================================== */}
         {/* STEP 3: SUCCESS / BOOKING COMPLETE WITH NOTIFICATION */}
@@ -313,7 +496,7 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
             </div>
             <h3 className="text-2xl font-bold font-display text-slate-900">Booking &amp; Payment Successful!</h3>
             <p className="text-slate-600 text-sm max-w-md mx-auto leading-relaxed">
-              Aapka slot <span className="text-blue-600 font-semibold">{currentCategory.title}</span> ({planType === 'monthly' ? 'Monthly Course' : 'Trial Demo'}) ke liye register ho gaya hai.
+              Aapka slot <span className="text-blue-600 font-semibold">{currentCategory.title}</span> ({planType === 'monthly' ? 'Monthly Course' : 'Trial Demo at'}) ke liye register ho gaya hai.
             </p>
 
             {/* Direct WhatsApp Notification Button (Green) */}
@@ -352,13 +535,25 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
               <div className="flex justify-between">
                 <span className="text-slate-500">Selected Plan:</span>
                 <span className="font-bold text-slate-900">
-                  {planType === 'monthly' ? 'Full Monthly Course' : 'Trial Demo Session'}
+                  {planType === 'monthly' ? 'Full Monthly Course' : 'Trial Demo at'}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Selected Batch:</span>
                 <span className="font-medium text-slate-900">{activeBatch.name}</span>
               </div>
+              {date && (
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Preferred Date:</span>
+                  <span className="font-medium text-slate-900">{date}</span>
+                </div>
+              )}
+              {time && (
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Preferred Time:</span>
+                  <span className="font-semibold text-blue-600">{time} (Flexible Mon-Sun)</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-slate-500">Amount Paid:</span>
                 <span className="font-extrabold text-emerald-600">{activeFeeText} (UPI Paid)</span>
@@ -416,8 +611,8 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                 <span className="text-xs sm:text-sm text-slate-700 font-medium">
                   {isKidsDance ? `${selectedLevel} • ` : ''}
                   {planType === 'monthly'
-                    ? (isGymnastic ? '4 Days / Week (16 Sessions)' : 'Full Monthly Course')
-                    : 'Trial Demo Session'} • {activeBatch.name}
+                    ? (isGymnastic ? `${(activeBatch?.name || '4 Days').replace(/\s*\/\s*week/i, '')} (16 Sessions)` : 'Full Monthly Course')
+                    : 'Trial Demo at'} • {activeBatch.name.replace(/\s*\/\s*week/i, '')}
                 </span>
               </div>
               <div className="text-right">
@@ -514,7 +709,7 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
               className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-600 via-green-600 to-emerald-700 hover:from-emerald-700 hover:via-green-700 hover:to-emerald-800 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2.5 transition-transform active:scale-[0.99] shadow-xl shadow-emerald-600/30 cursor-pointer border border-emerald-500/40"
             >
               <Send className="w-5 h-5 text-white" />
-              <span>DONE — BOOK &amp; SEND NOTIFICATION ({activeFeeText})</span>
+              <span>DONE — BOOK &amp; SEND NOTIFICATION</span>
             </button>
 
             {/* Security Guarantee Notice */}
@@ -529,7 +724,16 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
         {/* STEP 1: BOOKING FORM (DETAILS & PLAN SELECTION) */}
         {/* ============================================================== */}
         {step === 'form' && (
-          <form onSubmit={handleProceedToPayment} className="space-y-5">
+          <form 
+            onSubmit={handleProceedToPayment} 
+            className={`space-y-5 transition-all duration-200 ${
+              slideAnim === 'slide-left' ? '-translate-x-6 opacity-60' :
+              slideAnim === 'slide-right' ? 'translate-x-6 opacity-60' : 'translate-x-0 opacity-100'
+            }`}
+            style={{
+              transform: isDragging ? `translateX(${dragOffset * 0.4}px)` : undefined,
+            }}
+          >
             {/* Header Lockup */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pr-8">
               <div>
@@ -541,56 +745,9 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
               </div>
             </div>
 
-            {/* 1. SELECT DANCE PROGRAM */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider">
-                  1. SELECT DANCE PROGRAM
-                </label>
-                <span className="text-xs font-mono font-bold text-blue-600">
-                  {isSpecialCategory ? activeFeeText : `Demo ${currentCategory.demoPrice || '₹49'}`}
-                </span>
-              </div>
-              <div className="relative">
-                <select
-                  value={selectedCatId}
-                  onChange={(e) => {
-                    const newCatId = e.target.value;
-                    setSelectedCatId(newCatId);
-                    const targetCat = activeCategories.find((c) => c && c.id === newCatId);
-                    const popIdx = targetCat?.batches?.findIndex((b) => b.badge === 'POPULAR');
-                    setSelectedBatchIndex(popIdx !== undefined && popIdx >= 0 ? popIdx : 0);
-                    setErrorMessage('');
-                  }}
-                  className="w-full bg-slate-50 border-2 border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 rounded-xl px-4 py-3 text-sm sm:text-base font-bold text-slate-900 focus:outline-none appearance-none cursor-pointer transition-colors shadow-xs"
-                >
-                  {activeCategories.map((program) => {
-                    const isSpec = ['home-service', 'private-class', 'wedding-choreography'].includes(program.id);
-                    return (
-                      <option key={program.id} value={program.id} className="bg-white text-slate-900">
-                        {program.title} {isSpec ? (program.id === 'private-class' ? '(Studio: ₹549 | Home: ₹849)' : `(Package: ${program.demoPrice || program.monthlyFee})`) : `(Demo: ${program.demoPrice || '₹49'} | Monthly: ${getMonthlyPriceText(program.monthlyFee)})`}
-                      </option>
-                    );
-                  })}
-                </select>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 font-bold">
-                  ▼
-                </div>
-              </div>
-            </div>
-
-            {/* 2. CHOOSE PLAN OR DIRECT PACKAGE SELECTION */}
+            {/* CHOOSE PLAN OR DIRECT PACKAGE SELECTION */}
             {isSpecialCategory ? (
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider">
-                    {isHomeService ? '2. SELECT HOME SERVICE PACKAGE' : '2. SELECT PACKAGE'}
-                  </label>
-                  <span className="text-sm font-black text-blue-600 font-display">
-                    {activeFeeText}
-                  </span>
-                </div>
-
                 <div className={`grid gap-3 ${currentBatches.length > 1 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
                   {currentBatches.map((batch, idx) => {
                     const isSelected = selectedBatchIndex === idx;
@@ -645,12 +802,8 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
               </div>
             ) : (
               <>
-                {/* Standard Categories: 2. SELECT COURSE PLAN */}
+                {/* Standard Categories: COURSE PLAN */}
                 <div>
-                  <label className="block text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider mb-2">
-                    2. CHOOSE YOUR PLAN (TRIAL OR MONTHLY COURSE)
-                  </label>
-
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {/* Plan A: Trial Demo Session ₹49 */}
                     <div
@@ -663,7 +816,7 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                     >
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-black uppercase tracking-wider text-slate-900">
-                          Trial Demo Class
+                          Trial Demo at
                         </span>
                         <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${
                           planType === 'demo' ? 'border-blue-600 bg-blue-600' : 'border-slate-400 bg-white'
@@ -671,10 +824,6 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                           {planType === 'demo' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
                         </span>
                       </div>
-
-                      <p className="text-xs sm:text-sm text-slate-700 leading-snug">
-                        Experience the studio ambiance, meet coaches &amp; try 1 full class.
-                      </p>
 
                       <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-baseline justify-between">
                         <span className="text-xs font-semibold text-slate-600">Trial Fee:</span>
@@ -696,7 +845,7 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-1.5">
                           <span className="text-sm font-black uppercase tracking-wider text-slate-900">
-                            {isGymnastic ? (activeBatch?.name || '4 Days / Week') : 'Monthly Course'}
+                            {isGymnastic ? ((activeBatch?.name || '4 Days').replace(/\s*\/\s*week/i, '')) : 'Monthly Course'}
                           </span>
                           {!isGymnastic && (
                             <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200">
@@ -711,16 +860,6 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                         </span>
                       </div>
 
-                      <p className="text-xs sm:text-sm text-slate-700 leading-snug">
-                        {isGymnastic
-                          ? (activeBatch?.name === '2 Days / Week'
-                              ? 'Full total 8 sessions comprehensive training with stage & certificate track.'
-                              : activeBatch?.name === '3 Days / Week'
-                              ? 'Full total 12 sessions comprehensive training with stage & certificate track.'
-                              : 'Full total 16 sessions comprehensive training with stage & certificate track.')
-                          : 'Full 12 sessions comprehensive training with stage & certificate track.'}
-                      </p>
-
                       <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-baseline justify-between">
                         <span className="text-xs font-semibold text-slate-600">
                           {isGymnastic ? 'Monthly Plan Fee:' : 'Course Fee:'}
@@ -733,12 +872,12 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                   </div>
                 </div>
 
-                {/* 3. SELECT LEVEL (Only for Kids Dance as requested) */}
+                {/* SELECT LEVEL (Only for Kids Dance as requested) */}
                 {isKidsDance && (
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <label className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider">
-                        3. SELECT LEVEL
+                        SELECT LEVEL
                       </label>
                       <span className="text-xs text-blue-600 font-bold uppercase">
                         {selectedLevel}
@@ -751,7 +890,10 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                           <button
                             key={lvl}
                             type="button"
-                            onClick={() => setSelectedLevel(lvl)}
+                            onClick={() => {
+                              setSelectedLevel(lvl);
+                              setSelectedBatchIndex(0);
+                            }}
                             className={`py-2.5 px-3 rounded-xl border text-center transition-all cursor-pointer flex items-center justify-center gap-2 ${
                               isSelected
                                 ? 'border-blue-600 bg-blue-50/70 shadow-xs ring-2 ring-blue-500/20 text-slate-900 font-bold'
@@ -775,12 +917,12 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider">
-                      {isKidsDance ? '4. SELECT TIMINGS' : '3. SELECT TIMINGS'}
+                      SELECT TIMINGS
                     </label>
                   </div>
                   <div className={`grid gap-2.5 ${currentBatches.length > 1 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
                     {currentBatches.map((batch, idx) => {
-                      const isSelected = selectedBatchIndex === idx;
+                      const isSelected = planType === 'monthly' && selectedBatchIndex === idx;
                       const isFull = batch.isFull;
 
                       return (
@@ -797,7 +939,7 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                         >
                           <div className="font-bold text-slate-900 text-xs sm:text-sm mb-1.5 flex items-center justify-between">
                             <span className="flex items-center gap-1.5">
-                              <span className="font-extrabold">{batch.name}</span>
+                              <span className="font-extrabold">{batch.name.replace(/\s*\/\s*week/i, '')}</span>
                               {batch.days && (
                                 <span className="text-xs text-slate-600 font-medium">
                                   ({batch.days})
@@ -873,33 +1015,90 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
               </div>
             </div>
 
-            {/* 5. PREFERRED DATE INPUT */}
-            <div>
-              <label className="block text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider mb-1.5">
-                PREFERRED STARTING DATE (OPTIONAL)
-              </label>
-              <div className="relative">
-                <input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="w-full bg-slate-50 border-2 border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 rounded-xl px-4 py-3 text-sm sm:text-base font-medium text-slate-900 focus:outline-none transition-colors shadow-xs [color-scheme:light]"
-                />
+            {/* 5. PREFERRED DATE & TIME INPUTS (Flexible Mon to Sun) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider mb-1.5">
+                  {isPrivateClass || isHomeService ? 'PREFERRED DATE *' : 'PREFERRED DATE (OPTIONAL)'}
+                </label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    className="w-full bg-slate-50 border-2 border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 rounded-xl px-4 py-3 text-sm sm:text-base font-medium text-slate-900 focus:outline-none transition-colors shadow-xs [color-scheme:light]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider mb-1.5">
+                  {isPrivateClass || isHomeService ? 'PREFERRED TIME (MON - SUN) *' : 'PREFERRED TIME (OPTIONAL)'}
+                </label>
+                <div className="relative">
+                  <input
+                    type="time"
+                    value={time}
+                    onChange={(e) => setTime(e.target.value)}
+                    className="w-full bg-slate-50 border-2 border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 rounded-xl px-4 py-3 text-sm sm:text-base font-medium text-slate-900 focus:outline-none transition-colors shadow-xs [color-scheme:light]"
+                  />
+                </div>
               </div>
             </div>
+
+            {/* Quick Time Slots for Private Class & Home Service */}
+            {(isPrivateClass || isHomeService) && (
+              <div className="bg-blue-50/80 border border-blue-200 rounded-2xl p-3.5 text-xs">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-black text-blue-900 uppercase tracking-wide text-[11px] sm:text-xs">
+                    ⚡ Tap Quick Slot or Pick Custom Time (Mon to Sun):
+                  </span>
+                  {time && (
+                    <span className="text-blue-700 font-extrabold text-xs">
+                      Selected: {time}
+                    </span>
+                  )}
+                </div>
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
+                  {[
+                    { label: '8:00 AM', val: '08:00' },
+                    { label: '11:00 AM', val: '11:00' },
+                    { label: '3:00 PM', val: '15:00' },
+                    { label: '5:00 PM', val: '17:00' },
+                    { label: '6:30 PM', val: '18:30' },
+                    { label: '8:00 PM', val: '20:00' },
+                  ].map((slot) => {
+                    const isSelected = time === slot.val;
+                    return (
+                      <button
+                        key={slot.val}
+                        type="button"
+                        onClick={() => setTime(slot.val)}
+                        className={`py-2 px-1 rounded-xl text-center font-bold text-xs transition-all cursor-pointer border ${
+                          isSelected
+                            ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                            : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 hover:border-slate-400'
+                        }`}
+                      >
+                        {slot.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Error Message */}
             {errorMessage && (
               <p className="text-red-600 text-sm font-bold">{errorMessage}</p>
             )}
 
-            {/* 6. PROCEED TO UPI PAYMENT BUTTON (Blue as requested!) */}
+            {/* 6. BOOK YOUR APPOINTMENT BUTTON */}
             <button
               type="submit"
               className="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 via-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2.5 transition-transform active:scale-[0.99] shadow-lg shadow-blue-600/30 cursor-pointer border border-blue-500/40"
             >
-              <CreditCard className="w-5 h-5 text-white" />
-              <span>PROCEED TO UPI PAYMENT ({activeFeeText})</span>
+              <span>BOOK YOUR APPOINTMENT</span>
               <ArrowRight className="w-5 h-5 text-white" />
             </button>
 
@@ -914,6 +1113,23 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
               </a>
             </div>
           </form>
+        )}
+        </div>
+
+        {/* Right Side Slide Arrow (Outside modal card on the side) */}
+        {step === 'form' && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              goToNextCategory();
+            }}
+            className="absolute -right-3 sm:-right-12 md:-right-14 top-1/2 -translate-y-1/2 z-50 p-2 text-white hover:text-blue-300 opacity-90 hover:opacity-100 transition-all hover:scale-125 active:scale-95 border-none outline-none cursor-pointer group"
+            title={`Slide to next: ${nextCategory?.title || 'Next'}`}
+            aria-label="Slide to next dance program"
+          >
+            <ChevronRight className="w-8 h-8 sm:w-10 sm:h-10 stroke-[3] animate-slide-right drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]" />
+          </button>
         )}
       </div>
     </div>

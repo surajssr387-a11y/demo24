@@ -34,3 +34,29 @@
 .glow-card {
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
 }
+
+@keyframes slideRightNudge {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes slideLeftNudge {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-4px);
+  }
+}
+
+.animate-slide-right {
+  animation: slideRightNudge 1.3s ease-in-out infinite;
+}
+
+.animate-slide-left {
+  animation: slideLeftNudge 1.3s ease-in-out infinite;
+}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CategoryItem, DEFAULT_CATEGORIES, loadCategories } from '../data/categoriesData';
+import { CategoryItem, DEFAULT_CATEGORIES, loadCategories, saveCategories } from '../data/categoriesData';
 
 interface CategoriesSectionProps {
   onSelectCategory: (categoryTitle: string) => void;
@@ -27,11 +27,11 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
-          // Filter out home-service and job-person if cached
           const filtered = data.filter(
             (c) => c.id !== 'home-service' && c.id !== 'job-person'
           );
           setInternalCategories(filtered);
+          saveCategories(filtered);
         }
       })
       .catch(() => {});
@@ -46,11 +46,14 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
       {/* Main Categories Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 md:py-16">
         
-        {/* Section Header: Title */}
+        {/* Section Header */}
         <div className="relative mb-8 sm:mb-12 text-center">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-neutral-950 font-display tracking-tight uppercase">
             Categories
           </h2>
+          <p className="text-xs sm:text-sm text-neutral-500 mt-1">
+            Select a category to view schedules, batches &amp; book demo
+          </p>
         </div>
 
         {/* Categories Grid (3 columns on desktop, Wedding centered in its row with same size) */}
@@ -70,7 +73,7 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
               >
                 {/* Card Container: Identical size & aspect-ratio across all cards */}
                 <div className="relative w-full aspect-[16/10.5] rounded-2xl overflow-hidden bg-neutral-100 border border-neutral-200/90 shadow-xs transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-md group-hover:border-neutral-300">
-                  {/* Media: Video if present, else Image */}
+                  {/* Media: Video if present, else Image (plays seamlessly without overlays) */}
                   {category.videoUrl ? (
                     <video
                       key={category.videoUrl}
