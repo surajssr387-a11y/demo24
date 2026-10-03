@@ -879,9 +879,6 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
                       <label className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider">
                         SELECT LEVEL
                       </label>
-                      <span className="text-xs text-blue-600 font-bold uppercase">
-                        {selectedLevel}
-                      </span>
                     </div>
                     <div className="grid grid-cols-3 gap-2.5">
                       {['Level 1', 'Level 2', 'Level 3'].map((lvl) => {
