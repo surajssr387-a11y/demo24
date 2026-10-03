@@ -96,6 +96,9 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
   const [utrNumber, setUtrNumber] = useState('');
   const [copiedUpi, setCopiedUpi] = useState(false);
 
+  // Skill Level: Level 1, Level 2, Level 3 (Used specifically for Kids Dance)
+  const [selectedLevel, setSelectedLevel] = useState<string>('Level 1');
+
   // Sync selected program when initialCategory changes or modal opens
   useEffect(() => {
     if (initialCategory && isOpen) {
@@ -104,6 +107,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
       const popIdx = cat.batches?.findIndex((b) => b.badge === 'POPULAR');
       setSelectedBatchIndex(popIdx !== undefined && popIdx >= 0 ? popIdx : 0);
       setPlanType('monthly');
+      setSelectedLevel('Level 1');
       setStep('form');
       setErrorMessage('');
       setLastWhatsAppUrl('');
@@ -130,6 +134,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
       ];
 
   const activeBatch = currentBatches[selectedBatchIndex] || currentBatches[0];
+  const isKidsDance = currentCategory.id === 'kids-dance' || currentCategory.title.toLowerCase().includes('kids');
   const isHomeService = currentCategory.id === 'home-service';
   const isPrivateClass = currentCategory.id === 'private-class';
   const isWeddingChoreo = currentCategory.id === 'wedding-choreography';
@@ -228,7 +233,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📋 *Booking Type:* ${planLabel}
 💃 *Dance Program:* ${currentCategory.title}
-🏷️ *Selected Batch:* ${activeBatch.name}${activeBatch.days ? ` (${activeBatch.days})` : ''}
+${isKidsDance ? `🎯 *Skill Level:* ${selectedLevel}\n` : ''}🏷️ *Selected Batch:* ${activeBatch.name}${activeBatch.days ? ` (${activeBatch.days})` : ''}
 🕒 *Schedule & Timings:*
 ${scheduleBulletList}
 
@@ -263,6 +268,7 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
             name: name.trim(),
             phone: cleanPhone,
             program: currentCategory.title,
+            level: isKidsDance ? selectedLevel : undefined,
             plan: planLabel,
             batch: activeBatch.name,
             schedule: activeBatch.schedules,
@@ -337,6 +343,12 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                 <span className="text-slate-500">Dance Program:</span>
                 <span className="font-semibold text-blue-600">{currentCategory.title}</span>
               </div>
+              {isKidsDance && (
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Selected Level:</span>
+                  <span className="font-semibold text-slate-900">{selectedLevel}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-slate-500">Selected Plan:</span>
                 <span className="font-bold text-slate-900">
@@ -402,6 +414,7 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                   {currentCategory.title}
                 </span>
                 <span className="text-xs sm:text-sm text-slate-700 font-medium">
+                  {isKidsDance ? `${selectedLevel} • ` : ''}
                   {planType === 'monthly'
                     ? (isGymnastic ? '4 Days / Week (16 Sessions)' : 'Full Monthly Course')
                     : 'Trial Demo Session'} • {activeBatch.name}
@@ -720,11 +733,49 @@ ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}�
                   </div>
                 </div>
 
-                {/* 3. SELECT TIMINGS */}
+                {/* 3. SELECT LEVEL (Only for Kids Dance as requested) */}
+                {isKidsDance && (
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider">
+                        3. SELECT LEVEL
+                      </label>
+                      <span className="text-xs text-blue-600 font-bold uppercase">
+                        {selectedLevel}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2.5">
+                      {['Level 1', 'Level 2', 'Level 3'].map((lvl) => {
+                        const isSelected = selectedLevel === lvl;
+                        return (
+                          <button
+                            key={lvl}
+                            type="button"
+                            onClick={() => setSelectedLevel(lvl)}
+                            className={`py-2.5 px-3 rounded-xl border text-center transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                              isSelected
+                                ? 'border-blue-600 bg-blue-50/70 shadow-xs ring-2 ring-blue-500/20 text-slate-900 font-bold'
+                                : 'border-slate-300 bg-slate-50 hover:bg-slate-100/80 text-slate-700 hover:border-slate-400 font-medium'
+                            }`}
+                          >
+                            <span className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center shrink-0 ${
+                              isSelected ? 'border-blue-600 bg-blue-600' : 'border-slate-400 bg-white'
+                            }`}>
+                              {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                            </span>
+                            <span className="text-xs sm:text-sm font-bold">{lvl}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* SELECT TIMINGS */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider">
-                      3. SELECT TIMINGS
+                      {isKidsDance ? '4. SELECT TIMINGS' : '3. SELECT TIMINGS'}
                     </label>
                   </div>
                   <div className={`grid gap-2.5 ${currentBatches.length > 1 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
