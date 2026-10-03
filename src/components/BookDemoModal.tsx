@@ -288,16 +288,12 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
     DEFAULT_CATEGORIES[0];
   const isKidsDance = currentCategory.id === 'kids-dance' || currentCategory.title.toLowerCase().includes('kids');
 
-  const kidsLevel1Batches = currentCategory?.batches && currentCategory.batches.length > 0
-    ? currentCategory.batches
-    : KIDS_LEVEL_BATCHES['Level 1'];
-
   const currentBatches = isKidsDance
     ? (selectedLevel === 'Level 2'
         ? KIDS_LEVEL_BATCHES['Level 2']
         : selectedLevel === 'Level 3'
         ? KIDS_LEVEL_BATCHES['Level 3']
-        : kidsLevel1Batches)
+        : KIDS_LEVEL_BATCHES['Level 1'])
     : (currentCategory?.batches && currentCategory.batches.length > 0
         ? currentCategory.batches
         : [

@@ -307,10 +307,15 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
   }
 ];
 
-export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v17';
+export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v18';
 
 export function loadCategories(): CategoryItem[] {
   try {
+    // Clear old versions to prevent stale batch timings
+    ['ramys_categories_config_v14', 'ramys_categories_config_v15', 'ramys_categories_config_v16', 'ramys_categories_config_v17'].forEach((k) => {
+      try { localStorage.removeItem(k); } catch {}
+    });
+
     const saved = localStorage.getItem(CATEGORIES_STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
