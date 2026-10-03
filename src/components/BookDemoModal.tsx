@@ -1176,48 +1176,6 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
               </div>
             )}
 
-            {/* Quick Time Slots for Private Class & Home Service */}
-            {(isPrivateClass || isHomeService) && (
-              <div className="bg-blue-50/80 border border-blue-200 rounded-2xl p-3.5 text-xs">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-black text-blue-900 uppercase tracking-wide text-[11px] sm:text-xs">
-                    ⚡ Tap Quick Slot or Pick Custom Time (Mon to Sun):
-                  </span>
-                  {time && (
-                    <span className="text-blue-700 font-extrabold text-xs">
-                      Selected: {time}
-                    </span>
-                  )}
-                </div>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
-                  {[
-                    { label: '8:00 AM', val: '08:00' },
-                    { label: '11:00 AM', val: '11:00' },
-                    { label: '3:00 PM', val: '15:00' },
-                    { label: '5:00 PM', val: '17:00' },
-                    { label: '6:30 PM', val: '18:30' },
-                    { label: '8:00 PM', val: '20:00' },
-                  ].map((slot) => {
-                    const isSelected = time === slot.val;
-                    return (
-                      <button
-                        key={slot.val}
-                        type="button"
-                        onClick={() => setTime(slot.val)}
-                        className={`py-2 px-1 rounded-xl text-center font-bold text-xs transition-all cursor-pointer border ${
-                          isSelected
-                            ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                            : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 hover:border-slate-400'
-                        }`}
-                      >
-                        {slot.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
             {/* Error Message */}
             {errorMessage && (
               <p className="text-red-600 text-sm font-bold">{errorMessage}</p>
