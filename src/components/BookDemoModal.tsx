@@ -779,14 +779,13 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
                             </span>
                           </div>
 
-                          {batch.days && (
-                            <span className="text-xs text-blue-600 font-semibold mb-2 block">
-                              {batch.days}
-                            </span>
-                          )}
-
                           <div className="space-y-1.5 my-2.5">
-                            {batch.schedules.map((schedule, sIdx) => (
+                            {batch.schedules
+                              .filter((schedule) => {
+                                const lower = schedule.toLowerCase();
+                                return !lower.includes('fee') && !lower.startsWith('total package') && !lower.startsWith('per class');
+                              })
+                              .map((schedule, sIdx) => (
                               <p key={sIdx} className="text-xs text-slate-600 flex items-start gap-1.5 leading-snug">
                                 <span className="text-blue-600 font-bold shrink-0">•</span>
                                 <span>{schedule}</span>

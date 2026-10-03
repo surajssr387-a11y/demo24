@@ -234,8 +234,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
         price: "₹549",
         schedules: [
           "Customize your days and time according to you",
-          "Dedicated master instructor coaching",
-          "Per class — ₹549"
+          "Dedicated master instructor coaching"
         ]
       },
       {
@@ -246,8 +245,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
         schedules: [
           "Instructor visits directly to your home",
           "Personalized 1-on-1 dance training at your doorstep",
-          "Flexible timing according to your convenience",
-          "Per class — ₹849"
+          "Flexible timing according to your convenience"
         ]
       }
     ]
@@ -272,8 +270,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
         price: "₹3,049",
         schedules: [
           "1 customized dance routine",
-          "Bride & Groom or Solo / Duo",
-          "Fee — ₹3,049"
+          "Bride & Groom or Solo / Duo"
         ]
       },
       {
@@ -283,8 +280,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
         price: "₹2,549/ea",
         schedules: [
           "2 customized dance routines",
-          "Couple & family special",
-          "Fee — ₹2,549 each (₹5,049)"
+          "Couple & family special"
         ]
       },
       {
@@ -294,15 +290,14 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
         price: "₹10,049",
         schedules: [
           "5 complete Sangeet routines",
-          "Full family flashmob + audio edits",
-          "Total Package — ₹10,049"
+          "Full family flashmob + audio edits"
         ]
       }
     ]
   }
 ];
 
-export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v11';
+export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v12';
 
 export function loadCategories(): CategoryItem[] {
   try {
