@@ -289,15 +289,15 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
         days: "Full family crash rehearsal",
         price: "₹10,049",
         schedules: [
-          "5 complete Sangeet routines",
-          "Full family flashmob + audio edits"
+          "5 customized dance routines",
+          "Full family"
         ]
       }
     ]
   }
 ];
 
-export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v13';
+export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v14';
 
 export function loadCategories(): CategoryItem[] {
   try {
