@@ -698,7 +698,7 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
                           <span className="text-sm font-black uppercase tracking-wider text-slate-900">
                             {isGymnastic ? (activeBatch?.name || '4 Days / Week') : 'Monthly Course'}
                           </span>
-                          {((isGymnastic && (activeBatch?.badge === 'POPULAR' || !activeBatch?.badge)) || (!isGymnastic)) && (
+                          {!isGymnastic && (
                             <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200">
                               POPULAR
                             </span>
@@ -723,7 +723,7 @@ ${utrNumber.trim() ? `ðŸ”¢ *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}â
 
                       <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-baseline justify-between">
                         <span className="text-xs font-semibold text-slate-600">
-                          {isGymnastic ? 'Plan Fee:' : 'Course Fee:'}
+                          {isGymnastic ? 'Monthly Plan Fee:' : 'Course Fee:'}
                         </span>
                         <span className="text-xl sm:text-2xl font-black text-blue-600 font-display">
                           {activeBatch?.price || monthlyPriceText}
