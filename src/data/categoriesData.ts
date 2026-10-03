@@ -218,10 +218,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
         name: "Evening Ladies Batch",
         days: "Mon, Tue, Wed, Thu",
         schedules: [
-          "Monday — 7:00 PM - 8:00 PM",
-          "Tuesday — 7:00 PM - 8:00 PM",
-          "Wednesday — 7:00 PM - 8:00 PM",
-          "Thursday — 7:00 PM - 8:00 PM"
+          "7:00 PM to 8:00 PM"
         ]
       }
     ]
@@ -318,12 +315,12 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
   }
 ];
 
-export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v23';
+export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v24';
 
 export function loadCategories(): CategoryItem[] {
   try {
     // Clear old versions to prevent stale batch timings
-    ['ramys_categories_config_v14', 'ramys_categories_config_v15', 'ramys_categories_config_v16', 'ramys_categories_config_v17', 'ramys_categories_config_v18', 'ramys_categories_config_v19', 'ramys_categories_config_v20', 'ramys_categories_config_v21', 'ramys_categories_config_v22'].forEach((k) => {
+    ['ramys_categories_config_v14', 'ramys_categories_config_v15', 'ramys_categories_config_v16', 'ramys_categories_config_v17', 'ramys_categories_config_v18', 'ramys_categories_config_v19', 'ramys_categories_config_v20', 'ramys_categories_config_v21', 'ramys_categories_config_v22', 'ramys_categories_config_v23'].forEach((k) => {
       try { localStorage.removeItem(k); } catch {}
     });
 

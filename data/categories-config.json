@@ -191,10 +191,7 @@
         "name": "Evening Ladies Batch",
         "days": "Mon, Tue, Wed, Thu",
         "schedules": [
-          "Monday — 7:00 PM - 8:00 PM",
-          "Tuesday — 7:00 PM - 8:00 PM",
-          "Wednesday — 7:00 PM - 8:00 PM",
-          "Thursday — 7:00 PM - 8:00 PM"
+          "7:00 PM to 8:00 PM"
         ]
       }
     ],
