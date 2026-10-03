@@ -943,7 +943,7 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
                             </span>
                             <span className="text-xs font-black text-emerald-700 bg-emerald-100/90 border border-emerald-300 px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-xs">
                               <MessageCircle className="w-3.5 h-3.5 fill-emerald-600/30 text-emerald-700 shrink-0" />
-                              Custom Quote on WhatsApp
+                              On WhatsApp
                             </span>
                           </div>
                         ) : (
