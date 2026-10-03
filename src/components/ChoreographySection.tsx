@@ -189,11 +189,6 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
                     </div>
                   </button>
                 </div>
-
-                {/* Performance Title Label */}
-                <h3 className="mt-3 text-center font-bold text-neutral-950 text-sm sm:text-base md:text-lg tracking-tight group-hover:text-[#0066FF] transition-colors">
-                  {itemTitle}
-                </h3>
               </div>
             );
           })}
