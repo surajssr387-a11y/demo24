@@ -74,6 +74,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     id: "senior-beginner",
     title: "Beginner",
     imageUrl: "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?auto=format&fit=crop&w=1000&q=80",
+    videoUrl: "/beginner-dance.mp4",
     pillTag: "ALL AGES",
     levelLabel: "ZERO EXPERIENCE NEEDED",
     description: "Step-by-Step Fundamentals",
@@ -192,6 +193,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     id: "bollywood-ladies",
     title: "Bollywood Ladies",
     imageUrl: "https://images.unsplash.com/photo-1518834107812-67b0b7c58434?auto=format&fit=crop&w=1000&q=80",
+    videoUrl: "/bollywood-ladies.mp4",
     pillTag: "ENERGIZING",
     levelLabel: "LADIES SPECIAL",
     description: "Vibrant Beats, Expression & Fitness",
@@ -254,6 +256,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     id: "wedding-choreography",
     title: "Wedding choreography",
     imageUrl: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1000&q=80",
+    videoUrl: "/wedding-choreography.mp4",
     pillTag: "SANGEET SPECIAL",
     levelLabel: "CUSTOM ROUTINES",
     description: "Family Sangeet & Couple Dance Preparation",
@@ -299,7 +302,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
   }
 ];
 
-export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v9';
+export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v11';
 
 export function loadCategories(): CategoryItem[] {
   try {
@@ -308,16 +311,16 @@ export function loadCategories(): CategoryItem[] {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
         return parsed.map((cat: CategoryItem) => {
-          if (cat.batches) {
-            return {
-              ...cat,
-              batches: cat.batches.map((b) => ({
-                ...b,
-                name: b.name ? b.name.replace(/\s*\/\s*week/i, '') : b.name,
-              })),
-            };
-          }
-          return cat;
+          const defaultCat = DEFAULT_CATEGORIES.find((d) => d.id === cat.id);
+          const videoUrl = cat.videoUrl || defaultCat?.videoUrl;
+          return {
+            ...cat,
+            videoUrl,
+            batches: cat.batches?.map((b) => ({
+              ...b,
+              name: b.name ? b.name.replace(/\s*\/\s*week/i, '') : b.name,
+            })),
+          };
         });
       }
     }

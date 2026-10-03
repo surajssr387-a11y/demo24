@@ -78,10 +78,21 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
                     <video
                       key={category.videoUrl}
                       src={category.videoUrl}
+                      ref={(el) => {
+                        if (el) {
+                          el.muted = true;
+                          el.defaultMuted = true;
+                          el.play().catch(() => {});
+                        }
+                      }}
                       autoPlay
                       loop
                       muted
                       playsInline
+                      preload="auto"
+                      onLoadedData={(e) => {
+                        e.currentTarget.play().catch(() => {});
+                      }}
                       className="w-full h-full object-cover object-center transition-all duration-300 group-hover:brightness-105 pointer-events-none"
                     />
                   ) : (
