@@ -45,17 +45,17 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
         schedules: [
           "Thursday — 5:00 PM",
           "Saturday — 5:00 PM",
-          "Sunday — 9:00 AM"
+          "Sunday — 11:00 AM"
         ]
       },
       {
         id: "batch-2",
         name: "Batch 2",
-        days: "Sat, Sun",
+        days: "Sat, Sun, Mon",
         schedules: [
           "Saturday — 5:00 PM",
-          "Sunday — 5:00 PM",
-          "Sunday — 9:00 AM"
+          "Sunday — 9:00 AM",
+          "Monday — 4:00 PM"
         ]
       },
       {
@@ -307,7 +307,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
   }
 ];
 
-export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v16';
+export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v17';
 
 export function loadCategories(): CategoryItem[] {
   try {

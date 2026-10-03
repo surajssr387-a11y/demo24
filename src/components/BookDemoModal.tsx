@@ -38,17 +38,17 @@ const KIDS_LEVEL_BATCHES: Record<string, BatchSchedule[]> = {
       schedules: [
         'Thursday — 5:00 PM',
         'Saturday — 5:00 PM',
-        'Sunday — 9:00 AM'
+        'Sunday — 11:00 AM'
       ]
     },
     {
       id: 'batch-2',
       name: 'Batch 2',
-      days: 'Sat, Sun',
+      days: 'Sat, Sun, Mon',
       schedules: [
         'Saturday — 5:00 PM',
-        'Sunday — 5:00 PM',
-        'Sunday — 9:00 AM'
+        'Sunday — 9:00 AM',
+        'Monday — 4:00 PM'
       ]
     },
     {
