@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   X,
   CreditCard,
@@ -162,6 +162,11 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
   // Skill Level: Level 1, Level 2, Level 3 (Used specifically for Kids Dance)
   const [selectedLevel, setSelectedLevel] = useState<string>('Level 1');
 
+  // Custom Wedding Choreography customization
+  const [customChoreographyCount, setCustomChoreographyCount] = useState<number>(3);
+  const [customSelectedRoutines, setCustomSelectedRoutines] = useState<string[]>(['Bride & Groom Couple']);
+  const [customNotes, setCustomNotes] = useState<string>('');
+
   // Category slide helpers with real animation & swipe/drag
   const validCategories = activeCategories.filter(
     (c) => c && c.id !== 'home-service' && c.id !== 'job-person'
@@ -314,9 +319,21 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
     : getMonthlyPriceText(currentCategory.monthlyFee);
   const demoPriceText = currentCategory.demoPrice || '₹49';
 
+  // Dynamic fee calculation for Custom Wedding Choreography
+  const customChoreographyFee = useMemo(() => {
+    if (customChoreographyCount <= 1) return 3049;
+    if (customChoreographyCount === 2) return 5549;
+    if (customChoreographyCount === 3) return 7549;
+    if (customChoreographyCount === 4) return 8999;
+    if (customChoreographyCount === 5) return 10049;
+    return 10049 + (customChoreographyCount - 5) * 1800;
+  }, [customChoreographyCount]);
+
   // Active price based on plan choice or package choice
   const activeFeeText = isSpecialCategory
-    ? (activeBatch?.price || currentCategory.demoPrice || currentCategory.monthlyFee || '₹6,000')
+    ? (isWeddingChoreo && activeBatch?.id === 'batch-custom'
+        ? `₹${customChoreographyFee.toLocaleString('en-IN')}`
+        : (activeBatch?.price || currentCategory.demoPrice || currentCategory.monthlyFee || '₹6,000'))
     : (planType === 'monthly' ? (activeBatch?.price || monthlyPriceText) : demoPriceText);
 
   // Numeric amount for UPI
@@ -382,12 +399,20 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
     const scheduleBulletList = activeBatch.schedules.map((s) => `  • ${s}`).join('\n');
     const chosenDate = date ? date : 'Flexible (Earliest Available)';
     const chosenTime = time ? time : 'Flexible (Mon to Sun)';
+    const isCustomChoreo = isWeddingChoreo && activeBatch?.id === 'batch-custom';
     const planLabel = isSpecialCategory
-      ? `${currentCategory.title} (${activeBatch.name})`
+      ? (isCustomChoreo
+          ? `${currentCategory.title} (Custom: ${customChoreographyCount} Routines)`
+          : `${currentCategory.title} (${activeBatch.name})`)
       : planType === 'monthly'
       ? (isGymnastic ? `${(activeBatch?.name || '4 Days').replace(/\s*\/\s*week/i, '')} (16 Sessions Course)` : 'Full Monthly Course')
       : 'Demo Class (Trial ₹49)';
     const paymentStatusBadge = 'PAID ONLINE VIA UPI (Verified)';
+
+    const customDetailsBlock = isCustomChoreo ? `
+✨ *CUSTOM CHOREOGRAPHY SPECIFICATIONS:*
+• *Total Routines Selected:* ${customChoreographyCount} Choreographies
+${customSelectedRoutines.length > 0 ? `• *Performers / Events:* ${customSelectedRoutines.join(', ')}\n` : ''}${customNotes.trim() ? `• *Song / Special Notes:* ${customNotes.trim()}\n` : ''}` : '';
 
     const formattedMessage =
 `🔔 *NEW BOOKING & PAYMENT RECEIVED - RAMY'S DANCE STUDIO*
@@ -396,8 +421,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
 💃 *Dance Program:* ${currentCategory.title}
 ${isKidsDance ? `🎯 *Skill Level:* ${selectedLevel}\n` : ''}🏷️ *Selected Batch:* ${activeBatch.name}${activeBatch.days ? ` (${activeBatch.days})` : ''}
 🕒 *Schedule & Timings:*
-${scheduleBulletList}
-
+${scheduleBulletList}${customDetailsBlock}
 💵 *Amount:* ${activeFeeText}
 💳 *Payment Status:* ✅ ${paymentStatusBadge}
 ${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -757,6 +781,11 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
                 <div className={`grid gap-3 ${currentBatches.length > 1 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
                   {currentBatches.map((batch, idx) => {
                     const isSelected = selectedBatchIndex === idx;
+                    const isCustomBatch = isWeddingChoreo && batch.id === 'batch-custom';
+                    const displayPrice = isCustomBatch
+                      ? (isSelected ? `₹${customChoreographyFee.toLocaleString('en-IN')}` : (batch.price || 'From ₹7,549'))
+                      : (batch.price || activeFeeText);
+
                     return (
                       <div
                         key={batch.id || idx}
@@ -795,15 +824,113 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
                         </div>
 
                         <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-baseline justify-between">
-                          <span className="text-xs text-slate-500">Total Fee:</span>
+                          <span className="text-xs text-slate-500">
+                            {isCustomBatch && !isSelected ? 'Estimated Fee:' : 'Total Fee:'}
+                          </span>
                           <span className="text-xl font-black text-blue-600 font-display">
-                            {batch.price || activeFeeText}
+                            {displayPrice}
                           </span>
                         </div>
                       </div>
                     );
                   })}
                 </div>
+
+                {/* Interactive Customization Box when Customize According To You is selected */}
+                {isWeddingChoreo && activeBatch?.id === 'batch-custom' && (
+                  <div className="mt-3.5 p-4 rounded-2xl bg-gradient-to-br from-blue-50/90 via-indigo-50/40 to-white border-2 border-blue-200 shadow-sm animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 pb-3 border-b border-blue-100">
+                      <div>
+                        <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider block">
+                          Customize Your Package
+                        </span>
+                        <h4 className="text-sm font-extrabold text-slate-900">
+                          How many choreographies do you need?
+                        </h4>
+                      </div>
+
+                      {/* Stepper */}
+                      <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-blue-200 shadow-xs self-start sm:self-auto">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCustomChoreographyCount(Math.max(1, customChoreographyCount - 1));
+                          }}
+                          className="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 font-bold flex items-center justify-center transition-colors cursor-pointer"
+                          aria-label="Decrease choreography count"
+                        >
+                          -
+                        </button>
+                        <span className="text-sm font-extrabold text-blue-900 min-w-[75px] text-center">
+                          {customChoreographyCount} {customChoreographyCount === 1 ? 'Routine' : 'Routines'}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCustomChoreographyCount(Math.min(20, customChoreographyCount + 1));
+                          }}
+                          className="w-7 h-7 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-bold flex items-center justify-center transition-colors cursor-pointer"
+                          aria-label="Increase choreography count"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Performer / Performance options */}
+                    <div className="mb-3">
+                      <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-2">
+                        Select performance types (Optional):
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {[
+                          'Bride & Groom Couple',
+                          'Parents / Elders',
+                          'Friends & Cousins',
+                          'Full Family Flashmob',
+                          'Bride / Groom Solo',
+                          'Ring Ceremony / Entry'
+                        ].map((routineType) => {
+                          const isPicked = customSelectedRoutines.includes(routineType);
+                          return (
+                            <button
+                              type="button"
+                              key={routineType}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (isPicked) {
+                                  setCustomSelectedRoutines(customSelectedRoutines.filter((r) => r !== routineType));
+                                } else {
+                                  setCustomSelectedRoutines([...customSelectedRoutines, routineType]);
+                                }
+                              }}
+                              className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-all cursor-pointer ${
+                                isPicked
+                                  ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                                  : 'bg-white text-slate-700 border-slate-200 hover:border-blue-300 hover:bg-blue-50/50'
+                              }`}
+                            >
+                              {isPicked ? '✓ ' : '+ '} {routineType}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Custom note or song name */}
+                    <div>
+                      <input
+                        type="text"
+                        value={customNotes}
+                        onChange={(e) => setCustomNotes(e.target.value)}
+                        placeholder="Song names or special family requirements? (Optional)"
+                        className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-white border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400 text-slate-900"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <>

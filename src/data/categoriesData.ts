@@ -292,12 +292,22 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
           "5 customized dance routines",
           "Full family"
         ]
+      },
+      {
+        id: "batch-custom",
+        name: "Customize According To You",
+        days: "Flexible schedule (Studio / Home / Venue)",
+        price: "From ₹7,549",
+        schedules: [
+          "Choose any number of routines",
+          "Fully customized for your event"
+        ]
       }
     ]
   }
 ];
 
-export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v14';
+export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v15';
 
 export function loadCategories(): CategoryItem[] {
   try {

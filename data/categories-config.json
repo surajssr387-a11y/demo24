@@ -265,6 +265,16 @@
           "5 customized dance routines",
           "Full family"
         ]
+      },
+      {
+        "id": "batch-custom",
+        "name": "Customize According To You",
+        "days": "Flexible schedule (Studio / Home / Venue)",
+        "price": "From ₹7,549",
+        "schedules": [
+          "Choose any number of routines",
+          "Fully customized for your event"
+        ]
       }
     ],
     "videoUrl": "/wedding-choreography.mp4"
