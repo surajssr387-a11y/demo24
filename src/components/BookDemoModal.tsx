@@ -756,6 +756,7 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
                   {planType === 'monthly'
                     ? (isGymnastic ? `${(activeBatch?.name || '4 Days').replace(/\s*\/\s*week/i, '')} (16 Sessions)` : 'Full Monthly Course')
                     : 'Trial Demo at'} • {activeBatch.name.replace(/\s*\/\s*week/i, '')}
+                  {date ? ` • Starts: ${date}` : ''}
                 </span>
               </div>
               <div className="text-right">
@@ -1269,8 +1270,8 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
               </div>
             </div>
 
-            {/* 5. PREFERRED DATE & TIME INPUTS (Special categories like Private Class, Home Service & Wedding Choreography) */}
-            {isSpecialCategory && (
+            {/* 5. PREFERRED DATE & TIME INPUTS */}
+            {isSpecialCategory ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider mb-1.5">
@@ -1298,6 +1299,21 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
                       className="w-full bg-slate-50 border-2 border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 rounded-xl px-4 py-3 text-sm sm:text-base font-medium text-slate-900 focus:outline-none transition-colors shadow-xs [color-scheme:light]"
                     />
                   </div>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider mb-1.5">
+                  PREFERRED STARTING DATE (OPTIONAL)
+                </label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full bg-slate-50 border-2 border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 rounded-xl px-4 py-3 text-sm sm:text-base font-medium text-slate-900 focus:outline-none transition-colors shadow-xs [color-scheme:light]"
+                  />
                 </div>
               </div>
             )}
