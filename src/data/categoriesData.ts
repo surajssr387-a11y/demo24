@@ -297,7 +297,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
         id: "batch-custom",
         name: "Customize According To You",
         days: "Flexible schedule (Studio / Home / Venue)",
-        price: "From ₹7,549",
+        price: "Custom Quote",
         schedules: [
           "Choose any number of routines",
           "Fully customized for your event"
@@ -307,12 +307,12 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
   }
 ];
 
-export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v20';
+export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v21';
 
 export function loadCategories(): CategoryItem[] {
   try {
     // Clear old versions to prevent stale batch timings
-    ['ramys_categories_config_v14', 'ramys_categories_config_v15', 'ramys_categories_config_v16', 'ramys_categories_config_v17', 'ramys_categories_config_v18', 'ramys_categories_config_v19'].forEach((k) => {
+    ['ramys_categories_config_v14', 'ramys_categories_config_v15', 'ramys_categories_config_v16', 'ramys_categories_config_v17', 'ramys_categories_config_v18', 'ramys_categories_config_v19', 'ramys_categories_config_v20'].forEach((k) => {
       try { localStorage.removeItem(k); } catch {}
     });
 

@@ -331,7 +331,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
   // Active price based on plan choice or package choice
   const activeFeeText = isSpecialCategory
     ? (isWeddingChoreo && activeBatch?.id === 'batch-custom'
-        ? `₹${customChoreographyFee.toLocaleString('en-IN')}`
+        ? 'Custom Quote'
         : (activeBatch?.price || currentCategory.demoPrice || currentCategory.monthlyFee || '₹6,000'))
     : (planType === 'monthly' ? (activeBatch?.price || monthlyPriceText) : demoPriceText);
 
@@ -371,7 +371,72 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
     }
   };
 
-  // Step 1: Validate form and proceed to Payment Screen
+  // Direct WhatsApp Enquiry submission for Customize According To You
+  const handleCustomEnquirySubmit = () => {
+    const cleanPhone = phone.trim().replace(/\D/g, '');
+    const chosenDate = date ? date : 'Flexible / Event date to be decided';
+    const chosenTime = time ? time : 'Flexible (Mon to Sun)';
+
+    const performersList = customSelectedRoutines.length > 0
+      ? `• *Performance Types:* ${customSelectedRoutines.join(', ')}\n`
+      : '';
+    const notesText = customNotes.trim()
+      ? `• *Special Songs / Notes:* ${customNotes.trim()}\n`
+      : '';
+
+    const formattedMessage =
+`💍 *WEDDING CHOREOGRAPHY CUSTOM ENQUIRY* 💍
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✨ *Package:* Customize According To You
+💃 *Program:* Wedding Choreography
+💰 *Pricing:* Custom Quote Required (To discuss on WhatsApp)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+👤 *CLIENT DETAILS:*
+• *Full Name:* ${name.trim()}
+• *Mobile Number:* ${cleanPhone}
+• *Target Event / Date:* ${chosenDate}
+• *Preferred Time:* ${chosenTime}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎭 *CHOREOGRAPHY REQUIREMENTS:*
+• *Routines Requested:* ${customChoreographyCount} ${customChoreographyCount === 1 ? 'Choreography' : 'Choreographies'}
+${performersList}${notesText}━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💬 *Client Message:* Namaste Ramy's Dance Studio, hume wedding dance choreography ke liye custom package aur pricing discuss karni hai. Please details share kijiye!`;
+
+    const whatsappUrl = `https://wa.me/${studioInfo.whatsappNumber}?text=${encodeURIComponent(formattedMessage)}`;
+    setLastWhatsAppUrl(whatsappUrl);
+    setStep('success');
+
+    // Automatically try opening WhatsApp
+    try {
+      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    } catch {
+      // Handled by direct button on success screen
+    }
+
+    // Save lead to database/server
+    try {
+      fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name.trim(),
+          phone: cleanPhone,
+          category: currentCategory.title,
+          batch: 'Customize According To You',
+          date: chosenDate,
+          time: chosenTime,
+          fee: 'Custom Quote (Discuss on WhatsApp)',
+          paymentStatus: 'Custom Enquiry Submitted',
+          customRoutines: customChoreographyCount,
+          performers: customSelectedRoutines,
+          notes: customNotes.trim(),
+          submittedAt: new Date().toISOString()
+        })
+      }).catch(() => {});
+    } catch {}
+  };
+
+  // Step 1: Validate form and proceed to Payment Screen OR Direct WhatsApp Enquiry
   const handleProceedToPayment = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
@@ -388,6 +453,13 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
       return;
     }
     setErrorMessage('');
+
+    // If Wedding Choreography Customize According To You is selected: Submit Enquiry directly on WhatsApp!
+    if (isWeddingChoreo && activeBatch?.id === 'batch-custom') {
+      handleCustomEnquirySubmit();
+      return;
+    }
+
     // Advance to Payment step
     setStep('payment');
   };
@@ -518,93 +590,135 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
         {/* ============================================================== */}
         {/* STEP 3: SUCCESS / BOOKING COMPLETE WITH NOTIFICATION */}
         {/* ============================================================== */}
-        {step === 'success' && (
-          <div className="text-center py-5 sm:py-7 space-y-4">
-            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-600 shadow-sm">
-              <CheckCircle2 className="w-10 h-10" />
-            </div>
-            <h3 className="text-2xl font-bold font-display text-slate-900">Booking &amp; Payment Successful!</h3>
-            <p className="text-slate-600 text-sm max-w-md mx-auto leading-relaxed">
-              Aapka slot <span className="text-blue-600 font-semibold">{currentCategory.title}</span> ({planType === 'monthly' ? 'Monthly Course' : 'Trial Demo at'}) ke liye register ho gaya hai.
-            </p>
+        {step === 'success' && (() => {
+          const isCustomChoreo = isWeddingChoreo && activeBatch?.id === 'batch-custom';
+          return (
+            <div className="text-center py-5 sm:py-7 space-y-4">
+              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-600 shadow-sm">
+                <CheckCircle2 className="w-10 h-10" />
+              </div>
+              <h3 className="text-2xl font-bold font-display text-slate-900">
+                {isCustomChoreo ? 'Custom Enquiry Submitted!' : 'Booking & Payment Successful!'}
+              </h3>
+              <p className="text-slate-600 text-sm max-w-md mx-auto leading-relaxed">
+                {isCustomChoreo
+                  ? 'Aapki custom choreography enquiry submit ho chuki hai. Admin aapse WhatsApp par connect karke pricing aur schedule finalize karenge.'
+                  : <>Aapka slot <span className="text-blue-600 font-semibold">{currentCategory.title}</span> ({planType === 'monthly' ? 'Monthly Course' : 'Trial Demo at'}) ke liye register ho gaya hai.</>}
+              </p>
 
-            {/* Direct WhatsApp Notification Button (Green) */}
-            {lastWhatsAppUrl && (
-              <a
-                href={lastWhatsAppUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#25D366] to-[#1ebe5d] hover:from-[#20ba59] hover:to-[#17a54f] text-white font-extrabold text-sm sm:text-base flex items-center justify-center gap-3 transition-all shadow-xl shadow-emerald-600/25 active:scale-95 cursor-pointer border border-emerald-400 relative overflow-hidden group"
-              >
-                <MessageCircle className="w-5 h-5 fill-white shrink-0" />
-                <span>📲 Open WhatsApp &amp; Send Booking Notification ({studioInfo.phoneDisplay})</span>
-              </a>
-            )}
+              {/* Direct WhatsApp Notification Button (Green) */}
+              {lastWhatsAppUrl && (
+                <a
+                  href={lastWhatsAppUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#25D366] to-[#1ebe5d] hover:from-[#20ba59] hover:to-[#17a54f] text-white font-extrabold text-sm sm:text-base flex items-center justify-center gap-3 transition-all shadow-xl shadow-emerald-600/25 active:scale-95 cursor-pointer border border-emerald-400 relative overflow-hidden group"
+                >
+                  <MessageCircle className="w-5 h-5 fill-white shrink-0" />
+                  <span>
+                    {isCustomChoreo
+                      ? `📲 Open WhatsApp & Chat With Admin (${studioInfo.phoneDisplay})`
+                      : `📲 Open WhatsApp & Send Booking Notification (${studioInfo.phoneDisplay})`}
+                  </span>
+                </a>
+              )}
 
-            {/* Receipt Summary (Light White Card) */}
-            <div className="bg-slate-50 rounded-2xl p-4 text-left border border-slate-200 space-y-2.5 text-xs text-slate-700 mt-3 shadow-inner">
-              <div className="flex justify-between">
-                <span className="text-slate-500">Student Name:</span>
-                <span className="font-semibold text-slate-900">{name.trim()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Mobile Number:</span>
-                <span className="font-semibold text-slate-900">{phone.trim()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Dance Program:</span>
-                <span className="font-semibold text-blue-600">{currentCategory.title}</span>
-              </div>
-              {isKidsDance && (
+              {/* Receipt Summary (Light White Card) */}
+              <div className="bg-slate-50 rounded-2xl p-4 text-left border border-slate-200 space-y-2.5 text-xs text-slate-700 mt-3 shadow-inner">
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Selected Level:</span>
-                  <span className="font-semibold text-slate-900">{selectedLevel}</span>
+                  <span className="text-slate-500">Student Name:</span>
+                  <span className="font-semibold text-slate-900">{name.trim()}</span>
                 </div>
-              )}
-              <div className="flex justify-between">
-                <span className="text-slate-500">Selected Plan:</span>
-                <span className="font-bold text-slate-900">
-                  {planType === 'monthly' ? 'Full Monthly Course' : 'Trial Demo at'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Selected Batch:</span>
-                <span className="font-medium text-slate-900">{activeBatch.name}</span>
-              </div>
-              {date && (
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Preferred Date:</span>
-                  <span className="font-medium text-slate-900">{date}</span>
+                  <span className="text-slate-500">Mobile Number:</span>
+                  <span className="font-semibold text-slate-900">{phone.trim()}</span>
                 </div>
-              )}
-              {time && (
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Preferred Time:</span>
-                  <span className="font-semibold text-blue-600">{time} (Flexible Mon-Sun)</span>
+                  <span className="text-slate-500">Dance Program:</span>
+                  <span className="font-semibold text-blue-600">{currentCategory.title}</span>
                 </div>
-              )}
-              <div className="flex justify-between">
-                <span className="text-slate-500">Amount Paid:</span>
-                <span className="font-extrabold text-emerald-600">{activeFeeText} (UPI Paid)</span>
+                {isCustomChoreo ? (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Selected Package:</span>
+                      <span className="font-bold text-slate-900">Customize According To You</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Routines Requested:</span>
+                      <span className="font-bold text-slate-900">{customChoreographyCount} Routines</span>
+                    </div>
+                    {customSelectedRoutines.length > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Performance Types:</span>
+                        <span className="font-medium text-slate-900 text-right max-w-[200px]">{customSelectedRoutines.join(', ')}</span>
+                      </div>
+                    )}
+                    {customNotes.trim() && (
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Special Notes:</span>
+                        <span className="font-medium text-slate-900 text-right max-w-[200px]">{customNotes.trim()}</span>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {isKidsDance && (
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Selected Level:</span>
+                        <span className="font-semibold text-slate-900">{selectedLevel}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Selected Plan:</span>
+                      <span className="font-bold text-slate-900">
+                        {planType === 'monthly' ? 'Full Monthly Course' : 'Trial Demo at'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Selected Batch:</span>
+                      <span className="font-medium text-slate-900">{activeBatch.name}</span>
+                    </div>
+                  </>
+                )}
+                {date && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Preferred Date:</span>
+                    <span className="font-medium text-slate-900">{date}</span>
+                  </div>
+                )}
+                {time && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Preferred Time:</span>
+                    <span className="font-semibold text-blue-600">{time} (Flexible Mon-Sun)</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-slate-500">
+                    {isCustomChoreo ? 'Pricing Details:' : 'Amount Paid:'}
+                  </span>
+                  <span className="font-extrabold text-emerald-600">
+                    {isCustomChoreo ? 'Custom Quote (Discuss on WhatsApp)' : `${activeFeeText} (UPI Paid)`}
+                  </span>
+                </div>
+                {utrNumber && !isCustomChoreo && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">UPI Ref/UTR:</span>
+                    <span className="font-mono text-slate-800">{utrNumber.trim()}</span>
+                  </div>
+                )}
               </div>
-              {utrNumber && (
-                <div className="flex justify-between">
-                  <span className="text-slate-500">UPI Ref/UTR:</span>
-                  <span className="font-mono text-slate-800">{utrNumber.trim()}</span>
-                </div>
-              )}
-            </div>
 
-            <div className="pt-2">
-              <button
-                onClick={onClose}
-                className="w-full py-3 px-6 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition-all cursor-pointer border border-slate-200"
-              >
-                Done / Close
-              </button>
+              <div className="pt-2">
+                <button
+                  onClick={onClose}
+                  className="w-full py-3 px-6 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition-all cursor-pointer border border-slate-200"
+                >
+                  Done / Close
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* ============================================================== */}
         {/* STEP 2: UPI PAYMENT SCREEN (QR CODE + UPI DETAILS) */}
@@ -782,7 +896,7 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
                     const isSelected = selectedBatchIndex === idx;
                     const isCustomBatch = isWeddingChoreo && batch.id === 'batch-custom';
                     const displayPrice = isCustomBatch
-                      ? (isSelected ? `₹${customChoreographyFee.toLocaleString('en-IN')}` : (batch.price || 'From ₹7,549'))
+                      ? 'Custom Quote'
                       : (batch.price || activeFeeText);
 
                     return (
@@ -822,14 +936,26 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
                           </div>
                         </div>
 
-                        <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-baseline justify-between">
-                          <span className="text-xs text-slate-500">
-                            {isCustomBatch && !isSelected ? 'Estimated Fee:' : 'Total Fee:'}
-                          </span>
-                          <span className="text-xl font-black text-blue-600 font-display">
-                            {displayPrice}
-                          </span>
-                        </div>
+                        {isCustomBatch ? (
+                          <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-center justify-between">
+                            <span className="text-xs font-semibold text-slate-500">
+                              Package Fee:
+                            </span>
+                            <span className="text-xs font-black text-emerald-700 bg-emerald-100/90 border border-emerald-300 px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-xs">
+                              <MessageCircle className="w-3.5 h-3.5 fill-emerald-600/30 text-emerald-700 shrink-0" />
+                              Custom Quote on WhatsApp
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-baseline justify-between">
+                            <span className="text-xs text-slate-500">
+                              Total Fee:
+                            </span>
+                            <span className="text-xl font-black text-blue-600 font-display">
+                              {displayPrice}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -837,10 +963,10 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
 
                 {/* Interactive Customization Box when Customize According To You is selected */}
                 {isWeddingChoreo && activeBatch?.id === 'batch-custom' && (
-                  <div className="mt-3.5 p-4 rounded-2xl bg-gradient-to-br from-blue-50/90 via-indigo-50/40 to-white border-2 border-blue-200 shadow-sm animate-in fade-in slide-in-from-top-2 duration-200">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 pb-3 border-b border-blue-100">
+                  <div className="mt-3.5 p-4 rounded-2xl bg-gradient-to-br from-emerald-50/90 via-teal-50/40 to-white border-2 border-emerald-300 shadow-sm animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 pb-3 border-b border-emerald-100">
                       <div>
-                        <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider block">
+                        <span className="text-[11px] font-black text-emerald-700 uppercase tracking-wider block">
                           Customize Your Package
                         </span>
                         <h4 className="text-sm font-extrabold text-slate-900">
@@ -849,19 +975,19 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
                       </div>
 
                       {/* Stepper */}
-                      <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-blue-200 shadow-xs self-start sm:self-auto">
+                      <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-emerald-200 shadow-xs self-start sm:self-auto">
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             setCustomChoreographyCount(Math.max(1, customChoreographyCount - 1));
                           }}
-                          className="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 font-bold flex items-center justify-center transition-colors cursor-pointer"
+                          className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 hover:bg-emerald-200 font-bold flex items-center justify-center transition-colors cursor-pointer"
                           aria-label="Decrease choreography count"
                         >
                           -
                         </button>
-                        <span className="text-sm font-extrabold text-blue-900 min-w-[75px] text-center">
+                        <span className="text-sm font-extrabold text-emerald-950 min-w-[75px] text-center">
                           {customChoreographyCount} {customChoreographyCount === 1 ? 'Routine' : 'Routines'}
                         </span>
                         <button
@@ -870,7 +996,7 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
                             e.stopPropagation();
                             setCustomChoreographyCount(Math.min(20, customChoreographyCount + 1));
                           }}
-                          className="w-7 h-7 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-bold flex items-center justify-center transition-colors cursor-pointer"
+                          className="w-7 h-7 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 font-bold flex items-center justify-center transition-colors cursor-pointer"
                           aria-label="Increase choreography count"
                         >
                           +
@@ -880,7 +1006,7 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
 
                     {/* Performer / Performance options */}
                     <div className="mb-3">
-                      <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-2">
+                      <p className="text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-2">
                         Select performance types (Optional):
                       </p>
                       <div className="flex flex-wrap gap-1.5">
@@ -907,8 +1033,8 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
                               }}
                               className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-all cursor-pointer ${
                                 isPicked
-                                  ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                                  : 'bg-white text-slate-700 border-slate-200 hover:border-blue-300 hover:bg-blue-50/50'
+                                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                                  : 'bg-white text-slate-700 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50'
                               }`}
                             >
                               {isPicked ? '✓ ' : '+ '} {routineType}
@@ -925,8 +1051,16 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
                         value={customNotes}
                         onChange={(e) => setCustomNotes(e.target.value)}
                         placeholder="Song names or special family requirements? (Optional)"
-                        className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-white border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400 text-slate-900"
+                        className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-white border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder:text-slate-400 text-slate-900"
                       />
+                    </div>
+
+                    {/* WhatsApp enquiry callout */}
+                    <div className="mt-3 p-3 rounded-xl bg-emerald-100/70 border border-emerald-300 text-emerald-950 text-xs flex items-start gap-2.5">
+                      <MessageCircle className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5 fill-emerald-600/30" />
+                      <p className="leading-snug">
+                        <strong className="font-extrabold text-emerald-900">Submit Enquiry to WhatsApp:</strong> Niche diye gaye button par click karein. Aapki details ke sath WhatsApp open hoga jahan admin aapse direct connect karke customized pricing aur songs finalize karenge.
+                      </p>
                     </div>
                   </div>
                 )}
@@ -1181,14 +1315,24 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
               <p className="text-red-600 text-sm font-bold">{errorMessage}</p>
             )}
 
-            {/* 6. BOOK YOUR APPOINTMENT BUTTON */}
-            <button
-              type="submit"
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 via-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2.5 transition-transform active:scale-[0.99] shadow-lg shadow-blue-600/30 cursor-pointer border border-blue-500/40"
-            >
-              <span>BOOK YOUR APPOINTMENT</span>
-              <ArrowRight className="w-5 h-5 text-white" />
-            </button>
+            {/* 6. BOOK YOUR APPOINTMENT OR SUBMIT ENQUIRY BUTTON */}
+            {isWeddingChoreo && activeBatch?.id === 'batch-custom' ? (
+              <button
+                type="submit"
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2.5 transition-transform active:scale-[0.99] shadow-lg shadow-emerald-600/30 cursor-pointer border border-emerald-500/40"
+              >
+                <MessageCircle className="w-5 h-5 text-white fill-white/20" />
+                <span>SUBMIT ENQUIRY ON WHATSAPP</span>
+              </button>
+            ) : (
+              <button
+                type="submit"
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 via-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2.5 transition-transform active:scale-[0.99] shadow-lg shadow-blue-600/30 cursor-pointer border border-blue-500/40"
+              >
+                <span>BOOK YOUR APPOINTMENT</span>
+                <ArrowRight className="w-5 h-5 text-white" />
+              </button>
+            )}
           </form>
         )}
         </div>
