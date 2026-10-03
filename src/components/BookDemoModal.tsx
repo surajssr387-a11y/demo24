@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   X,
   CreditCard,
@@ -17,6 +17,16 @@ import {
 } from 'lucide-react';
 import { studioInfo } from '../data/danceData';
 import { CategoryItem, BatchSchedule, loadCategories, DEFAULT_CATEGORIES } from '../data/categoriesData';
+
+// Dynamic fee calculation for Custom Wedding Choreography
+function getCustomWeddingFee(count: number): number {
+  if (count <= 1) return 3049;
+  if (count === 2) return 5549;
+  if (count === 3) return 7549;
+  if (count === 4) return 8999;
+  if (count === 5) return 10049;
+  return 10049 + (count - 5) * 1800;
+}
 
 // Kids Dance specific batch timings for Level 1, Level 2, Level 3
 const KIDS_LEVEL_BATCHES: Record<string, BatchSchedule[]> = {
@@ -320,14 +330,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
   const demoPriceText = currentCategory.demoPrice || '₹49';
 
   // Dynamic fee calculation for Custom Wedding Choreography
-  const customChoreographyFee = useMemo(() => {
-    if (customChoreographyCount <= 1) return 3049;
-    if (customChoreographyCount === 2) return 5549;
-    if (customChoreographyCount === 3) return 7549;
-    if (customChoreographyCount === 4) return 8999;
-    if (customChoreographyCount === 5) return 10049;
-    return 10049 + (customChoreographyCount - 5) * 1800;
-  }, [customChoreographyCount]);
+  const customChoreographyFee = getCustomWeddingFee(customChoreographyCount);
 
   // Active price based on plan choice or package choice
   const activeFeeText = isSpecialCategory
