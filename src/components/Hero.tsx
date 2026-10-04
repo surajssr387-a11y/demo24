@@ -5,32 +5,48 @@ interface HeroProps {
   onOpenBooking?: () => void;
 }
 
+interface HeroConfigState {
+  videoUrl: string;
+  xPosition: number;
+  yPosition: number;
+  zoom: number;
+  brightness: number;
+  contrast: number;
+}
+
 export const Hero: React.FC<HeroProps> = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoSrc, setVideoSrc] = useState<string>('/hero-uploaded.mp4');
 
-  // Exact framing configuration finalized by user
-  const heroConfig = {
+  const [heroConfig, setHeroConfig] = useState<HeroConfigState>({
+    videoUrl: '/uploads/media_1791123532086_IMG_3618.mp4',
     xPosition: 50,
-    yPosition: 16,
+    yPosition: 21,
     zoom: 1,
-    brightness: 0.95,
-    contrast: 1.04,
-  };
+    brightness: 1,
+    contrast: 1,
+  });
 
-  // Sync latest video URL from server if custom URL was set
+  // Sync latest video URL and framing from server
   useEffect(() => {
     fetch('/api/hero-config')
       .then((res) => res.json())
       .then((data) => {
-        if (data && data.videoUrl && !data.videoUrl.startsWith('blob:')) {
-          setVideoSrc(data.videoUrl);
+        if (data && typeof data === 'object') {
+          setHeroConfig((prev) => ({
+            ...prev,
+            videoUrl: data.videoUrl || prev.videoUrl,
+            xPosition: typeof data.xPosition === 'number' ? data.xPosition : prev.xPosition,
+            yPosition: typeof data.yPosition === 'number' ? data.yPosition : prev.yPosition,
+            zoom: typeof data.zoom === 'number' ? data.zoom : prev.zoom,
+            brightness: typeof data.brightness === 'number' ? data.brightness : 1,
+            contrast: typeof data.contrast === 'number' ? data.contrast : 1,
+          }));
         }
       })
       .catch(() => {});
   }, []);
 
-  // Ensure autoplay works reliably across mobile & desktop browsers
+  // Ensure autoplay works buttery-smooth and instantly across all browsers
   useEffect(() => {
     const vid = videoRef.current;
     if (!vid) return;
@@ -56,7 +72,7 @@ export const Hero: React.FC<HeroProps> = () => {
     };
 
     playVideo();
-  }, [videoSrc]);
+  }, [heroConfig.videoUrl]);
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
@@ -71,7 +87,7 @@ export const Hero: React.FC<HeroProps> = () => {
       <div className="absolute inset-0 z-0 overflow-hidden bg-black">
         <video
           ref={videoRef}
-          key={videoSrc}
+          key={heroConfig.videoUrl}
           autoPlay
           loop
           muted
@@ -91,14 +107,12 @@ export const Hero: React.FC<HeroProps> = () => {
           }}
           style={{
             objectPosition: `${heroConfig.xPosition}% ${heroConfig.yPosition}%`,
-            transform: `scale(${heroConfig.zoom})`,
-            filter: `brightness(${heroConfig.brightness}) contrast(${heroConfig.contrast})`,
+            transform: 'translate3d(0, 0, 0)',
+            backfaceVisibility: 'hidden',
           }}
-          className="w-full h-full object-cover transition-all duration-150 pointer-events-none"
+          className="w-full h-full object-cover pointer-events-none"
         >
-          <source src={videoSrc} type="video/mp4" />
-          <source src="/hero-uploaded.mp4" type="video/mp4" />
-          <source src="/choreography-loop.mp4" type="video/mp4" />
+          <source src={heroConfig.videoUrl} type="video/mp4" />
         </video>
 
         {/* Ambient Top & Bottom Lighting Gradients */}

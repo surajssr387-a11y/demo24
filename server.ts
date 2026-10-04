@@ -184,13 +184,13 @@ async function startServer() {
       console.error('Error reading hero config:', e);
     }
     return res.json({
-      videoUrl: '/hero-uploaded.mp4',
+      videoUrl: '/uploads/media_1791123532086_IMG_3618.mp4',
       xPosition: 50,
-      yPosition: 16,
+      yPosition: 21,
       zoom: 1,
       overlayDarkness: 0.35,
-      brightness: 0.95,
-      contrast: 1.04,
+      brightness: 1,
+      contrast: 1,
       topGapPx: 0,
     });
   });
