@@ -35,7 +35,7 @@ export const PromoBanner: React.FC<PromoBannerProps> = ({ onOpenBooking }) => {
         {/* Bottom Yellow Strip Clickable Areas */}
         {/* 1. Address Link -> Google Maps */}
         <a
-          href="https://www.google.com/maps/search/?api=1&query=Ramy's+Dance+Studio+Metro+Market+Kutchery+Road+Ranchi"
+          href={studioInfo.googleMapsUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="absolute bottom-0 left-[28%] w-[54%] h-[16%] cursor-pointer z-10"

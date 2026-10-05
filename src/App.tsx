@@ -5,6 +5,7 @@ import { PromoBanner } from './components/PromoBanner';
 import { CategoriesSection } from './components/CategoriesSection';
 import { AchievementsSection } from './components/AchievementsSection';
 import { ChoreographySection } from './components/ChoreographySection';
+import { ReviewsSection } from './components/ReviewsSection';
 import { FooterSection } from './components/FooterSection';
 import { BookDemoModal } from './components/BookDemoModal';
 import {
@@ -68,6 +69,9 @@ export default function App() {
 
         {/* Choreography Section - Cinematic Showcase & Services */}
         <ChoreographySection onOpenBooking={handleOpenBooking} />
+
+        {/* Live Google Review & Client Testimonials Section */}
+        <ReviewsSection onOpenBooking={handleOpenBooking} />
       </main>
 
       {/* Footer Section with Location & Contact */}

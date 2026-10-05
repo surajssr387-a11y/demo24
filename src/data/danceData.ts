@@ -29,7 +29,7 @@ export const studioInfo: StudioInfo = {
   phoneDisplay: "8340158178",
   whatsappNumber: "918340158178",
   address: "2nd Floor, Metro Market, Kutchery Road, Ranchi - 834002, Jharkhand, India",
-  googleMapsUrl: "https://maps.google.com/?q=Metro+Market+Kutchery+Road+Ranchi+Jharkhand+834002",
+  googleMapsUrl: "https://maps.app.goo.gl/JdRffwFDdtRKHeY49",
   instagramHandle: "@ramysdancestudio",
   instagramUrl: "https://instagram.com/ramysdancestudio",
   youtubeHandle: "@ramysdancestudio6278",

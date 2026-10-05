@@ -26,7 +26,7 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ onOpenBooking }) =
               <img
                 src="/logo.jpg"
                 alt="Ramy's Dance Studio"
-                className="h-12 w-auto object-contain rounded-xl bg-white p-1 shadow-md shadow-black/50"
+                className="h-14 sm:h-16 w-auto object-contain rounded-xl bg-white p-1 shadow-md shadow-black/50"
               />
               <div className="flex flex-col">
                 <span className="text-[#0066FF] text-xs font-black tracking-[0.25em] uppercase">

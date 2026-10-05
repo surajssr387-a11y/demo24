@@ -48,25 +48,38 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
         className={`w-full transition-all duration-300 ${
           isScrolled
             ? 'bg-white/95 backdrop-blur-md border-b border-neutral-200/90 shadow-sm py-2 sm:py-2.5 text-neutral-900'
-            : 'bg-transparent border-b border-transparent py-3 sm:py-4 text-white'
+            : 'bg-transparent border-b border-transparent py-2.5 sm:py-3.5 text-white'
         }`}
       >
         <div className="w-full px-3.5 sm:px-6 md:px-8 lg:px-10 flex items-center justify-between">
           {/* Full Left: Brand Lockup */}
-          <a href="#" className="flex items-center gap-2 sm:gap-3 select-none group min-w-0 shrink">
+          <a href="#" className="flex items-center gap-2.5 sm:gap-3.5 select-none group shrink-0">
             <img
               src="/logo.jpg"
               alt="Ramy's Dance Studio"
-              className="h-9 w-9 sm:h-10 sm:w-10 md:h-11 md:w-11 object-contain rounded-lg bg-white p-0.5 shadow-xs border border-neutral-200/50 group-hover:scale-105 transition-all duration-200 shrink-0"
+              className="h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 object-contain rounded-xl sm:rounded-2xl bg-white p-0.5 sm:p-1 shadow-sm border border-neutral-200/60 group-hover:scale-105 transition-all duration-200 shrink-0"
             />
-            <div className="flex flex-col min-w-0">
-              <span
-                className={`text-sm sm:text-base md:text-lg font-black font-display tracking-tight leading-tight truncate transition-colors ${
+            <div className="flex flex-col justify-center shrink-0">
+              <div
+                className={`font-black font-display tracking-tight transition-colors ${
                   isScrolled ? 'text-neutral-950' : 'text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]'
                 }`}
               >
-                RAMY&apos;S DANCE STUDIO
-              </span>
+                {/* Mobile View: Strictly 2 lines */}
+                <div className="sm:hidden flex flex-col leading-none">
+                  <span className="text-[13px] font-black tracking-wide whitespace-nowrap">
+                    RAMY&apos;S
+                  </span>
+                  <span className="text-xs font-black tracking-tight whitespace-nowrap mt-0.5">
+                    DANCE STUDIO
+                  </span>
+                </div>
+
+                {/* Tablet / Desktop View: 1 single clean line */}
+                <span className="hidden sm:inline-block text-lg md:text-xl lg:text-2xl leading-tight whitespace-nowrap">
+                  RAMY&apos;S DANCE STUDIO
+                </span>
+              </div>
             </div>
           </a>
 
