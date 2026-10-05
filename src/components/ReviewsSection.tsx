@@ -116,25 +116,20 @@ export function ReviewsSection({ onOpenBooking }: { onOpenBooking: (category: st
     <section id="reviews" className="py-16 sm:py-20 bg-[#F8F9FA] text-neutral-900 border-t border-neutral-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Heading & Category Filter Bar */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-6 border-b border-neutral-200">
-          <div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black font-display tracking-tight text-neutral-900">
-              Google Reviews &amp; Student Stories
-            </h2>
-            <p className="mt-1 text-xs sm:text-sm text-neutral-500 font-medium">
-              Verified feedback from Google Business Profile &amp; Academy Dancers
-            </p>
-          </div>
+        {/* Section Heading & Category Filter Bar (Centered, with selected subtitle removed) */}
+        <div className="text-center max-w-3xl mx-auto mb-10 pb-6 border-b border-neutral-200">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black font-display tracking-tight text-neutral-900 text-center">
+            Google Reviews &amp; Student Stories
+          </h2>
 
-          {/* Filter Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          {/* Filter Pills Centered */}
+          <div className="flex items-center justify-center flex-wrap gap-2 mt-4">
             {(['All', 'Kids', 'Advance', 'Wedding', 'Ladies'] as const).map((cat) => (
               <button
                 key={cat}
                 type="button"
                 onClick={() => setActiveCategory(cat)}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 cursor-pointer ${
                   activeCategory === cat
                     ? 'bg-neutral-900 text-white shadow-sm'
                     : 'bg-white text-neutral-600 hover:text-neutral-900 border border-neutral-200 hover:border-neutral-300'
@@ -184,10 +179,10 @@ export function ReviewsSection({ onOpenBooking }: { onOpenBooking: (category: st
               </p>
             </div>
 
-            {/* Black Pill "Write a review" Button */}
+            {/* Black Pill "Write a review" Button - Opens Google Maps review dialog directly */}
             <div className="w-full mt-6 space-y-2">
               <a
-                href={studioInfo.googleMapsUrl}
+                href={studioInfo.googleReviewWriteUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full inline-flex items-center justify-center py-2.5 px-6 rounded-full bg-neutral-950 hover:bg-neutral-800 text-white font-semibold text-xs tracking-wide shadow-sm transition-all duration-150 cursor-pointer"

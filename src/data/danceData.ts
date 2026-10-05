@@ -7,6 +7,7 @@ export interface StudioInfo {
   whatsappNumber: string;
   address: string;
   googleMapsUrl: string;
+  googleReviewWriteUrl: string;
   instagramHandle: string;
   instagramUrl: string;
   youtubeHandle: string;
@@ -30,6 +31,7 @@ export const studioInfo: StudioInfo = {
   whatsappNumber: "918340158178",
   address: "2nd Floor, Metro Market, Kutchery Road, Ranchi - 834002, Jharkhand, India",
   googleMapsUrl: "https://maps.app.goo.gl/JdRffwFDdtRKHeY49",
+  googleReviewWriteUrl: "https://search.google.com/local/writereview?placeid=ChIJfXb3OSvh9DkRT_kKzlzE-lE",
   instagramHandle: "@ramysdancestudio",
   instagramUrl: "https://instagram.com/ramysdancestudio",
   youtubeHandle: "@ramysdancestudio6278",
