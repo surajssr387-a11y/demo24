@@ -26,7 +26,12 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
   // Sync latest categories from server
   useEffect(() => {
     fetch('/api/categories')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('Not ok');
+        const ct = res.headers.get('content-type');
+        if (!ct || !ct.includes('application/json')) throw new Error('Not JSON');
+        return res.json();
+      })
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
           const filtered = data.filter(

@@ -24,7 +24,12 @@ export default function App() {
   // Sync with live server on load
   useEffect(() => {
     fetch('/api/categories')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('Not ok');
+        const ct = res.headers.get('content-type');
+        if (!ct || !ct.includes('application/json')) throw new Error('Not JSON');
+        return res.json();
+      })
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
           setCategories(data);
@@ -32,7 +37,7 @@ export default function App() {
         }
       })
       .catch((err) => {
-        console.log('Using local categories cache', err);
+        console.log('Using static categories fallback', err);
       });
   }, []);
 

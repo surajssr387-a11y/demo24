@@ -115,8 +115,10 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     id: "advance",
     title: "Advance",
     imageUrl: "https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=1000&q=80",
-    videoUrl: "/uploads/media_1791043494707_IMG_3161.mp4",
-    videoYPosition: 15,
+    videoUrl: "/uploads/media_1791298432710_IMG_3664.mp4",
+    videoXPosition: 50,
+    videoYPosition: 12,
+    videoZoom: 1,
     pillTag: "INTENSIVE",
     levelLabel: "PROFESSIONAL TRACK",
     description: "Intensive Technique & Choreography",
@@ -152,7 +154,10 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
   {
     id: "gymnastic",
     title: "Gymnastic",
-    imageUrl: "/gymnastic.jpg",
+    imageUrl: "/uploads/media_1791299159900_Colourful_Kids__Gymnastics_Poster.jpg",
+    imageXPosition: 50,
+    imageYPosition: 50,
+    imageZoom: 1,
     pillTag: "ACROBATICS",
     levelLabel: "ALL LEVELS",
     description: "Flexibility, Acrobatics & Core Balance",
@@ -323,12 +328,12 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
   }
 ];
 
-export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v24';
+export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v25';
 
 export function loadCategories(): CategoryItem[] {
   try {
-    // Clear old versions to prevent stale batch timings
-    ['ramys_categories_config_v14', 'ramys_categories_config_v15', 'ramys_categories_config_v16', 'ramys_categories_config_v17', 'ramys_categories_config_v18', 'ramys_categories_config_v19', 'ramys_categories_config_v20', 'ramys_categories_config_v21', 'ramys_categories_config_v22', 'ramys_categories_config_v23'].forEach((k) => {
+    // Clear old versions to prevent stale batch timings and old cached media
+    ['ramys_categories_config_v14', 'ramys_categories_config_v15', 'ramys_categories_config_v16', 'ramys_categories_config_v17', 'ramys_categories_config_v18', 'ramys_categories_config_v19', 'ramys_categories_config_v20', 'ramys_categories_config_v21', 'ramys_categories_config_v22', 'ramys_categories_config_v23', 'ramys_categories_config_v24'].forEach((k) => {
       try { localStorage.removeItem(k); } catch {}
     });
 
