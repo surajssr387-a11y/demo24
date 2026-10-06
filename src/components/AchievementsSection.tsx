@@ -68,8 +68,9 @@ export const DEFAULT_ACHIEVEMENTS: AchievementMediaItem[] = [
     title: '',
     imageUrl: '/achievements/studio-photo-2.png',
     xPosition: 50,
-    yPosition: 50,
-    brightness: 1.0,
+    yPosition: 1,
+    brightness: 1.04,
+    contrast: 1,
   },
   {
     id: 'img-5',
@@ -77,8 +78,9 @@ export const DEFAULT_ACHIEVEMENTS: AchievementMediaItem[] = [
     title: '',
     imageUrl: '/achievements/studio-photo-3.png',
     xPosition: 50,
-    yPosition: 50,
-    brightness: 1.0,
+    yPosition: 0,
+    brightness: 1,
+    contrast: 1,
   },
   {
     id: 'img-6',
@@ -88,18 +90,39 @@ export const DEFAULT_ACHIEVEMENTS: AchievementMediaItem[] = [
   },
 ];
 
+const ACHIEVEMENTS_STORAGE_KEY = 'ramys_achievements_config_v2';
+
+function loadAchievements(): AchievementMediaItem[] {
+  try {
+    const saved = localStorage.getItem(ACHIEVEMENTS_STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {}
+  return DEFAULT_ACHIEVEMENTS;
+}
+
 export const AchievementsSection: React.FC = () => {
-  const [items, setItems] = useState<AchievementMediaItem[]>(DEFAULT_ACHIEVEMENTS);
+  const [items, setItems] = useState<AchievementMediaItem[]>(loadAchievements);
   const [activeVideo, setActiveVideo] = useState<AchievementMediaItem | null>(null);
   const [activePhoto, setActivePhoto] = useState<AchievementMediaItem | null>(null);
 
   // Sync latest achievements from server if available
   useEffect(() => {
     fetch('/api/achievements')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('Not ok');
+        const ct = res.headers.get('content-type');
+        if (!ct || !ct.includes('application/json')) throw new Error('Not JSON');
+        return res.json();
+      })
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
           setItems(data);
+          try {
+            localStorage.setItem(ACHIEVEMENTS_STORAGE_KEY, JSON.stringify(data));
+          } catch {}
         }
       })
       .catch(() => {});
@@ -146,6 +169,7 @@ export const AchievementsSection: React.FC = () => {
                     }}
                     className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
                     loading="lazy"
+                    decoding="async"
                   />
 
                   {/* Gentle hover overlay */}
