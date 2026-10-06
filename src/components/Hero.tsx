@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { ArrowDown } from 'lucide-react';
+import { LiquidGlassButton } from './LiquidGlassButton';
 
 interface HeroProps {
   onOpenBooking?: () => void;
@@ -128,16 +129,17 @@ export const Hero: React.FC<HeroProps> = () => {
         <div className="absolute top-0 left-0 right-0 h-28 bg-gradient-to-b from-black/60 via-black/15 to-transparent pointer-events-none" />
       </div>
 
-      {/* Main Center-Bottom Action - Clean single CATEGORIES Button */}
+      {/* Main Center-Bottom Action - Liquid Glass Button Plus */}
       <div className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pb-16 md:pb-20 flex flex-col items-center justify-center text-center">
         <div className="flex items-center justify-center mt-6">
-          <button
+          <LiquidGlassButton
             onClick={() => scrollToSection('categories')}
-            className="group flex items-center gap-2.5 bg-white/20 hover:bg-white/30 active:bg-white/40 text-white font-extrabold text-sm md:text-base px-9 py-4 rounded-full backdrop-blur-xl border border-white/40 hover:border-white/60 transition-all shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)] hover:scale-105 active:scale-95 cursor-pointer tracking-wide"
+            icon={<ArrowDown className="w-4 h-4 stroke-[3]" />}
+            iconPosition="right"
+            padding="px-10 py-4.5"
           >
-            <span>CATEGORIES</span>
-            <ArrowDown className="w-4 h-4 stroke-[3] group-hover:translate-y-0.5 transition-transform" />
-          </button>
+            CATEGORIES
+          </LiquidGlassButton>
         </div>
       </div>
     </section>
