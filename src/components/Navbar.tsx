@@ -11,11 +11,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const shouldScrolled = window.scrollY > 20;
+          setIsScrolled((prev) => (prev !== shouldScrolled ? shouldScrolled : prev));
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 

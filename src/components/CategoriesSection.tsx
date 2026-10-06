@@ -95,7 +95,7 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
                       src={category.videoUrl}
                       style={{
                         objectPosition: `${vX}% ${vY}%`,
-                        transform: `scale(${vZoom})`,
+                        transform: `scale(${vZoom}) translateZ(0)`,
                       }}
                       ref={(el) => {
                         if (el) {
@@ -108,11 +108,11 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
                       loop
                       muted
                       playsInline
-                      preload="auto"
+                      preload="metadata"
                       onLoadedData={(e) => {
                         e.currentTarget.play().catch(() => {});
                       }}
-                      className="w-full h-full object-cover transition-all duration-300 group-hover:brightness-105 pointer-events-none"
+                      className="w-full h-full object-cover transition-all duration-300 group-hover:brightness-105 pointer-events-none will-change-transform"
                     />
                   ) : (
                     <img
@@ -120,10 +120,11 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
                       alt={category.title}
                       style={{
                         objectPosition: `${iX}% ${iY}%`,
-                        transform: `scale(${iZoom})`,
+                        transform: `scale(${iZoom}) translateZ(0)`,
                       }}
-                      className="w-full h-full object-cover transition-all duration-300 group-hover:brightness-105"
+                      className="w-full h-full object-cover transition-all duration-300 group-hover:brightness-105 will-change-transform"
                       loading="lazy"
+                      decoding="async"
                       referrerPolicy="no-referrer"
                     />
                   )}

@@ -114,15 +114,6 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
     }
   }, [performances, activeModalVideo]);
 
-  // Ensure all videos play smoothly when rendered
-  useEffect(() => {
-    const vids = document.querySelectorAll<HTMLVideoElement>('section#choreography video');
-    vids.forEach((v) => {
-      v.muted = true;
-      v.play().catch(() => {});
-    });
-  }, [performances]);
-
   return (
     <section id="choreography" className="relative bg-white text-neutral-900 overflow-hidden select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 md:py-16">
@@ -154,7 +145,7 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
                     loop
                     muted
                     playsInline
-                    preload="auto"
+                    preload="metadata"
                     onLoadedData={(e) => {
                       const v = e.currentTarget;
                       v.muted = true;
@@ -169,7 +160,7 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
                       objectPosition: `${item.xPosition ?? 50}% ${item.yPosition}%`,
                       filter: `brightness(${item.brightness}) contrast(${item.contrast || 1.04})`,
                     }}
-                    className="w-full h-full object-cover transition-all duration-200 pointer-events-none"
+                    className="w-full h-full object-cover transition-all duration-200 pointer-events-none will-change-transform"
                   />
 
                   {/* Play Overlay Button (Opens Theater Modal with sound) */}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { PromoBanner } from './components/PromoBanner';
@@ -7,12 +7,16 @@ import { AchievementsSection } from './components/AchievementsSection';
 import { ChoreographySection } from './components/ChoreographySection';
 import { ReviewsSection } from './components/ReviewsSection';
 import { FooterSection } from './components/FooterSection';
-import { BookDemoModal } from './components/BookDemoModal';
 import {
   CategoryItem,
   loadCategories,
   saveCategories,
 } from './data/categoriesData';
+
+// Lazy load heavy booking modal to minimize initial bundle size and boost page speed
+const BookDemoModal = lazy(() =>
+  import('./components/BookDemoModal').then((m) => ({ default: m.BookDemoModal }))
+);
 
 export default function App() {
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
@@ -83,13 +87,17 @@ export default function App() {
       {/* Footer Section with Location & Contact */}
       <FooterSection onOpenBooking={handleOpenBooking} />
 
-      {/* Interactive Booking Demo Modal */}
-      <BookDemoModal
-        isOpen={bookingModalOpen}
-        onClose={() => setBookingModalOpen(false)}
-        initialCategory={selectedCategoryForBooking}
-        categories={categories}
-      />
+      {/* Interactive Booking Demo Modal (Loaded on-demand) */}
+      {bookingModalOpen && (
+        <Suspense fallback={null}>
+          <BookDemoModal
+            isOpen={bookingModalOpen}
+            onClose={() => setBookingModalOpen(false)}
+            initialCategory={selectedCategoryForBooking}
+            categories={categories}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }
