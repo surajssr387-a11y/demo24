@@ -93,6 +93,7 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
                     <video
                       key={`${category.videoUrl}-${vX}-${vY}-${vZoom}`}
                       src={category.videoUrl}
+                      poster={category.imageUrl}
                       style={{
                         objectPosition: `${vX}% ${vY}%`,
                         transform: `scale(${vZoom}) translateZ(0)`,
@@ -108,8 +109,11 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
                       loop
                       muted
                       playsInline
-                      preload="metadata"
+                      preload="auto"
                       onLoadedData={(e) => {
+                        e.currentTarget.play().catch(() => {});
+                      }}
+                      onCanPlay={(e) => {
                         e.currentTarget.play().catch(() => {});
                       }}
                       className="w-full h-full object-cover transition-all duration-300 group-hover:brightness-105 pointer-events-none will-change-transform"

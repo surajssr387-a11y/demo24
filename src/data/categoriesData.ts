@@ -276,6 +276,9 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     title: "Wedding choreography",
     imageUrl: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1000&q=80",
     videoUrl: "/wedding-choreography.mp4",
+    videoXPosition: 50,
+    videoYPosition: 25,
+    videoZoom: 1,
     pillTag: "SANGEET SPECIAL",
     levelLabel: "CUSTOM ROUTINES",
     description: "Family Sangeet & Couple Dance Preparation",
@@ -328,12 +331,12 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
   }
 ];
 
-export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v25';
+export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v26';
 
 export function loadCategories(): CategoryItem[] {
   try {
     // Clear old versions to prevent stale batch timings and old cached media
-    ['ramys_categories_config_v14', 'ramys_categories_config_v15', 'ramys_categories_config_v16', 'ramys_categories_config_v17', 'ramys_categories_config_v18', 'ramys_categories_config_v19', 'ramys_categories_config_v20', 'ramys_categories_config_v21', 'ramys_categories_config_v22', 'ramys_categories_config_v23', 'ramys_categories_config_v24'].forEach((k) => {
+    ['ramys_categories_config_v14', 'ramys_categories_config_v15', 'ramys_categories_config_v16', 'ramys_categories_config_v17', 'ramys_categories_config_v18', 'ramys_categories_config_v19', 'ramys_categories_config_v20', 'ramys_categories_config_v21', 'ramys_categories_config_v22', 'ramys_categories_config_v23', 'ramys_categories_config_v24', 'ramys_categories_config_v25'].forEach((k) => {
       try { localStorage.removeItem(k); } catch {}
     });
 
@@ -344,9 +347,23 @@ export function loadCategories(): CategoryItem[] {
         return parsed.map((cat: CategoryItem) => {
           const defaultCat = DEFAULT_CATEGORIES.find((d) => d.id === cat.id);
           const videoUrl = cat.videoUrl || defaultCat?.videoUrl;
+          const imageUrl = cat.imageUrl || defaultCat?.imageUrl || '/kids-dance.jpg';
+          const videoYPosition = cat.videoYPosition ?? defaultCat?.videoYPosition;
+          const videoXPosition = cat.videoXPosition ?? defaultCat?.videoXPosition;
+          const videoZoom = cat.videoZoom ?? defaultCat?.videoZoom;
+          const imageYPosition = cat.imageYPosition ?? defaultCat?.imageYPosition;
+          const imageXPosition = cat.imageXPosition ?? defaultCat?.imageXPosition;
+          const imageZoom = cat.imageZoom ?? defaultCat?.imageZoom;
           return {
             ...cat,
+            imageUrl,
             videoUrl,
+            videoYPosition,
+            videoXPosition,
+            videoZoom,
+            imageYPosition,
+            imageXPosition,
+            imageZoom,
             batches: cat.batches?.map((b) => ({
               ...b,
               name: b.name ? b.name.replace(/\s*\/\s*week/i, '') : b.name,
