@@ -114,12 +114,19 @@
         ]
       }
     ],
-    "videoUrl": "/uploads/media_1791043494707_IMG_3161.mp4"
+    "videoUrl": "/uploads/media_1791298432710_IMG_3664.mp4",
+    "videoXPosition": 50,
+    "videoYPosition": 12,
+    "videoZoom": 1,
+    "imageXPosition": 50,
+    "imageYPosition": 50,
+    "imageZoom": 1,
+    "updatedAt": "2026-10-06T15:06:32.795Z"
   },
   {
     "id": "gymnastic",
     "title": "Gymnastic",
-    "imageUrl": "/gymnastic.jpg",
+    "imageUrl": "/uploads/media_1791299159900_Colourful_Kids__Gymnastics_Poster.jpg",
     "pillTag": "ACROBATICS",
     "levelLabel": "ALL LEVELS",
     "description": "Flexibility, Acrobatics & Core Balance",
@@ -162,7 +169,14 @@
           "Sunday — 10:00 AM"
         ]
       }
-    ]
+    ],
+    "videoXPosition": 50,
+    "videoYPosition": 50,
+    "videoZoom": 1,
+    "imageXPosition": 5,
+    "imageYPosition": 50,
+    "imageZoom": 1,
+    "updatedAt": "2026-10-06T15:06:11.162Z"
   },
   {
     "id": "bollywood-ladies",
@@ -286,6 +300,13 @@
         ]
       }
     ],
-    "videoUrl": "/wedding-choreography.mp4"
+    "videoUrl": "/wedding-choreography.mp4",
+    "videoXPosition": 50,
+    "videoYPosition": 25,
+    "videoZoom": 1,
+    "imageXPosition": 50,
+    "imageYPosition": 50,
+    "imageZoom": 1,
+    "updatedAt": "2026-10-06T14:57:53.958Z"
   }
 ]

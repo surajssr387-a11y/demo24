@@ -74,19 +74,21 @@ async function startServer() {
   app.use('/uploads', express.static(UPLOADS_DIR));
 
   // Security: Magic bytes validation helper
-  const ALLOWED_EXTENSIONS = new Set(['.mp4', '.webm', '.mov', '.jpg', '.jpeg', '.png', '.webp']);
+  const ALLOWED_EXTENSIONS = new Set([
+    '.mp4', '.webm', '.mov', '.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif', '.avif', '.jfif', '.bmp'
+  ]);
   const isValidMedia = (buffer: Buffer, ext: string): boolean => {
     if (buffer.length < 8) return false;
-    // MP4 / MOV: 'ftyp' at bytes 4-8
-    if (ext === '.mp4' || ext === '.mov') {
+    // MP4 / MOV / HEIC / AVIF: 'ftyp' at bytes 4-8
+    if (ext === '.mp4' || ext === '.mov' || ext === '.heic' || ext === '.heif' || ext === '.avif') {
       return buffer.length >= 12 && buffer.toString('ascii', 4, 8) === 'ftyp';
     }
     // WebM / Matroska: 1A 45 DF A3
     if (ext === '.webm') {
       return buffer[0] === 0x1a && buffer[1] === 0x45 && buffer[2] === 0xdf && buffer[3] === 0xa3;
     }
-    // JPEG: FF D8 FF
-    if (ext === '.jpg' || ext === '.jpeg') {
+    // JPEG / JFIF: FF D8 FF
+    if (ext === '.jpg' || ext === '.jpeg' || ext === '.jfif') {
       return buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
     }
     // PNG: 89 50 4E 47
@@ -100,6 +102,10 @@ async function startServer() {
         buffer.toString('ascii', 0, 4) === 'RIFF' &&
         buffer.toString('ascii', 8, 12) === 'WEBP'
       );
+    }
+    // BMP: 'BM' (42 4D)
+    if (ext === '.bmp') {
+      return buffer[0] === 0x42 && buffer[1] === 0x4d;
     }
     return false;
   };

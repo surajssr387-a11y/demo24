@@ -62,6 +62,7 @@ export default function App() {
         <CategoriesSection
           onSelectCategory={handleOpenBooking}
           categories={categories}
+          onCategoriesChange={setCategories}
         />
 
         {/* Achievements Section - 3x3 Grid (Row 1: 3 Videos, Row 2: 3 Photos, Row 3: 3 Photos) */}

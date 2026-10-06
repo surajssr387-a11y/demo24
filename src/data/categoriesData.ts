@@ -13,7 +13,12 @@ export interface CategoryItem {
   title: string;
   imageUrl: string;
   videoUrl?: string;
+  videoXPosition?: number;
   videoYPosition?: number;
+  videoZoom?: number;
+  imageXPosition?: number;
+  imageYPosition?: number;
+  imageZoom?: number;
   pillTag: string;
   levelLabel: string;
   description: string;

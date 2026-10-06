@@ -4,11 +4,13 @@ import { CategoryItem, DEFAULT_CATEGORIES, loadCategories, saveCategories } from
 interface CategoriesSectionProps {
   onSelectCategory: (categoryTitle: string) => void;
   categories?: CategoryItem[];
+  onCategoriesChange?: (categories: CategoryItem[]) => void;
 }
 
 export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
   onSelectCategory,
   categories: propCategories,
+  onCategoriesChange,
 }) => {
   const [internalCategories, setInternalCategories] = useState<CategoryItem[]>(() => {
     return propCategories && propCategories.length > 0 ? propCategories : loadCategories();
@@ -32,6 +34,7 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
           );
           setInternalCategories(filtered);
           saveCategories(filtered);
+          onCategoriesChange?.(filtered);
         }
       })
       .catch(() => {});
@@ -57,7 +60,16 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
           {displayCategories.map((category: CategoryItem) => {
             const isWedding = category.id === 'wedding-choreography' || category.title.toLowerCase().includes('wedding');
-            const yPos = category.videoYPosition ?? 50;
+            
+            // Video positioning values
+            const vX = category.videoXPosition ?? 50;
+            const vY = category.videoYPosition ?? 50;
+            const vZoom = category.videoZoom ?? 1;
+
+            // Image positioning values
+            const iX = category.imageXPosition ?? 50;
+            const iY = category.imageYPosition ?? 50;
+            const iZoom = category.imageZoom ?? 1;
 
             return (
               <div
@@ -71,12 +83,15 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
               >
                 {/* Card Container: Identical size & aspect-ratio across all cards */}
                 <div className="relative w-full aspect-[16/10.5] rounded-2xl overflow-hidden bg-neutral-100 border border-neutral-200/90 shadow-xs transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-md group-hover:border-neutral-300">
-                  {/* Media: Video if present, else Image (plays seamlessly without overlays) */}
+                  {/* Media: Video if present, else Image */}
                   {category.videoUrl ? (
                     <video
-                      key={category.videoUrl}
+                      key={`${category.videoUrl}-${vX}-${vY}-${vZoom}`}
                       src={category.videoUrl}
-                      style={{ objectPosition: `50% ${yPos}%` }}
+                      style={{
+                        objectPosition: `${vX}% ${vY}%`,
+                        transform: `scale(${vZoom})`,
+                      }}
                       ref={(el) => {
                         if (el) {
                           el.muted = true;
@@ -98,7 +113,10 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
                     <img
                       src={category.imageUrl}
                       alt={category.title}
-                      style={{ objectPosition: `50% ${yPos}%` }}
+                      style={{
+                        objectPosition: `${iX}% ${iY}%`,
+                        transform: `scale(${iZoom})`,
+                      }}
                       className="w-full h-full object-cover transition-all duration-300 group-hover:brightness-105"
                       loading="lazy"
                       referrerPolicy="no-referrer"
