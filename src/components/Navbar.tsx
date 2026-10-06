@@ -55,9 +55,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
           {/* Full Left: Brand Lockup */}
           <a href="#" className="flex items-center gap-2.5 sm:gap-3.5 select-none group shrink-0">
             <img
-              src="/logo.jpg"
+              src="/logo-transparent.png"
               alt="Ramy's Dance Studio"
-              className="h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 object-contain rounded-xl sm:rounded-2xl bg-white p-0.5 sm:p-1 shadow-sm border border-neutral-200/60 group-hover:scale-105 transition-all duration-200 shrink-0"
+              className="h-14 w-14 sm:h-16 sm:w-16 md:h-20 md:w-20 lg:h-22 lg:w-22 object-contain group-hover:scale-105 transition-transform duration-200 shrink-0"
             />
             <div className="flex flex-col justify-center shrink-0">
               <div
