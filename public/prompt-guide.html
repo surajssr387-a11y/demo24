@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Studio Master Prompting & Architecture Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Syne"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: '#0066FF',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#F8FAFC] text-neutral-900 font-sans antialiased selection:bg-brand selection:text-white">
+
+  <!-- Top Hero Header -->
+  <header class="bg-gradient-to-r from-blue-900 via-brand to-blue-600 text-white py-12 px-4 sm:px-6 shadow-xl relative overflow-hidden">
+    <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+      <div>
+        <span class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+          🚀 Official AI Studio Guide
+        </span>
+        <h1 class="text-2xl sm:text-4xl font-extrabold font-display tracking-tight leading-tight">
+          Master Prompting & Architecture Blueprint
+        </h1>
+        <p class="mt-2 text-white/90 text-sm sm:text-base max-w-2xl">
+          Kaise instruction dein taaki AI bina error ke <strong>pehli hi baari me 100% structured, super-fast aur Vercel-ready</strong> website deliver kare.
+        </p>
+      </div>
+
+      <!-- Action Button -->
+      <a 
+        href="/AI-Studio-Master-Prompting-Architecture-Guide.pdf" 
+        download 
+        class="inline-flex items-center gap-2.5 bg-white text-brand hover:bg-neutral-100 font-bold px-6 py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all transform active:scale-95 shrink-0"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        Download PDF Guide
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-10 space-y-10">
+
+    <!-- Section 1: The Root Cause -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 border border-neutral-200/80 shadow-sm">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="w-8 h-8 rounded-lg bg-red-100 text-red-600 font-bold flex items-center justify-center text-sm">01</span>
+        <h2 class="text-xl sm:text-2xl font-bold font-display text-neutral-950">
+          Kyun Galti Hoti Hai? (Root Cause Samjhein)
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-5">
+        <div class="p-5 rounded-xl bg-neutral-50 border border-neutral-200">
+          <h3 class="font-bold text-neutral-900 text-base mb-1.5 flex items-center gap-2">
+            <span class="text-blue-600">⚡</span> Local vs Vercel Gap
+          </h3>
+          <p class="text-neutral-600 text-xs sm:text-sm leading-relaxed">
+            AI Studio me Node.js backend chalta hai jo JSON me save karta hai. Lekin <strong>Vercel par sirf static Vite bundle</strong> banta hai. Agar code dono jagah sync na ho, toh Vercel purana fallback hi render karega.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-xl bg-neutral-50 border border-neutral-200">
+          <h3 class="font-bold text-neutral-900 text-base mb-1.5 flex items-center gap-2">
+            <span class="text-amber-600">📱</span> Mobile Viewport Crop
+          </h3>
+          <p class="text-neutral-600 text-xs sm:text-sm leading-relaxed">
+            Desktop screen wide hoti hai, lekin mobile screen narrow hoti hai. Square photos ke top/bottom crop ho jate hain jab tak unme <code>objectPosition (x%, y%)</code> exact lock na kiya jaye.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-xl bg-neutral-50 border border-neutral-200">
+          <h3 class="font-bold text-neutral-900 text-base mb-1.5 flex items-center gap-2">
+            <span class="text-emerald-600">💾</span> Phone Browser Cache
+          </h3>
+          <p class="text-neutral-600 text-xs sm:text-sm leading-relaxed">
+            Mobile Chrome aur Safari purana <code>localStorage</code> aur images save kar lete hain. Jab tak code me <code>storageKey</code> ko bump (v26 -> v27) na kiya jaye, phone purana version hi dikhata hai.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: 4 Golden Rules -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 border border-neutral-200/80 shadow-sm">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="w-8 h-8 rounded-lg bg-blue-100 text-brand font-bold flex items-center justify-center text-sm">02</span>
+        <h2 class="text-xl sm:text-2xl font-bold font-display text-neutral-950">
+          AI Ko Command Dene Ke 4 Golden Rules
+        </h2>
+      </div>
+
+      <div class="space-y-4 mt-6">
+        <div class="flex items-start gap-4 p-4 rounded-xl bg-neutral-50 border border-neutral-200">
+          <span class="w-6 h-6 rounded-full bg-brand text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+          <div>
+            <h4 class="font-bold text-neutral-900 text-sm sm:text-base">Full Context Dein (Clarity Over One-Liners)</h4>
+            <p class="text-neutral-600 text-xs sm:text-sm mt-0.5">
+              Sirf <em>"photo theek karo"</em> mat boliye. Boliye: <strong>"Gymnastic photo ka position mobile view me left-align (5%) karo, static fallback me sync karo aur push karo."</strong>
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-4 p-4 rounded-xl bg-neutral-50 border border-neutral-200">
+          <span class="w-6 h-6 rounded-full bg-brand text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+          <div>
+            <h4 class="font-bold text-neutral-900 text-sm sm:text-base">Hosting Platform Ka Naam Boliye (Vercel)</h4>
+            <p class="text-neutral-600 text-xs sm:text-sm mt-0.5">
+              Hamesha mention karein: <strong>"Ye site Vercel static build par chalegi, toh Single Source of Truth follow karo taaki static fallback aur JSON me koi mismatch na rahe."</strong>
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-4 p-4 rounded-xl bg-neutral-50 border border-neutral-200">
+          <span class="w-6 h-6 rounded-full bg-brand text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+          <div>
+            <h4 class="font-bold text-neutral-900 text-sm sm:text-base">Mobile Framing Hamesha Lock Karwayein</h4>
+            <p class="text-neutral-600 text-xs sm:text-sm mt-0.5">
+              Media changes ke waqt boliye: <strong>"Mobile screen par check karke xPosition aur yPosition framing lock karo taaki faces/text crop na ho."</strong>
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-4 p-4 rounded-xl bg-neutral-50 border border-neutral-200">
+          <span class="w-6 h-6 rounded-full bg-brand text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
+          <div>
+            <h4 class="font-bold text-neutral-900 text-sm sm:text-base">Zero-Friction Push Directive</h4>
+            <p class="text-neutral-600 text-xs sm:text-sm mt-0.5">
+              Har prompt ke aakhri me ye sentence fix kar lein: <strong>"compile_applet verify karo aur git push origin main kar do."</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Copy Paste Prompts -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 border border-neutral-200/80 shadow-sm">
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 font-bold flex items-center justify-center text-sm">03</span>
+          <h2 class="text-xl sm:text-2xl font-bold font-display text-neutral-950">
+            Copy-Paste Master Prompts (1-Shot Success Formulas)
+          </h2>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+
+        <!-- Prompt 1 -->
+        <div class="border border-blue-200 rounded-xl bg-blue-50/50 p-5 relative">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-black uppercase tracking-wider text-brand">Prompt 1 — Photo / Video / Framing Badalte Waqt</span>
+            <button onclick="copyPrompt('p1')" class="text-xs font-bold bg-white border border-neutral-200 text-neutral-700 hover:text-brand px-3 py-1 rounded-md shadow-xs active:scale-95 transition-all">Copy</button>
+          </div>
+          <p id="p1" class="font-mono text-xs sm:text-sm text-neutral-800 bg-white p-3.5 rounded-lg border border-neutral-200 leading-relaxed select-all">
+Is [Photo/Video] ko update karo. Iska mobile framing (xPosition, yPosition) check karke desktop aur mobile dono ke liye lock karo. Static fallback (DEFAULT) aur JSON data dono me sync karo, storage version bump karo taaki mobile par turant dikhe, aur git push origin main karo.
+          </p>
+        </div>
+
+        <!-- Prompt 2 -->
+        <div class="border border-purple-200 rounded-xl bg-purple-50/50 p-5 relative">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-black uppercase tracking-wider text-purple-700">Prompt 2 — Ultra Fast & Smooth Performance (60FPS)</span>
+            <button onclick="copyPrompt('p2')" class="text-xs font-bold bg-white border border-neutral-200 text-neutral-700 hover:text-purple-700 px-3 py-1 rounded-md shadow-xs active:scale-95 transition-all">Copy</button>
+          </div>
+          <p id="p2" class="font-mono text-xs sm:text-sm text-neutral-800 bg-white p-3.5 rounded-lg border border-neutral-200 leading-relaxed select-all">
+Website ki speed aur smoothness optimize karo: Heavy modals ko React.lazy + Suspense se code-split karo, background videos par preload="auto" aur fallback poster lagao, scroll listeners ko requestAnimationFrame se throttle karo, unused code clean karo, aur push origin main kar do.
+          </p>
+        </div>
+
+        <!-- Prompt 3 -->
+        <div class="border border-emerald-200 rounded-xl bg-emerald-50/50 p-5 relative">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-black uppercase tracking-wider text-emerald-700">Prompt 3 — Nayi Website Shuru Karte Waqt (Kickoff)</span>
+            <button onclick="copyPrompt('p3')" class="text-xs font-bold bg-white border border-neutral-200 text-neutral-700 hover:text-emerald-700 px-3 py-1 rounded-md shadow-xs active:scale-95 transition-all">Copy</button>
+          </div>
+          <p id="p3" class="font-mono text-xs sm:text-sm text-neutral-800 bg-white p-3.5 rounded-lg border border-neutral-200 leading-relaxed select-all">
+Mujhe ek [Niche, jaise Dance Studio] website banani hai. Ye Vercel static build par host hogi. Single Source of Truth architecture follow karna taaki static build me koi data mismatch na ho. Tailwind CSS se modern, high-contrast, mobile-first design banao. Heavy modals ko lazy load karo. Page sections: [Navbar, Hero with video, Categories, Achievements, Reviews, Footer]. Sabhi media public folder me rakho aur build test pass karke git push origin main karo.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Section 4: Master Summary -->
+    <section class="bg-gradient-to-br from-neutral-900 to-neutral-950 text-white rounded-2xl p-6 sm:p-8 shadow-xl">
+      <h3 class="text-lg sm:text-xl font-bold font-display text-white mb-2">
+        🎯 1-Shot Golden Formula: "The Trinity Prompt"
+      </h3>
+      <p class="text-neutral-300 text-xs sm:text-sm leading-relaxed mb-4">
+        Agar aapke paas lamba prompt likhne ka time na ho, toh bas ye 3 keywords prompt me shamil karein:
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+        <div class="p-3 bg-white/10 rounded-xl border border-white/10 font-bold text-sm">
+          1. Single Source of Truth
+          <span class="block font-normal text-xs text-neutral-300 mt-1">JSON aur TS fallback hamesha synced</span>
+        </div>
+        <div class="p-3 bg-white/10 rounded-xl border border-white/10 font-bold text-sm">
+          2. Mobile Framing
+          <span class="block font-normal text-xs text-neutral-300 mt-1">xPosition & yPosition locked</span>
+        </div>
+        <div class="p-3 bg-white/10 rounded-xl border border-white/10 font-bold text-sm">
+          3. Git Push
+          <span class="block font-normal text-xs text-neutral-300 mt-1">Verified compilation + main branch</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="text-center py-8 text-neutral-500 text-xs">
+    © 2026 Ramy's Dance Studio — AI Studio Architecture Reference Guide
+  </footer>
+
+  <script>
+    function copyPrompt(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Prompt copied! Ab aap isse direct chat me paste kar sakte hain.');
+      });
+    }
+  </script>
+</body>
+</html>
