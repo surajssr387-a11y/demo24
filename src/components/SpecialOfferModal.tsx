@@ -468,11 +468,8 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
               <div className="pt-3 border-t border-neutral-100">
                 <div className="bg-amber-50 border border-amber-200/80 rounded-2xl p-3.5 mb-4 flex items-center justify-between">
                   <div>
-                    <span className="text-[11px] uppercase tracking-wider font-extrabold text-amber-800 block">
+                    <span className="text-xs uppercase tracking-wider font-extrabold text-amber-800 block">
                       Total Course Fee (Monthly)
-                    </span>
-                    <span className="text-xs text-neutral-600 font-medium">
-                      12 Sessions (3 Days/Week)
                     </span>
                   </div>
                   <div className="text-right">
