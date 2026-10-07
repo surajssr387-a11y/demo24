@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "name": "sanjeev biruly",
+    "phone": "8117075759",
+    "program": "Dance Class",
+    "plan": "Monthly",
+    "batch": "Special Offer (11AM-4PM) — Monday, Wednesday, Friday at 11:00 AM – 12:00 PM",
+    "schedule": [],
+    "fee": "₹899",
+    "preferredDate": "",
+    "paymentStatus": "Special Offer Booking (₹899)",
+    "utrNumber": "",
+    "isDemo": false,
+    "receivedAt": "2026-10-07T18:09:25.079Z"
+  }
+]

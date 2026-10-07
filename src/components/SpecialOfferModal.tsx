@@ -24,13 +24,12 @@ interface SpecialOfferModalProps {
   categories?: CategoryItem[];
 }
 
-// 1-Hour Time Slots between 11:00 AM and 4:00 PM
+// 1-Hour Time Slots between 11:00 AM and 3:00 PM
 const TIME_SLOTS = [
   '11:00 AM – 12:00 PM',
   '12:00 PM – 01:00 PM',
   '01:00 PM – 02:00 PM',
   '02:00 PM – 03:00 PM',
-  '03:00 PM – 04:00 PM',
 ];
 
 // Available days (Monday to Friday)
@@ -42,13 +41,12 @@ const WEEK_DAYS = [
   { id: 'Fri', label: 'Friday', short: 'Fri' },
 ];
 
-// Available Dance Styles
+// Eligible Dance Styles for 30% OFF offer
 const DANCE_STYLES = [
   'Kids Dance',
-  'Beginner Dance',
-  'Advance Hip-Hop',
+  'Beginner',
+  'Advance',
   'Bollywood Ladies',
-  'Free Style',
 ];
 
 export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
@@ -133,7 +131,7 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
       return;
     }
     if (!selectedTimeSlot) {
-      setErrorMessage('Please select a 1-hour time slot between 11:00 AM and 4:00 PM.');
+      setErrorMessage('Please select a 1-hour time slot between 11:00 AM and 3:00 PM.');
       return;
     }
     setErrorMessage('');
@@ -150,7 +148,7 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
     const formattedMessage =
 `🔥 *SPECIAL 30% OFF AFTERNOON COURSE REGISTRATION* 🔥
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✨ *Offer Package:* Flexible Afternoon Special (11 AM – 4 PM)
+✨ *Offer Package:* Flexible Afternoon Special (11 AM – 3 PM)
 💃 *Dance Style:* ${selectedCourse}
 💰 *Course Fee:* ₹${offerAmount} / Month (Saved ₹650 from ~₹${regularAmount}~)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -190,7 +188,7 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
           name: name.trim(),
           phone: cleanPhone,
           category: selectedCourse,
-          batch: `Special Offer (11AM-4PM) — ${chosenDaysNames} at ${selectedTimeSlot}`,
+          batch: `Special Offer (11AM-3PM) — ${chosenDaysNames} at ${selectedTimeSlot}`,
           date: 'Special Afternoon Offer',
           time: selectedTimeSlot,
           fee: `₹${offerAmount}`,
@@ -249,7 +247,7 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
           </h2>
 
           <p className="mt-1 text-white/90 text-xs sm:text-sm font-medium">
-            Choose your flexible 3 days &amp; preferred 1-hour slot between 11:00 AM – 4:00 PM.
+            Choose your flexible 3 days &amp; preferred 1-hour slot between 11:00 AM – 3:00 PM.
           </p>
 
           {/* Price Tag Row */}
@@ -379,11 +377,11 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
                 </div>
               </div>
 
-              {/* 3. Preferred 1-Hour Time Slot (11 AM to 4 PM) */}
+              {/* 3. Preferred 1-Hour Time Slot (11 AM to 3 PM) */}
               <div className="pt-2 border-t border-neutral-100">
                 <label className="text-xs font-bold uppercase tracking-wider text-neutral-700 flex items-center gap-1.5 mb-2">
                   <Clock className="w-3.5 h-3.5 text-blue-600" />
-                  <span>3. Choose 1-Hour Time Slot (11 AM – 4 PM)</span>
+                  <span>3. Choose 1-Hour Time Slot (11 AM – 3 PM)</span>
                 </label>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
