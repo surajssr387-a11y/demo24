@@ -486,7 +486,7 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
                   type="submit"
                   className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 hover:from-red-700 hover:to-amber-600 text-white font-extrabold text-sm sm:text-base shadow-xl shadow-rose-600/30 hover:shadow-rose-600/50 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <span>PROCEED TO PAYMENT (₹{offerAmount})</span>
+                  <span>BOOK YOUR APPOINTMENT</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
                 <p className="text-[11px] text-center text-neutral-500 mt-2">
