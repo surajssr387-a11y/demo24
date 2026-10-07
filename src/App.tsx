@@ -7,6 +7,7 @@ import { AchievementsSection } from './components/AchievementsSection';
 import { ChoreographySection } from './components/ChoreographySection';
 import { ReviewsSection } from './components/ReviewsSection';
 import { FooterSection } from './components/FooterSection';
+import { FloatingOfferButton } from './components/FloatingOfferButton';
 import {
   CategoryItem,
   loadCategories,
@@ -18,9 +19,15 @@ const BookDemoModal = lazy(() =>
   import('./components/BookDemoModal').then((m) => ({ default: m.BookDemoModal }))
 );
 
+// Lazy load special offer modal to keep initial bundle size ultra-fast
+const SpecialOfferModal = lazy(() =>
+  import('./components/SpecialOfferModal').then((m) => ({ default: m.SpecialOfferModal }))
+);
+
 export default function App() {
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
   const [selectedCategoryForBooking, setSelectedCategoryForBooking] = useState('Kids Dance');
+  const [offerModalOpen, setOfferModalOpen] = useState(false);
 
   // Categories state
   const [categories, setCategories] = useState<CategoryItem[]>(loadCategories);
@@ -87,6 +94,9 @@ export default function App() {
       {/* Footer Section with Location & Contact */}
       <FooterSection onOpenBooking={handleOpenBooking} />
 
+      {/* Floating 30% OFF Special Offer Button */}
+      <FloatingOfferButton onOpen={() => setOfferModalOpen(true)} />
+
       {/* Interactive Booking Demo Modal (Loaded on-demand) */}
       {bookingModalOpen && (
         <Suspense fallback={null}>
@@ -94,6 +104,17 @@ export default function App() {
             isOpen={bookingModalOpen}
             onClose={() => setBookingModalOpen(false)}
             initialCategory={selectedCategoryForBooking}
+            categories={categories}
+          />
+        </Suspense>
+      )}
+
+      {/* Special 30% OFF Afternoon Offer Modal (Loaded on-demand) */}
+      {offerModalOpen && (
+        <Suspense fallback={null}>
+          <SpecialOfferModal
+            isOpen={offerModalOpen}
+            onClose={() => setOfferModalOpen(false)}
             categories={categories}
           />
         </Suspense>
