@@ -322,10 +322,6 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
                   </span>
                 </div>
 
-                <p className="text-[11px] text-neutral-500 mb-2.5">
-                  Week me sirf 3 days choose kar sakte hain from Monday to Friday:
-                </p>
-
                 {/* Days Toggle Chips */}
                 <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
                   {WEEK_DAYS.map((day) => {
