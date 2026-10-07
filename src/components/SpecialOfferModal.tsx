@@ -61,6 +61,7 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
   // Client form data
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [startDate, setStartDate] = useState('');
   const [selectedCourse, setSelectedCourse] = useState('Kids Dance');
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(TIME_SLOTS[0]);
   const [selectedDays, setSelectedDays] = useState<string[]>(['Mon', 'Wed', 'Fri']);
@@ -154,6 +155,7 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
     const chosenDaysNames = WEEK_DAYS.filter((d) => selectedDays.includes(d.id))
       .map((d) => d.label)
       .join(', ');
+    const chosenStartDate = startDate ? startDate : 'Flexible / Earliest available batch';
 
     const formattedMessage =
 `🔥 *SPECIAL 30% OFF AFTERNOON COURSE REGISTRATION* 🔥
@@ -169,6 +171,7 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
 🗓️ *FLEXIBLE SCHEDULE SELECTED:*
 • *Chosen Days (3 Days/Week):* ${chosenDaysNames}
 • *Daily 1-Hour Time Slot:* ${selectedTimeSlot}
+• *Preferred Starting Date:* ${chosenStartDate}
 • *Total Sessions:* 12 Sessions (1 Month Course)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 💳 *PAYMENT STATUS:*
@@ -200,7 +203,8 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
           phone: cleanPhone,
           category: selectedCourse,
           batch: `Special Offer (11AM-3PM) — ${chosenDaysNames} at ${selectedTimeSlot}`,
-          date: 'Special Afternoon Offer',
+          date: chosenStartDate,
+          startDate: chosenStartDate,
           time: selectedTimeSlot,
           fee: `₹${offerAmount}`,
           paymentStatus: 'Special Offer Booking (₹899)',
@@ -444,6 +448,20 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
                     className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-neutral-300 focus:outline-none focus:border-[#0066FF] focus:ring-2 focus:ring-blue-100 transition-all font-medium"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-neutral-600 mb-1 flex items-center justify-between">
+                    <span>Preferred Starting Date (Optional)</span>
+                    <span className="text-[10px] text-neutral-400 font-normal">Choose when to start</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-neutral-300 focus:outline-none focus:border-[#0066FF] focus:ring-2 focus:ring-blue-100 transition-all font-medium bg-white text-neutral-800 cursor-pointer"
+                  />
+                </div>
               </div>
 
               {/* Offer Summary & Action Button */}
@@ -512,9 +530,10 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
                     <span className="block text-[10px] text-neutral-500 line-through">₹{regularAmount}</span>
                   </div>
                 </div>
-                <div className="text-[11px] text-neutral-500 pt-2 border-t border-neutral-200/80 flex items-center justify-between">
+                <div className="text-[11px] text-neutral-500 pt-2 border-t border-neutral-200/80 flex items-center justify-between flex-wrap gap-1">
                   <span>Student: <strong>{name}</strong></span>
                   <span>Phone: <strong>{phone}</strong></span>
+                  {startDate && <span>Start: <strong>{startDate}</strong></span>}
                 </div>
               </div>
 
@@ -702,6 +721,12 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
                   <span className="text-neutral-500">Timing:</span>
                   <span className="font-bold text-neutral-900">{selectedTimeSlot}</span>
                 </div>
+                {startDate && (
+                  <div className="flex justify-between">
+                    <span className="text-neutral-500">Starting Date:</span>
+                    <span className="font-bold text-neutral-900">{startDate}</span>
+                  </div>
+                )}
                 <div className="flex justify-between pt-1.5 border-t border-neutral-200">
                   <span className="text-neutral-500">Offer Fee:</span>
                   <span className="font-black text-emerald-600 text-sm">₹{offerAmount} (Saved ₹650)</span>
