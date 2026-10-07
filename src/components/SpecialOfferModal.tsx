@@ -145,8 +145,8 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
 
   // Step 2: Confirm Payment and trigger WhatsApp message
   const handleConfirmAndSendWhatsApp = () => {
-    if (!isPaymentConfirmed && !utrNumber.trim()) {
-      setPaymentError('⚠️ Payment First! Pehle QR code scan karke ₹899 pay karein aur "Maine payment complete kar diya hai" checkbox tick karein.');
+    if (!utrNumber.trim() || utrNumber.trim().length < 6) {
+      setPaymentError('⚠️ Payment First! Pehle QR code scan karke ₹899 payment complete karein aur apna 12-digit UTR No. enter karein.');
       return;
     }
     setPaymentError('');
@@ -605,53 +605,52 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
                 </div>
               )}
 
-              {/* Mandatory Payment Confirmation Box */}
+              {/* Payment Verification Box (Proof of Payment via UTR) */}
               <div
                 className={`p-4 rounded-2xl border-2 transition-all ${
                   isPaymentConfirmed
                     ? 'bg-emerald-50/90 border-emerald-400 ring-2 ring-emerald-500/20 shadow-xs'
-                    : 'bg-amber-50/70 border-amber-300'
+                    : 'bg-neutral-50 border-neutral-200'
                 }`}
               >
-                <label className="flex items-start gap-3 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={isPaymentConfirmed}
-                    onChange={(e) => {
-                      setIsPaymentConfirmed(e.target.checked);
-                      if (e.target.checked) setPaymentError('');
-                    }}
-                    className="w-5 h-5 rounded-md text-emerald-600 focus:ring-emerald-500 border-neutral-300 mt-0.5 cursor-pointer shrink-0 accent-emerald-600"
-                  />
-                  <div>
-                    <span className="font-black text-xs sm:text-sm text-neutral-950 block">
-                      Maine ₹899 ka UPI payment successfully complete kar diya hai *
-                    </span>
-                    <span className="text-[11px] text-neutral-600 block mt-0.5 font-medium">
-                      Pehle upar QR code scan karke ₹899 pay karein, uske baad hi WhatsApp confirmation send hoga.
-                    </span>
-                  </div>
-                </label>
-
-                {/* Optional UTR / Reference ID Field */}
-                <div className="mt-3 pt-3 border-t border-neutral-200/80">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1 flex items-center justify-between">
-                    <span>UPI Reference / UTR Number (Optional Proof)</span>
-                    <span className="text-[10px] text-neutral-400 font-normal">12 digits</span>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-black uppercase tracking-wider text-neutral-900 flex items-center gap-1.5">
+                    <ShieldCheck className={`w-4 h-4 ${isPaymentConfirmed ? 'text-emerald-600' : 'text-neutral-500'}`} />
+                    <span>Enter UPI UTR / Transaction ID (Payment Proof) *</span>
                   </label>
+                  {isPaymentConfirmed && (
+                    <span className="text-[11px] font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                      Payment Verified ✓
+                    </span>
+                  )}
+                </div>
+
+                <p className="text-[11px] text-neutral-600 mb-2">
+                  Payment hone ke baad apna 12-digit UPI UTR No. yahan enter karein:
+                </p>
+
+                <div className="relative">
                   <input
                     type="text"
                     value={utrNumber}
                     onChange={(e) => {
+                      const val = e.target.value.trim();
                       setUtrNumber(e.target.value);
-                      if (e.target.value.trim().length >= 4) {
+                      if (val.length >= 6) {
                         setIsPaymentConfirmed(true);
                         setPaymentError('');
+                      } else {
+                        setIsPaymentConfirmed(false);
                       }
                     }}
                     placeholder="Enter 12-digit UTR No. (e.g. 4289XXXXXXXX)"
-                    className="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl border border-neutral-300 focus:outline-none focus:border-emerald-600 font-mono bg-white font-medium"
+                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-neutral-300 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 font-mono bg-white font-medium tracking-wider"
                   />
+                  {isPaymentConfirmed && (
+                    <div className="absolute right-3 top-2.5 text-emerald-600">
+                      <Check className="w-5 h-5 stroke-[2.5]" />
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -669,7 +668,7 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
                 <button
                   type="button"
                   onClick={() => {
-                    setPaymentError('⚠️ Payment First! Pehle QR code scan karke ₹899 payment complete karein aur "Maine payment complete kar diya hai" box tick karein.');
+                    setPaymentError('⚠️ Payment First! Pehle QR code scan karke ₹899 payment complete karein aur apna 12-digit UTR No. enter karein.');
                   }}
                   className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-sm sm:text-base shadow-lg shadow-amber-500/25 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2 border-2 border-amber-400"
                 >
