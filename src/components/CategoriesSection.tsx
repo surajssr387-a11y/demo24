@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Star } from 'lucide-react';
 import { CategoryItem, DEFAULT_CATEGORIES, loadCategories, saveCategories } from '../data/categoriesData';
 
 interface CategoriesSectionProps {
@@ -55,8 +56,25 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 md:py-16">
         
         {/* Section Header */}
-        <div className="relative mb-8 sm:mb-12 text-center">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-neutral-950 font-display tracking-tight uppercase">
+        <div className="relative mb-8 sm:mb-12 flex items-center justify-between sm:justify-center">
+          {/* Top Left: Small Reviews Redirect Button (Scrolls smoothly to #reviews) */}
+          <a
+            href="#reviews"
+            onClick={(e) => {
+              e.preventDefault();
+              const el = document.getElementById('reviews');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+            className="sm:absolute sm:left-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-neutral-100 hover:bg-neutral-200 text-neutral-800 hover:text-neutral-950 border border-neutral-300/80 shadow-2xs hover:shadow-xs transition-all active:scale-95 group shrink-0"
+            title="Go to Reviews section"
+          >
+            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500 transition-transform group-hover:scale-110" />
+            <span>Reviews</span>
+          </a>
+
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-neutral-950 font-display tracking-tight uppercase text-center flex-1 sm:flex-initial">
             Categories
           </h2>
         </div>
