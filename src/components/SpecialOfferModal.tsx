@@ -14,6 +14,8 @@ import {
   ArrowRight,
   ArrowLeft,
   ChevronRight,
+  CreditCard,
+  AlertCircle,
 } from 'lucide-react';
 import { studioInfo } from '../data/danceData';
 import { CategoryItem } from '../data/categoriesData';
@@ -68,6 +70,8 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [lastWhatsAppUrl, setLastWhatsAppUrl] = useState('');
+  const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
+  const [paymentError, setPaymentError] = useState('');
 
   if (!isOpen) return null;
 
@@ -140,6 +144,12 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
 
   // Step 2: Confirm Payment and trigger WhatsApp message
   const handleConfirmAndSendWhatsApp = () => {
+    if (!isPaymentConfirmed && !utrNumber.trim()) {
+      setPaymentError('⚠️ Payment First! Pehle QR code scan karke ₹899 pay karein aur "Maine payment complete kar diya hai" checkbox tick karein.');
+      return;
+    }
+    setPaymentError('');
+
     const cleanPhone = phone.trim().replace(/\D/g, '');
     const chosenDaysNames = WEEK_DAYS.filter((d) => selectedDays.includes(d.id))
       .map((d) => d.label)
@@ -152,7 +162,7 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
 💃 *Dance Style:* ${selectedCourse}
 💰 *Course Fee:* ₹${offerAmount} / Month (Saved ₹650 from ~₹${regularAmount}~)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-👤 *STUDENT / CLIENT DETAILS:*
+👤 *CLIENT DETAILS:*
 • *Full Name:* ${name.trim()}
 • *Mobile Number:* ${cleanPhone}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -162,11 +172,12 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
 • *Total Sessions:* 12 Sessions (1 Month Course)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 💳 *PAYMENT STATUS:*
+• *Payment Confirmed:* YES (Paid via UPI / QR)
 • *Offer Amount:* ₹${offerAmount}
 • *UPI ID:* ${studioUpiId} (${upiPayee})
-• *Payment Ref / UTR:* ${utrNumber.trim() ? utrNumber.trim() : 'Paid via UPI QR / Ready to Pay'}
+• *Payment Ref / UTR:* ${utrNumber.trim() ? utrNumber.trim() : 'Verified via UPI QR Code'}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💬 *Client Message:* Namaste Ramy's Dance Studio, maine Special 30% OFF Afternoon Offer (₹${offerAmount}) ke liye register kiya hai. Kripya meri seat confirm kijiye!`;
+💬 *Client Message:* Namaste Ramy's Dance Studio, maine Special 30% OFF Afternoon Offer (₹${offerAmount}) ka payment complete karke register kiya hai. Kripya meri seat confirm kijiye!`;
 
     const whatsappUrl = `https://wa.me/${studioInfo.whatsappNumber}?text=${encodeURIComponent(formattedMessage)}`;
     setLastWhatsAppUrl(whatsappUrl);
@@ -567,32 +578,94 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
                 </button>
               </div>
 
-              {/* Optional UTR / Reference ID Field */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
-                  UPI Reference / UTR Number (Optional)
+              {/* Payment Error Alert (Shown if user clicks without paying) */}
+              {paymentError && (
+                <div className="p-3.5 rounded-2xl bg-red-50 border-2 border-red-300 text-red-800 text-xs sm:text-sm font-bold flex items-start gap-2.5 animate-in shake">
+                  <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="block font-black text-red-950 uppercase text-[11px] tracking-wider mb-0.5">Payment Required</span>
+                    <span>{paymentError}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Mandatory Payment Confirmation Box */}
+              <div
+                className={`p-4 rounded-2xl border-2 transition-all ${
+                  isPaymentConfirmed
+                    ? 'bg-emerald-50/90 border-emerald-400 ring-2 ring-emerald-500/20 shadow-xs'
+                    : 'bg-amber-50/70 border-amber-300'
+                }`}
+              >
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={isPaymentConfirmed}
+                    onChange={(e) => {
+                      setIsPaymentConfirmed(e.target.checked);
+                      if (e.target.checked) setPaymentError('');
+                    }}
+                    className="w-5 h-5 rounded-md text-emerald-600 focus:ring-emerald-500 border-neutral-300 mt-0.5 cursor-pointer shrink-0 accent-emerald-600"
+                  />
+                  <div>
+                    <span className="font-black text-xs sm:text-sm text-neutral-950 block">
+                      Maine ₹899 ka UPI payment successfully complete kar diya hai *
+                    </span>
+                    <span className="text-[11px] text-neutral-600 block mt-0.5 font-medium">
+                      Pehle upar QR code scan karke ₹899 pay karein, uske baad hi WhatsApp confirmation send hoga.
+                    </span>
+                  </div>
                 </label>
-                <input
-                  type="text"
-                  value={utrNumber}
-                  onChange={(e) => setUtrNumber(e.target.value)}
-                  placeholder="Enter 12-digit UTR or Transaction ID (if paid)"
-                  className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-neutral-300 focus:outline-none focus:border-[#0066FF] font-medium"
-                />
+
+                {/* Optional UTR / Reference ID Field */}
+                <div className="mt-3 pt-3 border-t border-neutral-200/80">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1 flex items-center justify-between">
+                    <span>UPI Reference / UTR Number (Optional Proof)</span>
+                    <span className="text-[10px] text-neutral-400 font-normal">12 digits</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={utrNumber}
+                    onChange={(e) => {
+                      setUtrNumber(e.target.value);
+                      if (e.target.value.trim().length >= 4) {
+                        setIsPaymentConfirmed(true);
+                        setPaymentError('');
+                      }
+                    }}
+                    placeholder="Enter 12-digit UTR No. (e.g. 4289XXXXXXXX)"
+                    className="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl border border-neutral-300 focus:outline-none focus:border-emerald-600 font-mono bg-white font-medium"
+                  />
+                </div>
               </div>
 
-              {/* Final Confirm Button */}
-              <button
-                type="button"
-                onClick={handleConfirmAndSendWhatsApp}
-                className="w-full py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm sm:text-base shadow-xl shadow-emerald-600/30 hover:shadow-emerald-600/50 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2"
-              >
-                <Send className="w-4 h-4 fill-white" />
-                <span>CONFIRM &amp; SEND ON WHATSAPP</span>
-              </button>
+              {/* Action Button: Dynamic based on Payment status */}
+              {isPaymentConfirmed ? (
+                <button
+                  type="button"
+                  onClick={handleConfirmAndSendWhatsApp}
+                  className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-green-600 to-emerald-700 hover:from-emerald-700 hover:via-green-700 hover:to-emerald-800 text-white font-black text-sm sm:text-base shadow-xl shadow-emerald-600/30 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2.5 animate-in fade-in"
+                >
+                  <Send className="w-5 h-5 fill-white" />
+                  <span>PAYMENT CONFIRMED — SEND ON WHATSAPP</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPaymentError('⚠️ Payment First! Pehle QR code scan karke ₹899 payment complete karein aur "Maine payment complete kar diya hai" box tick karein.');
+                  }}
+                  className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-sm sm:text-base shadow-lg shadow-amber-500/25 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2 border-2 border-amber-400"
+                >
+                  <CreditCard className="w-5 h-5" />
+                  <span>⚠️ PAYMENT FIRST — SCAN &amp; PAY ₹899</span>
+                </button>
+              )}
 
               <p className="text-[11px] text-center text-neutral-500">
-                Clicking will open WhatsApp with your full booking &amp; discount receipt.
+                {isPaymentConfirmed
+                  ? 'Clicking will open WhatsApp with your full registration & receipt.'
+                  : 'Bina payment ke WhatsApp message send nahi hoga (Payment First).'}
               </p>
             </div>
           )}
