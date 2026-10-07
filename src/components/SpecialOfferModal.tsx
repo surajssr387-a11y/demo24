@@ -417,7 +417,7 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Student / Client Full Name *"
+                    placeholder="Full Name *"
                     className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-neutral-300 focus:outline-none focus:border-[#0066FF] focus:ring-2 focus:ring-blue-100 transition-all font-medium"
                   />
                 </div>
