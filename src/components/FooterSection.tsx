@@ -1,13 +1,21 @@
-import React from 'react';
-import { MapPin, Clock, Phone, ArrowUp, ExternalLink } from 'lucide-react';
+import React, { useState } from 'react';
+import { MapPin, Clock, Phone, ArrowUp, ExternalLink, ShieldCheck } from 'lucide-react';
 import { studioInfo } from '../data/danceData';
 import { RealInstagramIcon, RealYoutubeIcon, RealWhatsappIcon } from './BrandIcons';
+import { LegalPoliciesModal, PolicyType } from './LegalPoliciesModal';
 
 interface FooterSectionProps {
   onOpenBooking: (category?: string) => void;
 }
 
 export const FooterSection: React.FC<FooterSectionProps> = ({ onOpenBooking }) => {
+  const [policyModalOpen, setPolicyModalOpen] = useState(false);
+  const [activePolicy, setActivePolicy] = useState<PolicyType>('terms');
+
+  const openPolicy = (policy: PolicyType) => {
+    setActivePolicy(policy);
+    setPolicyModalOpen(true);
+  };
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -138,8 +146,51 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ onOpenBooking }) =
 
         </div>
 
+        {/* Mandatory Razorpay & Legal Compliance Policy Links */}
+        <div className="py-6 border-t border-white/10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-400">
+          <button
+            type="button"
+            onClick={() => openPolicy('terms')}
+            className="hover:text-white transition-colors cursor-pointer hover:underline"
+          >
+            Terms &amp; Conditions
+          </button>
+          <span className="text-white/20 hidden sm:inline">•</span>
+          <button
+            type="button"
+            onClick={() => openPolicy('privacy')}
+            className="hover:text-white transition-colors cursor-pointer hover:underline"
+          >
+            Privacy Policy
+          </button>
+          <span className="text-white/20 hidden sm:inline">•</span>
+          <button
+            type="button"
+            onClick={() => openPolicy('shipping')}
+            className="hover:text-white transition-colors cursor-pointer hover:underline"
+          >
+            Shipping Policy
+          </button>
+          <span className="text-white/20 hidden sm:inline">•</span>
+          <button
+            type="button"
+            onClick={() => openPolicy('refund')}
+            className="hover:text-white transition-colors cursor-pointer hover:underline"
+          >
+            Cancellation &amp; Refunds
+          </button>
+          <span className="text-white/20 hidden sm:inline">•</span>
+          <button
+            type="button"
+            onClick={() => openPolicy('contact')}
+            className="hover:text-white transition-colors cursor-pointer hover:underline"
+          >
+            Contact Us
+          </button>
+        </div>
+
         {/* Bottom copyright and Back to Top matching Screenshot 5 */}
-        <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <div className="flex flex-wrap items-center gap-3 sm:gap-4">
             <p>© 2026 Ramy&apos;s Dance Studio. All rights reserved.</p>
           </div>
@@ -154,6 +205,15 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ onOpenBooking }) =
         </div>
 
       </div>
+
+      {/* Legal Policies Modal for Razorpay Verification */}
+      {policyModalOpen && (
+        <LegalPoliciesModal
+          isOpen={policyModalOpen}
+          initialPolicy={activePolicy}
+          onClose={() => setPolicyModalOpen(false)}
+        />
+      )}
     </footer>
   );
 };
