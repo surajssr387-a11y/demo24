@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Play, X, ZoomIn } from 'lucide-react';
+import defaultAchievementsData from '../../data/achievements-config.json';
 
 export interface AchievementMediaItem {
   id: string;
@@ -14,83 +15,9 @@ export interface AchievementMediaItem {
   contrast?: number;
 }
 
-export const DEFAULT_ACHIEVEMENTS: AchievementMediaItem[] = [
-  // 3 Verified Video Achievements
-  {
-    id: 'vid-1',
-    type: 'video',
-    title: 'Dance India Dance (DID)',
-    imageUrl: '/achievements/did-thumb.png',
-    videoUrl: '/achievements/did-video.mp4',
-    badge: 'Video',
-  },
-  {
-    id: 'vid-2',
-    type: 'video',
-    title: "India's Got Talent (IGT)",
-    imageUrl: '/achievements/igt-thumb.png',
-    videoUrl: '/achievements/igt-video.mp4',
-    badge: 'Video',
-  },
-  {
-    id: 'vid-3',
-    type: 'video',
-    title: 'Bollywood Movies Choreography',
-    imageUrl: '/achievements/bollywood-thumb.png',
-    videoUrl: '/achievements/bollywood-video.mp4',
-    badge: 'Video',
-  },
+export const DEFAULT_ACHIEVEMENTS: AchievementMediaItem[] = defaultAchievementsData as AchievementMediaItem[];
 
-  // 2nd Row: 3 Photos
-  {
-    id: 'img-1',
-    type: 'photo',
-    title: '',
-    imageUrl: '/achievements/ramy-igt.jpg',
-  },
-  {
-    id: 'img-2',
-    type: 'photo',
-    title: '',
-    imageUrl: '/achievements/magazine-collage.png',
-  },
-  {
-    id: 'img-3',
-    type: 'photo',
-    title: '',
-    imageUrl: '/achievements/studio-photo-1.png',
-  },
-
-  // 3rd Row: 3 Photos
-  {
-    id: 'img-4',
-    type: 'photo',
-    title: '',
-    imageUrl: '/achievements/studio-photo-2.png',
-    xPosition: 50,
-    yPosition: 1,
-    brightness: 1.04,
-    contrast: 1,
-  },
-  {
-    id: 'img-5',
-    type: 'photo',
-    title: '',
-    imageUrl: '/achievements/studio-photo-3.png',
-    xPosition: 50,
-    yPosition: 0,
-    brightness: 1,
-    contrast: 1,
-  },
-  {
-    id: 'img-6',
-    type: 'photo',
-    title: '',
-    imageUrl: '/achievements/studio-photo-4.jpg',
-  },
-];
-
-const ACHIEVEMENTS_STORAGE_KEY = 'ramys_achievements_config_v2';
+const ACHIEVEMENTS_STORAGE_KEY = 'ramys_achievements_config_v3';
 
 function loadAchievements(): AchievementMediaItem[] {
   try {
