@@ -155,7 +155,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     id: "gymnastic",
     title: "Gymnastic",
     imageUrl: "/uploads/media_1791299159900_Colourful_Kids__Gymnastics_Poster.jpg",
-    imageXPosition: 50,
+    imageXPosition: 5,
     imageYPosition: 50,
     imageZoom: 1,
     pillTag: "ACROBATICS",
@@ -331,12 +331,12 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
   }
 ];
 
-export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v26';
+export const CATEGORIES_STORAGE_KEY = 'ramys_categories_config_v27';
 
 export function loadCategories(): CategoryItem[] {
   try {
     // Clear old versions to prevent stale batch timings and old cached media
-    ['ramys_categories_config_v14', 'ramys_categories_config_v15', 'ramys_categories_config_v16', 'ramys_categories_config_v17', 'ramys_categories_config_v18', 'ramys_categories_config_v19', 'ramys_categories_config_v20', 'ramys_categories_config_v21', 'ramys_categories_config_v22', 'ramys_categories_config_v23', 'ramys_categories_config_v24', 'ramys_categories_config_v25'].forEach((k) => {
+    ['ramys_categories_config_v14', 'ramys_categories_config_v15', 'ramys_categories_config_v16', 'ramys_categories_config_v17', 'ramys_categories_config_v18', 'ramys_categories_config_v19', 'ramys_categories_config_v20', 'ramys_categories_config_v21', 'ramys_categories_config_v22', 'ramys_categories_config_v23', 'ramys_categories_config_v24', 'ramys_categories_config_v25', 'ramys_categories_config_v26'].forEach((k) => {
       try { localStorage.removeItem(k); } catch {}
     });
 

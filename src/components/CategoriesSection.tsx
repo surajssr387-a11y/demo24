@@ -127,7 +127,6 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
                         transform: `scale(${iZoom}) translateZ(0)`,
                       }}
                       className="w-full h-full object-cover transition-all duration-300 group-hover:brightness-105 will-change-transform"
-                      loading="lazy"
                       decoding="async"
                       referrerPolicy="no-referrer"
                     />
