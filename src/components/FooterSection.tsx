@@ -148,45 +148,60 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ onOpenBooking }) =
 
         {/* Mandatory Razorpay & Legal Compliance Policy Links */}
         <div className="py-6 border-t border-white/10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-400">
-          <button
-            type="button"
-            onClick={() => openPolicy('terms')}
+          <a
+            href="/terms"
+            onClick={(e) => {
+              e.preventDefault();
+              openPolicy('terms');
+            }}
             className="hover:text-white transition-colors cursor-pointer hover:underline"
           >
             Terms &amp; Conditions
-          </button>
+          </a>
           <span className="text-white/20 hidden sm:inline">•</span>
-          <button
-            type="button"
-            onClick={() => openPolicy('privacy')}
+          <a
+            href="/privacy"
+            onClick={(e) => {
+              e.preventDefault();
+              openPolicy('privacy');
+            }}
             className="hover:text-white transition-colors cursor-pointer hover:underline"
           >
             Privacy Policy
-          </button>
+          </a>
           <span className="text-white/20 hidden sm:inline">•</span>
-          <button
-            type="button"
-            onClick={() => openPolicy('shipping')}
+          <a
+            href="/shipping-policy"
+            onClick={(e) => {
+              e.preventDefault();
+              openPolicy('shipping');
+            }}
             className="hover:text-white transition-colors cursor-pointer hover:underline"
           >
             Shipping Policy
-          </button>
+          </a>
           <span className="text-white/20 hidden sm:inline">•</span>
-          <button
-            type="button"
-            onClick={() => openPolicy('refund')}
+          <a
+            href="/refund-policy"
+            onClick={(e) => {
+              e.preventDefault();
+              openPolicy('refund');
+            }}
             className="hover:text-white transition-colors cursor-pointer hover:underline"
           >
             Cancellation &amp; Refunds
-          </button>
+          </a>
           <span className="text-white/20 hidden sm:inline">•</span>
-          <button
-            type="button"
-            onClick={() => openPolicy('contact')}
+          <a
+            href="/contact"
+            onClick={(e) => {
+              e.preventDefault();
+              openPolicy('contact');
+            }}
             className="hover:text-white transition-colors cursor-pointer hover:underline"
           >
             Contact Us
-          </button>
+          </a>
         </div>
 
         {/* Bottom copyright and Back to Top matching Screenshot 5 */}

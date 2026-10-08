@@ -14,11 +14,14 @@ async function startServer() {
   // Security: Disable X-Powered-By header to prevent fingerprinting
   app.disable('x-powered-by');
 
-  // Security: Core HTTP Security Headers (without blocking studio iframe)
+  // Security: Core HTTP Security Headers & Razorpay Payment Compatible CSP
   app.use((_req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+    res.setHeader('Permissions-Policy', 'camera=(), microphone=(), payment=(self "https://checkout.razorpay.com" "https://api.razorpay.com")');
     next();
   });
 
@@ -67,6 +70,27 @@ async function startServer() {
 
   // Security: Standard JSON parser bounded to 2MB to protect against Memory DoS
   app.use(express.json({ limit: '2mb' }));
+
+  // Security: Sanitize incoming request bodies against Prototype Pollution and Script Injections
+  app.use((req, _res, next) => {
+    if (req.body && typeof req.body === 'object') {
+      const sanitizeObj = (obj: any) => {
+        for (const key of Object.keys(obj)) {
+          if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+            delete obj[key];
+            continue;
+          }
+          if (typeof obj[key] === 'string') {
+            obj[key] = obj[key].replace(/\0/g, '').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+          } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+            sanitizeObj(obj[key]);
+          }
+        }
+      };
+      sanitizeObj(req.body);
+    }
+    next();
+  });
 
   const PUBLIC_DIR = path.join(__dirname, 'public');
   // High-performance static serving with HTTP Byte-Range video streaming and immutable caching
@@ -530,6 +554,139 @@ async function startServer() {
       console.error('Error saving booking:', e);
       return res.status(500).json({ error: 'Failed to record booking securely' });
     }
+  });
+
+  // --- Dedicated Razorpay Merchant Verification & Legal Compliance Routes ---
+  const renderLegalDoc = (title: string, subtitle: string, bodyHtml: string) => `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>${title} | Ramy's Dance Studio - Official Website</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="${title} of Ramy's Dance Studio, Ranchi, Jharkhand.">
+  <link rel="icon" type="image/png" href="/logo-transparent.png">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0C0E12; color: #F1F5F9; line-height: 1.6; margin: 0; padding: 0; }
+    .header { background: #000; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 16px 24px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: white; font-weight: 800; font-size: 16px; }
+    .brand img { height: 38px; width: 38px; object-fit: contain; }
+    .home-btn { background: #1f242e; color: #fff; text-decoration: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; border: 1px solid rgba(255,255,255,0.15); transition: 0.2s; }
+    .home-btn:hover { background: #0066FF; }
+    .container { max-width: 860px; margin: 30px auto; padding: 0 20px 80px; }
+    .card { background: #16181F; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    h1 { font-size: 26px; font-weight: 800; margin: 0 0 6px; color: #fff; }
+    .sub { color: #94A3B8; font-size: 13px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    h2 { font-size: 17px; font-weight: 700; color: #fff; margin-top: 24px; margin-bottom: 8px; }
+    p, li { color: #CBD5E1; font-size: 14px; }
+    ul { padding-left: 20px; }
+    li { margin-bottom: 6px; }
+    .contact-box { background: #0f1117; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 20px; margin-top: 28px; }
+    .badge { display: inline-block; background: #0066FF; color: white; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px; }
+    footer { text-align: center; color: #64748B; font-size: 12px; margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <a href="/" class="brand">
+      <img src="/logo-transparent.png" alt="Ramy's Dance Studio Logo">
+      <span>RAMY'S DANCE STUDIO</span>
+    </a>
+    <a href="/" class="home-btn">← Back to Website</a>
+  </div>
+  <div class="container">
+    <div class="card">
+      <span class="badge">Official Legal Document</span>
+      <h1>${title}</h1>
+      <div class="sub">${subtitle}</div>
+      ${bodyHtml}
+      <div class="contact-box">
+        <h2 style="margin-top:0;">Official Grievance & Support Desk</h2>
+        <p><strong>Business Name:</strong> Ramy's Dance Studio (Founder & Director: Ramyyy Singh)</p>
+        <p><strong>Registered Address:</strong> 2nd Floor, Above Reliance Smart Point, Plaza Chowk, Old H.B. Road, Ranchi, Jharkhand – 834001, India</p>
+        <p><strong>Official Support Email:</strong> <a href="mailto:ramyysingh81@gmail.com" style="color:#60A5FA;">ramyysingh81@gmail.com</a></p>
+        <p><strong>Official Phone & WhatsApp:</strong> <a href="tel:+918340158178" style="color:#60A5FA;">+91 8340158178</a></p>
+        <p><strong>Operating Hours:</strong> Monday to Sunday, 7:00 AM – 9:00 PM IST</p>
+      </div>
+    </div>
+    <footer>© 2026 Ramy's Dance Studio. All rights reserved. Compliant with RBI Payment Aggregator Guidelines & IT Act 2000.</footer>
+  </div>
+</body>
+</html>`;
+
+  // 1. Terms & Conditions
+  app.get(['/terms', '/terms-and-conditions'], (_req, res) => {
+    res.send(renderLegalDoc(
+      'Terms and Conditions',
+      'Effective Date: October 2026 | Last Updated: October 2026',
+      `<h2>1. Introduction & Acceptance of Terms</h2>
+      <p>Welcome to <strong>Ramy's Dance Studio</strong>. By booking demo sessions, enrolling in dance courses, or paying via our online platform, you agree to comply with and be bound by these Terms and Conditions.</p>
+      <h2>2. Studio Rules, Attendance & Decorum</h2>
+      <ul>
+        <li>Students are required to report 10 minutes prior to their scheduled batch timing in proper dance/fitness attire.</li>
+        <li>Students must notify instructors of any prior physical injuries or medical limitations before starting vigorous choreography sessions.</li>
+        <li>Studio decorum, mutual respect, and discipline must be maintained towards trainers, fellow students, and staff at all times.</li>
+      </ul>
+      <h2>3. Fee Schedule & Online Payments</h2>
+      <ul>
+        <li>All class registration fees (₹49 demo fee, monthly courses ranging from ₹899 to ₹1,950/month) must be settled via authorized digital payment gateways before attending classes.</li>
+        <li>Upon successful payment, official digital admission receipts and batch passes are generated immediately.</li>
+      </ul>`
+    ));
+  });
+
+  // 2. Privacy Policy
+  app.get(['/privacy', '/privacy-policy'], (_req, res) => {
+    res.send(renderLegalDoc(
+      'Privacy Policy',
+      'Effective Date: October 2026 | Compliant with IT Rules, 2011',
+      `<h2>1. Information We Collect</h2>
+      <p>We collect student Full Name, Mobile Phone / WhatsApp Number, chosen batch timing, and dance discipline to facilitate admission and batch scheduling.</p>
+      <h2>2. Payment Information Security</h2>
+      <p>All online payment transactions are processed through RBI-authorized, PCI-DSS Level 1 compliant payment gateways (such as Razorpay). We <strong>never store or access</strong> your card numbers, CVVs, or UPI PINs on our servers.</p>
+      <h2>3. Data Usage & Non-Disclosure</h2>
+      <p>Student contact details are used exclusively for scheduling confirmations, batch reminders, and studio service updates. We do not sell, rent, or trade your personal data to any external commercial marketing agencies.</p>`
+    ));
+  });
+
+  // 3. Cancellation & Refund Policy
+  app.get(['/refund-policy', '/cancellation-refund', '/refund'], (_req, res) => {
+    res.send(renderLegalDoc(
+      'Cancellation and Refund Policy',
+      'Effective Date: October 2026 | RBI Compliant Refund Process',
+      `<h2>1. Demo Class Cancellation (₹49)</h2>
+      <p>If a student is unable to attend their booked demo session, cancellation or rescheduling requests can be submitted via WhatsApp (+91 8340158178) up to 12 hours prior to the session time. A 100% refund is initiated upon cancellation request.</p>
+      <h2>2. Course Admissions & Batch Rescheduling</h2>
+      <p>Students enrolled in monthly disciplines who encounter unavoidable emergencies may request a batch timing transfer or put their subscription on pause for up to 30 days without forfeiting their fees.</p>
+      <h2>3. Refund Processing Timelines</h2>
+      <p>All approved refunds are credited back to the customer's original source payment method (Bank Account, UPI, or Credit/Debit Card) within <strong>5 to 7 working days</strong> in strict accordance with payment gateway and banking settlement standards.</p>`
+    ));
+  });
+
+  // 4. Shipping & Delivery Policy (Service Fulfillment)
+  app.get(['/shipping-policy', '/shipping', '/delivery-policy'], (_req, res) => {
+    res.send(renderLegalDoc(
+      'Shipping and Delivery Policy',
+      'Effective Date: October 2026 | Service Fulfillment Terms',
+      `<h2>1. Digital Delivery of Admission Pass</h2>
+      <p>Ramy's Dance Studio offers educational dance instruction, fitness classes, and custom choreography. Upon successful online booking, confirmation passes and batch access receipts are delivered <strong>digitally within 5 minutes</strong> via WhatsApp and SMS.</p>
+      <h2>2. Physical Service Delivery</h2>
+      <p>Physical classes and choreography services are fulfilled directly at our state-of-the-art studio facility located at Plaza Chowk, Old H.B. Road, Ranchi, Jharkhand, as per the batch time selected during checkout.</p>`
+    ));
+  });
+
+  // 5. Contact Us
+  app.get(['/contact', '/contact-us'], (_req, res) => {
+    res.send(renderLegalDoc(
+      'Contact Us',
+      'Official Contact Channels & Studio Location',
+      `<h2>Studio Address & Hours</h2>
+      <p><strong>Studio Location:</strong> 2nd Floor, Above Reliance Smart Point, Plaza Chowk, Old H.B. Road, Ranchi, Jharkhand – 834001, India</p>
+      <p><strong>Operating Hours:</strong> 7:00 AM – 9:00 PM (Open 7 Days a Week)</p>
+      <h2>Direct Communications</h2>
+      <p><strong>Phone:</strong> +91 8340158178</p>
+      <p><strong>WhatsApp Support:</strong> +91 8340158178</p>
+      <p><strong>Email:</strong> ramyysingh81@gmail.com</p>`
+    ));
   });
 
   // --- Health Check ---
