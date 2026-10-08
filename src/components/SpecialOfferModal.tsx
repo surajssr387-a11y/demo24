@@ -45,7 +45,6 @@ const WEEK_DAYS = [
 
 // Eligible Dance Styles for 30% OFF offer
 const DANCE_STYLES = [
-  'Kids Dance',
   'Beginner',
   'Advance',
   'Bollywood Ladies',
@@ -62,7 +61,7 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [startDate, setStartDate] = useState('');
-  const [selectedCourse, setSelectedCourse] = useState('Kids Dance');
+  const [selectedCourse, setSelectedCourse] = useState('Beginner');
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(TIME_SLOTS[0]);
   const [selectedDays, setSelectedDays] = useState<string[]>(['Mon', 'Wed', 'Fri']);
   const [utrNumber, setUtrNumber] = useState('');

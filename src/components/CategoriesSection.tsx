@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Star } from 'lucide-react';
+import { Star, Flame } from 'lucide-react';
 import { CategoryItem, DEFAULT_CATEGORIES, loadCategories, saveCategories } from '../data/categoriesData';
 
 interface CategoriesSectionProps {
   onSelectCategory: (categoryTitle: string) => void;
   categories?: CategoryItem[];
   onCategoriesChange?: (categories: CategoryItem[]) => void;
+  onOpenSpecialOffer?: () => void;
 }
 
 export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
   onSelectCategory,
   categories: propCategories,
   onCategoriesChange,
+  onOpenSpecialOffer,
 }) => {
   const [internalCategories, setInternalCategories] = useState<CategoryItem[]>(() => {
     return propCategories && propCategories.length > 0 ? propCategories : loadCategories();
@@ -56,7 +58,7 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 md:py-16">
         
         {/* Section Header */}
-        <div className="relative mb-8 sm:mb-12 flex items-center justify-between sm:justify-center">
+        <div className="relative mb-8 sm:mb-12 flex flex-wrap items-center justify-between sm:justify-center gap-3">
           {/* Top Left: Small Reviews Redirect Button (Scrolls smoothly to #reviews) */}
           <a
             href="#reviews"
@@ -74,9 +76,25 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
             <span>Reviews</span>
           </a>
 
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-neutral-950 font-display tracking-tight uppercase text-center flex-1 sm:flex-initial">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-neutral-950 font-display tracking-tight uppercase text-center order-first sm:order-none w-full sm:w-auto">
             Categories
           </h2>
+
+          {/* Top Right: Floating Special Offer Button (Click opens Offer Modal) */}
+          {onOpenSpecialOffer && (
+            <button
+              type="button"
+              onClick={onOpenSpecialOffer}
+              className="sm:absolute sm:right-0 inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full text-xs sm:text-sm font-extrabold bg-gradient-to-r from-rose-500 via-amber-500 to-orange-500 hover:from-rose-600 hover:via-amber-600 hover:to-orange-600 text-white shadow-md shadow-rose-500/20 hover:shadow-lg transition-all active:scale-95 cursor-pointer shrink-0 animate-pulse hover:animate-none group"
+              title="Special Flexible Batch Offer - ₹899 Only"
+            >
+              <Flame className="w-3.5 h-3.5 fill-white text-white group-hover:scale-110 transition-transform" />
+              <span>Special Offer</span>
+              <span className="bg-white/25 backdrop-blur-xs px-1.5 py-0.5 rounded text-[11px] font-black">
+                ₹899
+              </span>
+            </button>
+          )}
         </div>
 
         {/* Categories Grid (3 columns on desktop, Wedding centered in its row with same size) */}
