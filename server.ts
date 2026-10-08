@@ -69,9 +69,20 @@ async function startServer() {
   app.use(express.json({ limit: '2mb' }));
 
   const PUBLIC_DIR = path.join(__dirname, 'public');
-  // Serve static public assets and uploads
-  app.use(express.static(PUBLIC_DIR));
-  app.use('/uploads', express.static(UPLOADS_DIR));
+  // High-performance static serving with HTTP Byte-Range video streaming and immutable caching
+  const staticOptions = {
+    maxAge: '7d',
+    setHeaders: (res: express.Response, filePath: string) => {
+      if (filePath.endsWith('.mp4') || filePath.endsWith('.webm')) {
+        res.setHeader('Accept-Ranges', 'bytes');
+        res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+      } else if (filePath.match(/\.(jpg|jpeg|png|webp|svg|gif|woff2|woff)$/i)) {
+        res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
+      }
+    },
+  };
+  app.use(express.static(PUBLIC_DIR, staticOptions));
+  app.use('/uploads', express.static(UPLOADS_DIR, staticOptions));
 
   // Security: Magic bytes validation helper
   const ALLOWED_EXTENSIONS = new Set([

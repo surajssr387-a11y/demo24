@@ -73,6 +73,52 @@ interface ChoreographySectionProps {
   onOpenBooking?: (category?: string) => void;
 }
 
+// Lazy performance video loader for smooth 60fps scrolling and zero buffering
+const ChoreoCardVideo: React.FC<{
+  item: ChoreographyPerformanceItem;
+}> = ({ item }) => {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (videoRef.current) {
+          if (entry.isIntersecting) {
+            videoRef.current.play().catch(() => {});
+          } else {
+            videoRef.current.pause();
+          }
+        }
+      },
+      { rootMargin: '200px', threshold: 0.1 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={containerRef} className="w-full h-full">
+      <video
+        ref={videoRef}
+        src={item.videoUrl}
+        loop
+        muted
+        playsInline
+        preload="none"
+        style={{
+          objectPosition: `${item.xPosition ?? 50}% ${item.yPosition}%`,
+          filter: `brightness(${item.brightness}) contrast(${item.contrast || 1.04})`,
+        }}
+        className="w-full h-full object-cover transition-all duration-200 pointer-events-none will-change-transform"
+      />
+    </div>
+  );
+};
+
 export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpenBooking }) => {
   const [performances, setPerformances] = useState<ChoreographyPerformanceItem[]>(DEFAULT_PERFORMANCES);
   const [activeModalVideo, setActiveModalVideo] = useState<ChoreographyPerformanceItem | null>(null);
@@ -137,31 +183,8 @@ export const ChoreographySection: React.FC<ChoreographySectionProps> = ({ onOpen
               >
                 {/* Card Container */}
                 <div className="relative w-full aspect-[16/10.5] rounded-2xl overflow-hidden bg-neutral-950 border border-neutral-200/90 shadow-xs transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-md group-hover:border-neutral-300">
-                  {/* Performance Video */}
-                  <video
-                    key={item.videoUrl}
-                    src={item.videoUrl}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    preload="metadata"
-                    onLoadedData={(e) => {
-                      const v = e.currentTarget;
-                      v.muted = true;
-                      v.play().catch(() => {});
-                    }}
-                    onCanPlay={(e) => {
-                      const v = e.currentTarget;
-                      v.muted = true;
-                      v.play().catch(() => {});
-                    }}
-                    style={{
-                      objectPosition: `${item.xPosition ?? 50}% ${item.yPosition}%`,
-                      filter: `brightness(${item.brightness}) contrast(${item.contrast || 1.04})`,
-                    }}
-                    className="w-full h-full object-cover transition-all duration-200 pointer-events-none will-change-transform"
-                  />
+                  {/* Performance Video with Lazy Loading */}
+                  <ChoreoCardVideo item={item} />
 
                   {/* Play Overlay Button (Opens Theater Modal with sound) */}
                   <button

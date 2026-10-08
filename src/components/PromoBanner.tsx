@@ -14,6 +14,8 @@ export const PromoBanner: React.FC<PromoBannerProps> = ({ onOpenBooking }) => {
           src="/image.jpg"
           alt="Ramy's Dance Studio - Ramyyy Singh | Dance India Dance, India's Got Talent, So You Think You Can Dance"
           className="w-full h-auto block select-none object-cover"
+          loading="lazy"
+          decoding="async"
           referrerPolicy="no-referrer"
         />
 

@@ -60,3 +60,22 @@
 .animate-slide-left {
   animation: slideLeftNudge 1.3s ease-in-out infinite;
 }
+
+/* Smooth 60-120fps scrolling & touch response */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-y: none;
+}
+
+/* Hardware accelerated video and canvas performance */
+video {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}

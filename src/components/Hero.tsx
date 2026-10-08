@@ -110,8 +110,9 @@ export const Hero: React.FC<HeroProps> = () => {
             objectPosition: `${heroConfig.xPosition}% ${heroConfig.yPosition}%`,
             transform: 'translate3d(0, 0, 0)',
             backfaceVisibility: 'hidden',
+            willChange: 'transform',
           }}
-          className="w-full h-full object-cover pointer-events-none"
+          className="w-full h-full object-cover pointer-events-none will-change-transform"
         >
           <source src={heroConfig.videoUrl} type="video/mp4" />
         </video>

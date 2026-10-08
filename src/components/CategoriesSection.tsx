@@ -9,6 +9,77 @@ interface CategoriesSectionProps {
   onOpenSpecialOffer?: () => void;
 }
 
+// Lazy media loader for smooth 60fps mobile scrolling and zero buffering
+const CategoryMedia: React.FC<{
+  videoUrl?: string;
+  imageUrl: string;
+  title: string;
+  vX: number;
+  vY: number;
+  vZoom: number;
+  iX: number;
+  iY: number;
+  iZoom: number;
+}> = ({ videoUrl, imageUrl, title, vX, vY, vZoom, iX, iY, iZoom }) => {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+
+  React.useEffect(() => {
+    if (!videoUrl) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (videoRef.current) {
+          if (entry.isIntersecting) {
+            videoRef.current.play().catch(() => {});
+          } else {
+            videoRef.current.pause();
+          }
+        }
+      },
+      { rootMargin: '200px', threshold: 0.1 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+    return () => observer.disconnect();
+  }, [videoUrl]);
+
+  return (
+    <div ref={containerRef} className="w-full h-full">
+      {videoUrl ? (
+        <video
+          ref={videoRef}
+          src={videoUrl}
+          poster={imageUrl}
+          style={{
+            objectPosition: `${vX}% ${vY}%`,
+            transform: `scale(${vZoom}) translateZ(0)`,
+          }}
+          loop
+          muted
+          playsInline
+          preload="none"
+          className="w-full h-full object-cover transition-all duration-300 group-hover:brightness-105 pointer-events-none will-change-transform"
+        />
+      ) : (
+        <img
+          src={imageUrl}
+          alt={title}
+          style={{
+            objectPosition: `${iX}% ${iY}%`,
+            transform: `scale(${iZoom}) translateZ(0)`,
+          }}
+          loading="lazy"
+          decoding="async"
+          className="w-full h-full object-cover transition-all duration-300 group-hover:brightness-105 will-change-transform"
+          referrerPolicy="no-referrer"
+        />
+      )}
+    </div>
+  );
+};
+
 export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
   onSelectCategory,
   categories: propCategories,
@@ -124,49 +195,17 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
               >
                 {/* Card Container: Identical size & aspect-ratio across all cards */}
                 <div className="relative w-full aspect-[16/10.5] rounded-2xl overflow-hidden bg-neutral-100 border border-neutral-200/90 shadow-xs transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-md group-hover:border-neutral-300">
-                  {/* Media: Video if present, else Image */}
-                  {category.videoUrl ? (
-                    <video
-                      key={`${category.videoUrl}-${vX}-${vY}-${vZoom}`}
-                      src={category.videoUrl}
-                      poster={category.imageUrl}
-                      style={{
-                        objectPosition: `${vX}% ${vY}%`,
-                        transform: `scale(${vZoom}) translateZ(0)`,
-                      }}
-                      ref={(el) => {
-                        if (el) {
-                          el.muted = true;
-                          el.defaultMuted = true;
-                          el.play().catch(() => {});
-                        }
-                      }}
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      preload="auto"
-                      onLoadedData={(e) => {
-                        e.currentTarget.play().catch(() => {});
-                      }}
-                      onCanPlay={(e) => {
-                        e.currentTarget.play().catch(() => {});
-                      }}
-                      className="w-full h-full object-cover transition-all duration-300 group-hover:brightness-105 pointer-events-none will-change-transform"
-                    />
-                  ) : (
-                    <img
-                      src={category.imageUrl}
-                      alt={category.title}
-                      style={{
-                        objectPosition: `${iX}% ${iY}%`,
-                        transform: `scale(${iZoom}) translateZ(0)`,
-                      }}
-                      className="w-full h-full object-cover transition-all duration-300 group-hover:brightness-105 will-change-transform"
-                      decoding="async"
-                      referrerPolicy="no-referrer"
-                    />
-                  )}
+                  <CategoryMedia
+                    videoUrl={category.videoUrl}
+                    imageUrl={category.imageUrl}
+                    title={category.title}
+                    vX={vX}
+                    vY={vY}
+                    vZoom={vZoom}
+                    iX={iX}
+                    iY={iY}
+                    iZoom={iZoom}
+                  />
                 </div>
 
                 {/* Single Bold Text Label Centered Directly Below Each Card */}
