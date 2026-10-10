@@ -4,6 +4,19 @@ import { PaymentService } from '../src/server/paymentService';
 const app = express();
 const paymentService = new PaymentService();
 
+// Security: Disable X-Powered-By header
+app.disable('x-powered-by');
+
+// Security: Core HTTP Security Headers & Razorpay Payment Compatible CSP
+app.use((_req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), payment=(self "https://checkout.razorpay.com" "https://api.razorpay.com")');
+  next();
+});
+
 // Raw body parser for webhook cryptographic verification
 app.use(
   ['/api/payment/webhook', '/api/webhook', '/webhook'],
@@ -14,6 +27,27 @@ app.use(
 );
 
 app.use(express.json({ limit: '2mb' }));
+
+// Security: Sanitize incoming request bodies
+app.use((req, _res, next) => {
+  if (req.body && typeof req.body === 'object' && !Buffer.isBuffer(req.body)) {
+    const sanitizeObj = (obj: any) => {
+      for (const key of Object.keys(obj)) {
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+          delete obj[key];
+          continue;
+        }
+        if (typeof obj[key] === 'string') {
+          obj[key] = obj[key].replace(/\0/g, '').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+        } else if (typeof obj[key] === 'object' && obj[key] !== null && !Buffer.isBuffer(obj[key])) {
+          sanitizeObj(obj[key]);
+        }
+      }
+    };
+    sanitizeObj(req.body);
+  }
+  next();
+});
 
 app.get(['/api/payment/config'], (_req, res) => {
   res.json({

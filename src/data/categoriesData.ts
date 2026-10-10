@@ -372,8 +372,8 @@ export function loadCategories(): CategoryItem[] {
         });
       }
     }
-  } catch (e) {
-    console.error('Failed to load categories from local storage:', e);
+  } catch {
+    // Return default categories if localStorage is unavailable or corrupt
   }
   return DEFAULT_CATEGORIES;
 }
@@ -381,7 +381,7 @@ export function loadCategories(): CategoryItem[] {
 export function saveCategories(categories: CategoryItem[]): void {
   try {
     localStorage.setItem(CATEGORIES_STORAGE_KEY, JSON.stringify(categories));
-  } catch (e) {
-    console.error('Failed to save categories to local storage:', e);
+  } catch {
+    // Ignore quota or private browsing storage errors
   }
 }

@@ -47,8 +47,8 @@ export default function App() {
           saveCategories(data);
         }
       })
-      .catch((err) => {
-        console.log('Using static categories fallback', err);
+      .catch(() => {
+        // Fallback to static category catalog seamlessly
       });
   }, []);
 

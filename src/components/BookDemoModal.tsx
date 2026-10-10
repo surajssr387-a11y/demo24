@@ -174,6 +174,7 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
   const [paymentError, setPaymentError] = useState('');
   const [lastTraceId, setLastTraceId] = useState('');
   const [copiedTestCard, setCopiedTestCard] = useState(false);
+  const [isSubmittingLead, setIsSubmittingLead] = useState(false);
 
   const handleCopyTestCard = () => {
     try {
@@ -386,7 +387,9 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
   };
 
   // Direct WhatsApp Enquiry submission for Customize According To You
-  const handleCustomEnquirySubmit = () => {
+  const handleCustomEnquirySubmit = async () => {
+    if (isSubmittingLead) return;
+    setIsSubmittingLead(true);
     const cleanPhone = phone.trim().replace(/\D/g, '');
     const chosenDate = date ? date : 'Flexible / Event date to be decided';
     const chosenTime = time ? time : 'Flexible (Mon to Sun)';
@@ -424,16 +427,9 @@ ${performersList}${notesText}• *Target Event Date:* ${chosenDate}
     setLastWhatsAppUrl(whatsappUrl);
     setStep('success');
 
-    // Automatically try opening WhatsApp
-    try {
-      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-    } catch {
-      // Handled by direct button on success screen
-    }
-
     // Save lead to database/server
     try {
-      fetch('/api/bookings', {
+      await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -450,8 +446,12 @@ ${performersList}${notesText}• *Target Event Date:* ${chosenDate}
           notes: customNotes.trim(),
           submittedAt: new Date().toISOString()
         })
-      }).catch(() => {});
-    } catch {}
+      });
+    } catch {
+      // Ignored for offline tolerance
+    } finally {
+      setIsSubmittingLead(false);
+    }
   };
 
   // Step 1: Validate form and proceed to Payment Screen OR Direct WhatsApp Enquiry
@@ -528,9 +528,6 @@ ${performersList}${notesText}• *Target Event Date:* ${chosenDate}
         if (result.traceId) setLastTraceId(result.traceId);
         if (result.whatsappUrl) {
           setLastWhatsAppUrl(result.whatsappUrl);
-          try {
-            window.open(result.whatsappUrl, '_blank', 'noopener,noreferrer');
-          } catch {}
         }
         setStep('success');
       },
@@ -635,13 +632,6 @@ Payment received & verified. Please confirm slot availability and send student w
     const whatsappUrl = `https://wa.me/${studioInfo.whatsappNumber}?text=${encodeURIComponent(formattedMessage)}`;
     setLastWhatsAppUrl(whatsappUrl);
     setStep('success');
-
-    // Automatically try opening WhatsApp
-    try {
-      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-    } catch {
-      // Handled by direct button
-    }
 
     // Save booking to server
     try {
@@ -1490,10 +1480,20 @@ Payment received & verified. Please confirm slot availability and send student w
             {isWeddingChoreo && activeBatch?.id === 'batch-custom' ? (
               <button
                 type="submit"
-                className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2.5 transition-transform active:scale-[0.99] shadow-lg shadow-emerald-600/30 cursor-pointer border border-emerald-500/40"
+                disabled={isSubmittingLead}
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2.5 transition-transform active:scale-[0.99] shadow-lg shadow-emerald-600/30 cursor-pointer border border-emerald-500/40 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <MessageCircle className="w-5 h-5 text-white fill-white/20" />
-                <span>SUBMIT ENQUIRY</span>
+                {isSubmittingLead ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0" />
+                    <span>SUBMITTING ENQUIRY...</span>
+                  </>
+                ) : (
+                  <>
+                    <MessageCircle className="w-5 h-5 text-white fill-white/20" />
+                    <span>SUBMIT ENQUIRY</span>
+                  </>
+                )}
               </button>
             ) : (
               <button

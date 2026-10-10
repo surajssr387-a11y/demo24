@@ -192,9 +192,6 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
         if (result.traceId) setLastTraceId(result.traceId);
         if (result.whatsappUrl) {
           setLastWhatsAppUrl(result.whatsappUrl);
-          try {
-            window.open(result.whatsappUrl, '_blank', 'noopener,noreferrer');
-          } catch {}
         }
         setStep('success');
       },
@@ -294,13 +291,6 @@ Payment received. Special afternoon batch slot reserved. Please acknowledge & se
     const whatsappUrl = `https://wa.me/${studioInfo.whatsappNumber}?text=${encodeURIComponent(formattedMessage)}`;
     setLastWhatsAppUrl(whatsappUrl);
     setStep('success');
-
-    // Automatically open WhatsApp in new tab
-    try {
-      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-    } catch {
-      // Handled by direct button on success screen
-    }
 
     // Save lead to local server database
     try {

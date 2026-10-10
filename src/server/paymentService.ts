@@ -435,8 +435,13 @@ export class PaymentService {
           .update(`${params.orderId}|${params.paymentId}`)
           .digest('hex');
 
-        isSignatureValid = expectedSignature === params.signature;
-      } catch (e) {
+        const expectedBuf = Buffer.from(expectedSignature, 'hex');
+        const signatureBuf = Buffer.from(params.signature, 'hex');
+
+        isSignatureValid =
+          expectedBuf.length === signatureBuf.length &&
+          crypto.timingSafeEqual(expectedBuf, signatureBuf);
+      } catch {
         isSignatureValid = false;
       }
     } else {
@@ -509,12 +514,24 @@ export class PaymentService {
     clientIp: string
   ): { success: boolean; event?: string } {
     if (this.razorpayWebhookSecret) {
-      const expected = crypto
-        .createHmac('sha256', this.razorpayWebhookSecret)
-        .update(rawBody)
-        .digest('hex');
+      let isSigMatch = false;
+      try {
+        const expected = crypto
+          .createHmac('sha256', this.razorpayWebhookSecret)
+          .update(rawBody)
+          .digest('hex');
 
-      if (expected !== signatureHeader) {
+        const expectedBuf = Buffer.from(expected, 'hex');
+        const signatureBuf = Buffer.from(signatureHeader, 'hex');
+
+        isSigMatch =
+          expectedBuf.length === signatureBuf.length &&
+          crypto.timingSafeEqual(expectedBuf, signatureBuf);
+      } catch {
+        isSigMatch = false;
+      }
+
+      if (!isSigMatch) {
         this.auditLog({
           trace_id: 'webhook_unauth',
           event_type: 'WEBHOOK_RECEIVED',
