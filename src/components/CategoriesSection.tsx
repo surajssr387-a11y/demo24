@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Star, Flame } from 'lucide-react';
+import { Star } from 'lucide-react';
+import { RealWhatsappIcon } from './BrandIcons';
+import { studioInfo } from '../data/danceData';
 import { CategoryItem, DEFAULT_CATEGORIES, loadCategories, saveCategories } from '../data/categoriesData';
 
 interface CategoriesSectionProps {
@@ -151,21 +153,17 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
             Categories
           </h2>
 
-          {/* Top Right: Floating Special Offer Button (Click opens Offer Modal) */}
-          {onOpenSpecialOffer && (
-            <button
-              type="button"
-              onClick={onOpenSpecialOffer}
-              className="sm:absolute sm:right-0 inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full text-xs sm:text-sm font-extrabold bg-gradient-to-r from-rose-500 via-amber-500 to-orange-500 hover:from-rose-600 hover:via-amber-600 hover:to-orange-600 text-white shadow-md shadow-rose-500/20 hover:shadow-lg transition-all active:scale-95 cursor-pointer shrink-0 animate-pulse hover:animate-none group"
-              title="Special Flexible Batch Offer - ₹899 Only"
-            >
-              <Flame className="w-3.5 h-3.5 fill-white text-white group-hover:scale-110 transition-transform" />
-              <span>Special Offer</span>
-              <span className="bg-white/25 backdrop-blur-xs px-1.5 py-0.5 rounded text-[11px] font-black">
-                ₹899
-              </span>
-            </button>
-          )}
+          {/* Top Right: Chat with Us WhatsApp Button (Same size as Reviews button) */}
+          <a
+            href={`https://wa.me/${studioInfo.whatsappNumber}?text=${encodeURIComponent("Hi Ramy's Dance Studio, I want to inquire about dance classes, batches, and admission.")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sm:absolute sm:right-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-neutral-100 hover:bg-neutral-200 text-neutral-800 hover:text-neutral-950 border border-neutral-300/80 shadow-2xs hover:shadow-xs transition-all active:scale-95 group shrink-0"
+            title="Chat with us on WhatsApp"
+          >
+            <RealWhatsappIcon className="w-3.5 h-3.5 shrink-0 transition-transform group-hover:scale-110" />
+            <span>Chat with us</span>
+          </a>
         </div>
 
         {/* Categories Grid (3 columns on desktop, Wedding centered in its row with same size) */}
