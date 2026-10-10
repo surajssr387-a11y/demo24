@@ -144,8 +144,19 @@ export class PaymentService {
     this.ordersFile = path.join(this.dataDir, 'orders.json');
     this.logsFile = path.join(this.dataDir, 'payment-logs.json');
 
-    // Razorpay Test credentials provided:
-    // Key ID: rzp_test_TmGhxLupa7Bm8z | Key Secret: v3L6U47RsNRqf06PJr3fh0a5
+    // =========================================================================
+    // RAZORPAY CREDENTIALS CONFIGURATION:
+    // Yeh values environment variables (.env / hosting provider env) se aati hain.
+    // Agar .env na ho, toh default fallback test keys use hoti hain.
+    // 
+    // 👉 REAL LIVE KEYS LAGANE KE LIYE:
+    // Option A: Apne server / .env me set karein:
+    //           RAZORPAY_KEY_ID="rzp_live_..."
+    //           RAZORPAY_KEY_SECRET="AapkaLiveSecret"
+    //           RAZORPAY_WEBHOOK_SECRET="AapkaWebhookSecret"
+    //
+    // Option B: Ya fir neeche diye gaye fallback string values ko replace karein:
+    // =========================================================================
     this.razorpayKeyId = process.env.RAZORPAY_KEY_ID || 'rzp_test_TmGhxLupa7Bm8z';
     this.razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET || 'v3L6U47RsNRqf06PJr3fh0a5';
     this.razorpayWebhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET || 'v3L6U47RsNRqf06PJr3fh0a5';
