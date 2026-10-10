@@ -175,9 +175,21 @@ export async function openRazorpayCheckout(params: PaymentInitiationParams): Pro
 
     const rzp = new window.Razorpay(options);
     rzp.on('payment.failed', function (resp: any) {
-      console.error('Razorpay payment failed:', resp.error);
+      console.warn('Razorpay payment declined/failed:', resp.error);
+      const desc = resp.error?.description || '';
+      const reason = resp.error?.reason || '';
+
+      let friendlyMessage = desc || 'Payment was declined or cancelled.';
+      if (
+        reason === 'international_transaction_not_allowed' ||
+        desc.toLowerCase().includes('international card')
+      ) {
+        friendlyMessage =
+          'International cards are not enabled on this merchant account. For testing, please use the Indian Test Card (4012 0000 0000 0002, Exp: 12/28, CVV: 123) or Netbanking (SBI/HDFC).';
+      }
+
       params.onFailure(
-        resp.error?.description || 'Payment was declined or cancelled.',
+        friendlyMessage,
         activeTraceId
       );
     });

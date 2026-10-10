@@ -76,6 +76,15 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [verifiedPaymentId, setVerifiedPaymentId] = useState('');
   const [lastTraceId, setLastTraceId] = useState('');
+  const [copiedTestCard, setCopiedTestCard] = useState(false);
+
+  const handleCopyTestCard = () => {
+    try {
+      navigator.clipboard.writeText('4012000000000002');
+      setCopiedTestCard(true);
+      setTimeout(() => setCopiedTestCard(false), 2500);
+    } catch {}
+  };
 
   if (!isOpen) return null;
 
@@ -691,26 +700,68 @@ Payment received. Special afternoon batch slot reserved. Please acknowledge & se
 
                 {/* Payment Error Alert / Failure Recovery with Trace ID */}
                 {paymentError && (
-                  <div className="w-full p-3.5 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-900 text-xs sm:text-sm font-semibold text-left space-y-2 animate-in fade-in">
-                    <div className="flex items-start gap-2">
+                  <div className="w-full p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-900 text-xs sm:text-sm font-semibold text-left space-y-3 animate-in fade-in">
+                    <div className="flex items-start gap-2.5">
                       <span className="text-amber-600 font-black text-base shrink-0">⚠️</span>
-                      <div>
-                        <span className="font-extrabold block text-amber-950">Payment Status / Notice</span>
-                        <span>{paymentError}</span>
+                      <div className="space-y-1">
+                        <span className="font-extrabold block text-amber-950 text-sm">Payment Notice / Error</span>
+                        <p className="text-amber-900 leading-relaxed font-normal">{paymentError}</p>
                         {lastTraceId && (
                           <span className="block mt-1 font-mono text-[11px] text-amber-800">
-                            Transaction Trace ID: <strong>#{lastTraceId}</strong> (auto-reconciling in 5 min)
+                            Transaction Trace ID: <strong>#{lastTraceId}</strong>
                           </span>
                         )}
                       </div>
                     </div>
-                    <div className="pt-1 flex justify-end">
+
+                    {/* Test Mode Quick Solution Box */}
+                    <div className="p-3 bg-white/90 rounded-xl border border-amber-200 text-xs space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-bold text-amber-950">💡 Test Mode Card Details:</span>
+                        <button
+                          type="button"
+                          onClick={handleCopyTestCard}
+                          className="px-2.5 py-1 rounded-md bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors"
+                        >
+                          {copiedTestCard ? (
+                            <>
+                              <Check className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>Copied!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5" />
+                              <span>Copy Indian Test Card</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      <div className="font-mono text-[11px] text-neutral-800 bg-neutral-50 p-2 rounded-lg border border-neutral-200 flex flex-wrap gap-x-4 gap-y-1">
+                        <span>Card: <strong>4012 0000 0000 0002</strong></span>
+                        <span>Exp: <strong>12/28</strong></span>
+                        <span>CVV: <strong>123</strong></span>
+                      </div>
+                      <p className="text-[11px] text-neutral-600">
+                        ⚡ <strong>Tip:</strong> You can also choose <strong>Netbanking</strong> (SBI / HDFC) in the popup and click <em>"Success"</em> for an instant test pass.
+                      </p>
+                    </div>
+
+                    <div className="pt-1 flex items-center justify-between gap-2 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={handleInitiateRazorpay}
+                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white text-xs font-black transition-all cursor-pointer shadow-md shadow-rose-600/20 flex items-center gap-1.5"
+                      >
+                        <CreditCard className="w-3.5 h-3.5" />
+                        <span>Retry Payment Now</span>
+                      </button>
+
                       <button
                         type="button"
                         onClick={handleCheckVerificationStatus}
-                        className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
+                        className="px-3 py-1.5 rounded-lg bg-neutral-200 hover:bg-neutral-300 text-neutral-800 text-xs font-bold transition-colors cursor-pointer"
                       >
-                        Check Verification Status
+                        Check Status
                       </button>
                     </div>
                   </div>
