@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { studioInfo } from '../data/danceData';
 import { CategoryItem, BatchSchedule, loadCategories, DEFAULT_CATEGORIES } from '../data/categoriesData';
+import { openRazorpayCheckout } from '../utils/razorpayClient';
 
 // Dynamic fee calculation for Custom Wedding Choreography
 function getCustomWeddingFee(count: number): number {
@@ -168,6 +169,10 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
   const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(true);
   const [utrNumber, setUtrNumber] = useState('');
   const [copiedUpi, setCopiedUpi] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [verifiedPaymentId, setVerifiedPaymentId] = useState('');
+  const [paymentError, setPaymentError] = useState('');
+  const [lastTraceId, setLastTraceId] = useState('');
 
   // Skill Level: Level 1, Level 2, Level 3 (Used specifically for Kids Dance)
   const [selectedLevel, setSelectedLevel] = useState<string>('Level 1');
@@ -386,21 +391,25 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({
 
     const formattedMessage =
 `💍 *WEDDING CHOREOGRAPHY CUSTOM ENQUIRY* 💍
+🏢 *RAMY'S DANCE STUDIO — RANCHI*
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✨ *Package:* Customize According To You
-💃 *Program:* Wedding Choreography
-💰 *Pricing:* Custom Quote Required (To discuss on WhatsApp)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-👤 *CLIENT DETAILS:*
-• *Full Name:* ${name.trim()}
-• *Mobile Number:* ${cleanPhone}
-• *Target Event / Date:* ${chosenDate}
-• *Preferred Time:* ${chosenTime}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎭 *CHOREOGRAPHY REQUIREMENTS:*
+✨ *ENQUIRY TYPE:* Custom Wedding Choreography Package
+
+📋 *REQUIREMENTS & SPECIFICATIONS:*
+• *Dance Program:* Wedding Dance Choreography
 • *Routines Requested:* ${customChoreographyCount} ${customChoreographyCount === 1 ? 'Choreography' : 'Choreographies'}
-${performersList}${notesText}━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💬 *Client Message:* Namaste Ramy's Dance Studio, hume wedding dance choreography ke liye custom package aur pricing discuss karni hai. Please details share kijiye!`;
+${performersList}${notesText}• *Target Event Date:* ${chosenDate}
+• *Preferred Time Slot:* ${chosenTime}
+
+👤 *CLIENT CONTACT DETAILS:*
+• *Client Full Name:* ${name.trim()}
+• *Mobile / WhatsApp:* +91 ${cleanPhone}
+
+📍 *STUDIO BRANCH & CONTACT:*
+🏢 *Address:* 2nd Floor, Above Reliance Smart Point, Plaza Chowk, Old H.B. Road, Ranchi – 834001
+📞 *Support:* Ramyyy Singh (+91 8340158178)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💬 *Client Note:* Namaste Ramy's Dance Studio, hume wedding choreography ke custom package, pricing aur rehearsal slots finalize karne hain. Kripya details share karein!`;
 
     const whatsappUrl = `https://wa.me/${studioInfo.whatsappNumber}?text=${encodeURIComponent(formattedMessage)}`;
     setLastWhatsAppUrl(whatsappUrl);
@@ -464,6 +473,95 @@ ${performersList}${notesText}━━━━━━━━━━━━━━━━━
     setStep('payment');
   };
 
+  // Launch Official Razorpay Payment Gateway
+  const handleInitiateRazorpay = () => {
+    if (!name.trim()) {
+      setErrorMessage('Please enter student full name');
+      return;
+    }
+    const cleanPhone = phone.trim().replace(/\D/g, '');
+    if (cleanPhone.length < 10) {
+      setErrorMessage('Please enter a valid 10-digit mobile number');
+      return;
+    }
+    setErrorMessage('');
+    setPaymentError('');
+    setIsProcessingPayment(true);
+
+    const routineCount = isWeddingChoreo ? customChoreographyCount : undefined;
+    const batchSummary = `${activeBatch.name}${activeBatch.days ? ' (' + activeBatch.days + ')' : ''}`;
+    const isCustomChoreo = isWeddingChoreo && activeBatch?.id === 'batch-custom';
+
+    const safePlanType = isSpecialCategory
+      ? (isCustomChoreo
+          ? 'custom_wedding'
+          : currentCategory.id === 'home-service' || activeBatch?.name?.toLowerCase().includes('home')
+          ? 'home_service'
+          : currentCategory.id === 'private-class'
+          ? 'private_class'
+          : 'monthly')
+      : planType;
+
+    openRazorpayCheckout({
+      studentName: name.trim(),
+      studentPhone: cleanPhone,
+      programId: currentCategory.id,
+      programName: currentCategory.title,
+      planType: safePlanType,
+      routineCount,
+      batchDetails: batchSummary,
+      preferredDate: date || undefined,
+      preferredTime: time || undefined,
+      onSuccess: (result) => {
+        setIsProcessingPayment(false);
+        setVerifiedPaymentId(result.paymentId);
+        setUtrNumber(result.paymentId);
+        if (result.traceId) setLastTraceId(result.traceId);
+        if (result.whatsappUrl) {
+          setLastWhatsAppUrl(result.whatsappUrl);
+          try {
+            window.open(result.whatsappUrl, '_blank', 'noopener,noreferrer');
+          } catch {}
+        }
+        setStep('success');
+      },
+      onFailure: (errMsg, traceId) => {
+        setIsProcessingPayment(false);
+        setPaymentError(errMsg);
+        if (traceId) setLastTraceId(traceId);
+      },
+      onClose: () => {
+        setIsProcessingPayment(false);
+      },
+    });
+  };
+
+  const handleCheckVerificationStatus = async () => {
+    const checkId = verifiedPaymentId || lastTraceId;
+    if (!checkId) {
+      setPaymentError('No active transaction reference found to verify. Please proceed with payment.');
+      return;
+    }
+    setIsProcessingPayment(true);
+    setPaymentError('');
+    try {
+      const res = await fetch(`/api/payment/verify-or-status?orderId=${encodeURIComponent(checkId)}`);
+      const data = await res.json();
+      if (data.status === 'SUCCESS' || data.success) {
+        if (data.whatsappUrl) setLastWhatsAppUrl(data.whatsappUrl);
+        setVerifiedPaymentId(data.paymentId || checkId);
+        setUtrNumber(data.paymentId || checkId);
+        setStep('success');
+        return;
+      }
+      setPaymentError(`Order status: ${data.status || 'PENDING'}. If amount was debited, payment will auto-sync in 5 minutes.`);
+    } catch {
+      setPaymentError('Network check failed. Please check internet connection.');
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
   // Step 2: Confirm Payment & Submit Booking Notification
   const handleFinalSubmit = () => {
     const cleanPhone = phone.trim().replace(/\D/g, '');
@@ -485,23 +583,45 @@ ${performersList}${notesText}━━━━━━━━━━━━━━━━━
 • *Total Routines Selected:* ${customChoreographyCount} Choreographies
 ${customSelectedRoutines.length > 0 ? `• *Performers / Events:* ${customSelectedRoutines.join(', ')}\n` : ''}${customNotes.trim() ? `• *Song / Special Notes:* ${customNotes.trim()}\n` : ''}` : '';
 
+    const paymentDateStr = new Date().toLocaleString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+    const txnId = verifiedPaymentId || utrNumber.trim() || 'GATEWAY_VERIFIED';
+
     const formattedMessage =
-`🔔 *NEW BOOKING & PAYMENT RECEIVED - RAMY'S DANCE STUDIO*
+`🎉 *NEW ADMISSION & PAYMENT CONFIRMATION* 🎉
+🏢 *RAMY'S DANCE STUDIO — RANCHI*
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📋 *Booking Type:* ${planLabel}
-💃 *Dance Program:* ${currentCategory.title}
-${isKidsDance ? `🎯 *Skill Level:* ${selectedLevel}\n` : ''}🏷️ *Selected Batch:* ${activeBatch.name}${activeBatch.days ? ` (${activeBatch.days})` : ''}
-🕒 *Schedule & Timings:*
-${scheduleBulletList}${customDetailsBlock}
-💵 *Amount:* ${activeFeeText}
-💳 *Payment Status:* ✅ ${paymentStatusBadge}
-${utrNumber.trim() ? `🔢 *Transaction / UTR ID:* ${utrNumber.trim()}\n` : ''}━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-👤 *STUDENT DETAILS:*
-• *Full Name:* ${name.trim()}
-• *Mobile Number:* ${cleanPhone}
+✅ *STATUS:* SEAT RESERVED & PAYMENT CONFIRMED
+
+💳 *TRANSACTION RECEIPT (PAID):*
+• *Payment Status:* ✅ ${paymentStatusBadge}
+• *Transaction / Payment ID:* ${txnId}
+• *Amount Paid:* ${activeFeeText}
+• *Transaction Time:* ${paymentDateStr}
+${lastTraceId ? `• *Security Trace ID:* #${lastTraceId}\n` : ''}━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎟️ *BOOKING & ADMISSION DETAILS:*
+• *Dance Program:* ${currentCategory.title}
+• *Course Plan:* ${planLabel}
+${isKidsDance ? `• *Skill Level:* ${selectedLevel}\n` : ''}• *Batch Selected:* ${activeBatch.name}${activeBatch.days ? ` (${activeBatch.days})` : ''}
+• *Class Schedule:* ${activeBatch.schedules.join(', ')}
 • *Preferred Starting Date:* ${chosenDate}
-${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTime} (Flexible Mon to Sun)\n` : ''}━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ *Admin Action:* Payment received. Please verify batch slot and reply with admission confirmation.`;
+${(time || isPrivateClass || isHomeService) ? `• *Preferred Daily Slot:* ${chosenTime} (Flexible Mon to Sun)\n` : ''}${customDetailsBlock}━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+👤 *STUDENT INFORMATION:*
+• *Full Name:* ${name.trim()}
+• *Mobile / WhatsApp:* +91 ${cleanPhone}
+
+📍 *STUDIO BRANCH & CONTACT:*
+🏢 *Address:* 2nd Floor, Above Reliance Smart Point, Plaza Chowk, Old H.B. Road, Ranchi – 834001
+📞 *Director / Support:* Ramyyy Singh (+91 8340158178)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 *ADMIN ACTION:*
+Payment received & verified. Please confirm slot availability and send student welcome guide! ✨`;
 
     const whatsappUrl = `https://wa.me/${studioInfo.whatsappNumber}?text=${encodeURIComponent(formattedMessage)}`;
     setLastWhatsAppUrl(whatsappUrl);
@@ -765,101 +885,93 @@ ${(time || isPrivateClass || isHomeService) ? `• *Preferred Time:* ${chosenTim
               </div>
             </div>
 
-            {/* Main UPI QR Code Card (Clean White with Blue Accent) */}
-            <div className="bg-gradient-to-b from-slate-50 to-slate-100/70 border-2 border-blue-500/40 rounded-3xl p-5 sm:p-6 flex flex-col items-center justify-center text-center relative overflow-hidden shadow-lg">
-              {/* Payee Name & UPI ID Pill */}
-              <div className="mb-3 space-y-1.5 flex flex-col items-center">
-                <span className="text-xl sm:text-2xl font-black text-slate-950 tracking-wide">
-                  {upiPayee}
+            {/* Official Razorpay Gateway Card */}
+            <div className="bg-gradient-to-b from-slate-50 via-white to-blue-50/30 border-2 border-blue-500/40 rounded-3xl p-5 sm:p-6 flex flex-col items-center justify-center text-center relative overflow-hidden shadow-lg space-y-4">
+              <div className="flex items-center gap-2 bg-blue-100/80 border border-blue-200 px-3.5 py-1.5 rounded-full text-xs font-black text-blue-800 uppercase tracking-wider">
+                <ShieldCheck className="w-4 h-4 text-blue-600" />
+                <span>Official Razorpay Payment Gateway</span>
+              </div>
+
+              <div className="space-y-1">
+                <span className="text-xl sm:text-2xl font-black text-slate-950 font-display block">
+                  Pay {activeFeeText} Securely
                 </span>
-                <div className="inline-flex items-center gap-1.5 bg-white border-2 border-slate-300 px-4 py-1.5 rounded-full text-sm sm:text-base font-mono font-bold text-slate-900 shadow-xs">
-                  <span>{studioUpiId}</span>
+                <p className="text-xs sm:text-sm text-slate-600 max-w-sm mx-auto">
+                  Instant automated admission verification via UPI (Google Pay, PhonePe, Paytm, BHIM), Debit/Credit Cards & NetBanking.
+                </p>
+              </div>
+
+              {/* Supported Payment Badges */}
+              <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-3 shadow-xs flex items-center justify-around gap-2 text-slate-700">
+                <div className="flex flex-col items-center">
+                  <span className="text-xs font-black text-slate-900">UPI</span>
+                  <span className="text-[10px] text-slate-500 font-medium">GPay • PhonePe</span>
+                </div>
+                <div className="h-6 w-px bg-slate-200" />
+                <div className="flex flex-col items-center">
+                  <span className="text-xs font-black text-slate-900">CARDS</span>
+                  <span className="text-[10px] text-slate-500 font-medium">Visa • RuPay</span>
+                </div>
+                <div className="h-6 w-px bg-slate-200" />
+                <div className="flex flex-col items-center">
+                  <span className="text-xs font-black text-slate-900">NETBANKING</span>
+                  <span className="text-[10px] text-slate-500 font-medium">50+ Banks</span>
                 </div>
               </div>
 
-              {/* QR Code Container */}
-              <div className="relative bg-white p-3 rounded-2xl shadow-md border border-slate-200 my-2 group">
-                <div className="bg-white p-2.5 rounded-xl overflow-hidden relative">
-                  <img
-                    src={qrCodeImageUrl}
-                    alt={`UPI QR Code - ${upiPayee} (${studioUpiId})`}
-                    className="w-52 h-52 sm:w-56 sm:h-56 object-contain rounded-lg"
-                    loading="eager"
-                  />
-                  {/* Central Emblem Badge - PhonePe */}
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-10 h-10 rounded-full bg-[#5f259f] border-2 border-white shadow-md flex items-center justify-center">
-                      <span className="text-white font-black text-base select-none">पे</span>
+              {/* Primary Call-to-Action: Pay via Razorpay Gateway */}
+              <button
+                type="button"
+                disabled={isProcessingPayment}
+                onClick={handleInitiateRazorpay}
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2.5 transition-transform active:scale-[0.99] shadow-xl shadow-blue-600/30 cursor-pointer border border-blue-500/40 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isProcessingPayment ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0" />
+                    <span>Launching Secure Razorpay Gateway...</span>
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="w-5 h-5 text-white" />
+                    <span>PAY {activeFeeText} SECURELY VIA RAZORPAY</span>
+                    <ArrowRight className="w-4 h-4 text-white" />
+                  </>
+                )}
+              </button>
+
+              {/* Payment Error Alert / Failure Recovery with Trace ID */}
+              {paymentError && (
+                <div className="w-full p-3.5 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-900 text-xs sm:text-sm font-semibold text-left space-y-2 animate-in fade-in">
+                  <div className="flex items-start gap-2">
+                    <span className="text-amber-600 font-black text-base shrink-0">⚠️</span>
+                    <div>
+                      <span className="font-extrabold block text-amber-950">Payment Status / Notice</span>
+                      <span>{paymentError}</span>
+                      {lastTraceId && (
+                        <span className="block mt-1 font-mono text-[11px] text-amber-800">
+                          Transaction Trace ID: <strong>#{lastTraceId}</strong> (auto-reconciling in 5 min)
+                        </span>
+                      )}
                     </div>
                   </div>
+                  <div className="pt-1 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={handleCheckVerificationStatus}
+                      className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
+                    >
+                      Check Verification Status
+                    </button>
+                  </div>
                 </div>
+              )}
+
+              {/* Security & Regulatory Footnote */}
+              <div className="flex items-center justify-center gap-2 text-center text-xs text-slate-500 font-medium pt-1">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>256-Bit SSL Encrypted • PCI-DSS Compliant • WhatsApp Notification Unlocks After Payment</span>
               </div>
-
-              {/* Scan to pay caption */}
-              <span className="text-xs sm:text-sm font-black text-slate-800 tracking-wider uppercase mt-1">
-                Scan to pay with any UPI app
-              </span>
-              <span className="text-xs sm:text-sm text-slate-600 font-semibold mt-0.5">
-                Google Pay • PhonePe • Paytm • FamApp • BHIM
-              </span>
-
-              {/* Amount reminder under QR */}
-              <div className="mt-2.5 px-5 py-2 bg-blue-50 border border-blue-200 rounded-full flex items-center gap-2">
-                <span className="text-xs sm:text-sm text-slate-700 font-bold">Payable:</span>
-                <span className="text-blue-700 text-sm sm:text-base font-black">{activeFeeText}</span>
-              </div>
-
-              {/* Direct UPI Apps Link Button (Mobile Users) - Blue */}
-              <div className="mt-3.5 w-full flex flex-wrap items-center justify-center gap-2">
-                <a
-                  href={upiPayUrl}
-                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl text-xs sm:text-sm font-black shadow-md shadow-blue-500/25 transition-all active:scale-95 cursor-pointer"
-                >
-                  <CreditCard className="w-4 h-4" />
-                  <span>Open in UPI App (Pay {activeFeeText})</span>
-                </a>
-              </div>
-
-              {/* Copy UPI ID Row */}
-              <div className="mt-3 w-full max-w-sm flex items-center justify-between bg-white border-2 border-slate-300 rounded-xl px-4 py-2.5 text-xs sm:text-sm shadow-xs">
-                <div className="flex flex-col text-left">
-                  <span className="text-xs font-bold text-slate-600">UPI ID (Tap to copy):</span>
-                  <span className="font-mono font-extrabold text-sm sm:text-base text-slate-900 select-all">{studioUpiId}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleCopyUpi}
-                  className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-extrabold transition-colors cursor-pointer border border-slate-300"
-                >
-                  {copiedUpi ? (
-                    <>
-                      <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
-                      <span className="text-emerald-700">Copied</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4 text-slate-700" />
-                      <span>Copy</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Final Action Button: DONE - BOOK & SEND NOTIFICATION (Green as requested!) */}
-            <button
-              type="button"
-              onClick={handleFinalSubmit}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-600 via-green-600 to-emerald-700 hover:from-emerald-700 hover:via-green-700 hover:to-emerald-800 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2.5 transition-transform active:scale-[0.99] shadow-xl shadow-emerald-600/30 cursor-pointer border border-emerald-500/40"
-            >
-              <Send className="w-5 h-5 text-white" />
-              <span>DONE — BOOK &amp; SEND NOTIFICATION</span>
-            </button>
-
-            {/* Security Guarantee Notice */}
-            <div className="flex items-center justify-center gap-2 text-center text-xs sm:text-sm text-slate-600 font-medium">
-              <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
-              <span>Direct Bank Payment to Ramy&apos;s Dance Studio • 100% Verified Admission</span>
             </div>
           </div>
         )}

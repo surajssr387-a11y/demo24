@@ -1,7 +1,9 @@
+import 'dotenv/config';
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { PaymentService } from './src/server/paymentService';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,6 +33,8 @@ async function startServer() {
   const CHOREOGRAPHY_PERFORMANCES_FILE = path.join(DATA_DIR, 'choreography-performances.json');
   const BOOKINGS_FILE = path.join(DATA_DIR, 'bookings.json');
 
+  const paymentService = new PaymentService(DATA_DIR);
+
   const UPLOADS_DIR = path.join(__dirname, 'public', 'uploads');
   if (!fs.existsSync(UPLOADS_DIR)) {
     fs.mkdirSync(UPLOADS_DIR, { recursive: true });
@@ -57,6 +61,16 @@ async function startServer() {
 
   const uploadLimiter = createRateLimiter(20, 60 * 1000); // 20 uploads per minute
   const bookingLimiter = createRateLimiter(30, 60 * 1000); // 30 booking attempts per minute
+  const paymentLimiter = createRateLimiter(60, 60 * 1000); // 60 payment calls per minute
+
+  // Raw body parser for webhook cryptographic verification (Must be BEFORE express.json)
+  app.use(
+    ['/api/payment/webhook', '/api/webhook', '/webhook'],
+    express.raw({
+      type: '*/*',
+      limit: '5mb',
+    })
+  );
 
   // Media upload raw body parser with bounded limit (50MB max)
   app.use(
@@ -553,6 +567,293 @@ async function startServer() {
       console.error('Error saving booking:', e);
       return res.status(500).json({ error: 'Failed to record booking securely' });
     }
+  });
+
+  // =========================================================================
+  // RAZORPAY PAYMENT GATEWAY ENDPOINTS (Production-Grade & Secure)
+  // =========================================================================
+
+  // 1. Get Payment Gateway Config (Key ID & Currency for frontend checkout initialization)
+  app.get('/api/payment/config', (_req, res) => {
+    res.json({
+      keyId: paymentService.getKeyId(),
+      currency: 'INR',
+      merchantName: "Ramy's Dance Studio",
+      themeColor: '#0066FF',
+    });
+  });
+
+  // 2. Create Order (Server-Authoritative Price Calculation with Idempotency)
+  app.post('/api/payment/create-order', paymentLimiter, async (req, res) => {
+    try {
+      const {
+        studentName,
+        studentPhone,
+        programId,
+        programName,
+        planType,
+        routineCount,
+        batchDetails,
+        preferredDate,
+        preferredTime,
+        idempotencyKey,
+      } = req.body || {};
+
+      const name = String(studentName || '').trim();
+      const phone = String(studentPhone || '').trim().replace(/\D/g, '');
+
+      if (!name || phone.length < 10) {
+        return res.status(400).json({ error: 'Valid student name and 10-digit mobile number are required.' });
+      }
+
+      const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket.remoteAddress || 'client';
+
+      const safePlanType =
+        planType === 'special_offer'
+          ? 'special_offer'
+          : planType === 'demo'
+          ? 'demo'
+          : planType === 'home_service'
+          ? 'home_service'
+          : planType === 'private_class'
+          ? 'private_class'
+          : planType === 'custom_wedding'
+          ? 'custom_wedding'
+          : 'monthly';
+
+      const orderData = await paymentService.createOrder({
+        studentName: name,
+        studentPhone: phone,
+        programId: String(programId || 'kids-dance'),
+        programName: String(programName || "Ramy's Dance Studio Class"),
+        planType: safePlanType,
+        routineCount: Number(routineCount) || undefined,
+        batchDetails: batchDetails ? String(batchDetails) : undefined,
+        preferredDate: preferredDate ? String(preferredDate) : undefined,
+        preferredTime: preferredTime ? String(preferredTime) : undefined,
+        idempotencyKey: idempotencyKey ? String(idempotencyKey) : undefined,
+        clientIp,
+      });
+
+      return res.json({
+        success: true,
+        orderId: orderData.orderId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        keyId: orderData.keyId,
+        traceId: orderData.traceId,
+      });
+    } catch (err: any) {
+      console.error('Error creating payment order:', err);
+      return res.status(500).json({ error: 'Failed to initiate secure payment order.' });
+    }
+  });
+
+  // Helper for Payment Verification & Booking Record Sync
+  const handleVerifyFlow = (req: express.Request, res: express.Response) => {
+    const { orderId, paymentId, signature } = req.body || {};
+
+    if (!orderId) {
+      return res.status(400).json({ error: 'orderId is required.' });
+    }
+
+    const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket.remoteAddress || 'client';
+
+    // If paymentId not provided, return current order status
+    if (!paymentId) {
+      const order = paymentService.getOrder(String(orderId));
+      if (!order) {
+        return res.status(404).json({ error: 'Order not found' });
+      }
+      return res.json({
+        success: order.status === 'SUCCESS',
+        status: order.status,
+        orderId: order.order_id,
+        traceId: order.trace_id,
+        amount: order.amount_in_paise,
+        currency: order.currency,
+        paymentId: order.razorpay_payment_id,
+        whatsappUrl: order.whatsapp_url,
+      });
+    }
+
+    const result = paymentService.verifyPayment({
+      orderId: String(orderId),
+      paymentId: String(paymentId),
+      signature: signature ? String(signature) : undefined,
+      clientIp,
+    });
+
+    if (!result.success) {
+      return res.status(400).json({ success: false, error: result.message });
+    }
+
+    // Automatically sync verified order into bookings.json
+    if (result.order) {
+      try {
+        let bookings: any[] = [];
+        if (fs.existsSync(BOOKINGS_FILE)) {
+          try {
+            bookings = JSON.parse(fs.readFileSync(BOOKINGS_FILE, 'utf-8'));
+            if (!Array.isArray(bookings)) bookings = [];
+          } catch {
+            bookings = [];
+          }
+        }
+        bookings.push({
+          id: result.order.order_id,
+          name: result.order.student_name,
+          phone: result.order.student_phone,
+          program: result.order.program,
+          plan:
+            result.order.plan_type === 'demo'
+              ? 'Trial Demo Session'
+              : result.order.plan_type === 'special_offer'
+              ? '30% OFF Special Batch'
+              : result.order.plan_type === 'home_service'
+              ? '1-on-1 Home Training'
+              : result.order.plan_type === 'private_class'
+              ? '1-on-1 Studio Class'
+              : 'Full Monthly Course',
+          batch: result.order.batch_details || 'Standard',
+          fee: `₹${(result.order.amount_in_paise / 100).toLocaleString('en-IN')}`,
+          paymentStatus: 'PAID (RAZORPAY)',
+          utrNumber: result.order.razorpay_payment_id,
+          isDemo: result.order.plan_type === 'demo',
+          preferredDate: result.order.preferred_date,
+          receivedAt: new Date().toISOString(),
+        });
+        fs.writeFileSync(BOOKINGS_FILE, JSON.stringify(bookings.slice(-500), null, 2), 'utf-8');
+      } catch (e) {
+        console.warn('Booking sync warning:', e);
+      }
+    }
+
+    return res.json({
+      success: true,
+      status: 'SUCCESS',
+      message: result.message,
+      order: result.order,
+      whatsappUrl: result.whatsappUrl,
+    });
+  };
+
+  // 3. Verify Payment Route (Requested /api/payment/verify-or-status and legacy /api/payment/verify)
+  app.post('/api/payment/verify-or-status', paymentLimiter, (req, res) => {
+    try {
+      return handleVerifyFlow(req, res);
+    } catch (err: any) {
+      console.error('Error verifying payment:', err);
+      return res.status(500).json({ error: 'Payment verification failed.' });
+    }
+  });
+
+  app.get('/api/payment/verify-or-status', (req, res) => {
+    const orderId = String(req.query.orderId || req.query.id || '');
+    if (!orderId) {
+      return res.status(400).json({ error: 'orderId query param required' });
+    }
+    const order = paymentService.getOrder(orderId);
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+    return res.json({
+      success: order.status === 'SUCCESS',
+      status: order.status,
+      orderId: order.order_id,
+      traceId: order.trace_id,
+      amount: order.amount_in_paise,
+      currency: order.currency,
+      paymentId: order.razorpay_payment_id,
+      whatsappUrl: order.whatsapp_url,
+    });
+  });
+
+  app.post('/api/payment/verify', paymentLimiter, (req, res) => {
+    try {
+      return handleVerifyFlow(req, res);
+    } catch (err: any) {
+      console.error('Error in /api/payment/verify:', err);
+      return res.status(500).json({ error: 'Payment verification failed.' });
+    }
+  });
+
+  // 4. Webhook Endpoint (Raw Body Cryptographic HMAC Verification - Single Source of Truth)
+  const webhookHandler = (req: express.Request, res: express.Response) => {
+    try {
+      const signature = (req.headers['x-razorpay-signature'] as string) || '';
+      const rawBody = Buffer.isBuffer(req.body) ? req.body : Buffer.from(JSON.stringify(req.body || {}));
+      const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket.remoteAddress || 'webhook';
+
+      const result = paymentService.handleWebhook(rawBody, signature, clientIp);
+
+      // Acknowledge with HTTP 200 to prevent infinite gateway retry loops
+      return res.status(200).json({ status: result.success ? 'ok' : 'ignored', event: result.event });
+    } catch (err) {
+      console.error('Error processing Razorpay webhook:', err);
+      return res.status(200).json({ status: 'error_handled' });
+    }
+  };
+
+  app.post(['/api/payment/webhook', '/api/webhook', '/webhook'], webhookHandler);
+  // Also handle POST to root / if x-razorpay-signature is present
+  app.post('/', (req, res, next) => {
+    if (req.headers['x-razorpay-signature']) {
+      return webhookHandler(req, res);
+    }
+    next();
+  });
+
+  // 5. Order Status Query (For polling/reconnection on slow networks)
+  app.get('/api/payment/order-status/:orderId', (req, res) => {
+    const orderId = req.params.orderId;
+    const order = paymentService.getOrder(orderId);
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+    return res.json({
+      orderId: order.order_id,
+      traceId: order.trace_id,
+      status: order.status,
+      amount: order.amount_in_paise,
+      currency: order.currency,
+      paymentId: order.razorpay_payment_id,
+      whatsappUrl: order.whatsapp_url,
+    });
+  });
+
+  // 6. Auto-Reconciler trigger endpoint & periodic runner
+  app.post('/api/payment/reconcile', async (_req, res) => {
+    try {
+      const result = await paymentService.reconcilePendingOrders();
+      return res.json({ success: true, ...result });
+    } catch (err) {
+      return res.status(500).json({ error: 'Reconciliation failed' });
+    }
+  });
+
+  // Periodic background reconciliation job (every 5 minutes)
+  setInterval(() => {
+    paymentService.reconcilePendingOrders().catch((e) => console.warn('Background reconciler warning:', e));
+  }, 5 * 60 * 1000);
+
+  // 7. Admin Observability & Audit Endpoints
+  app.get('/api/payment/admin/orders', (req, res) => {
+    const adminSecret = process.env.ADMIN_SECRET || 'ramy-admin-secure-key';
+    const authHeader = req.headers['x-admin-key'] || req.query.key;
+    const isAdmin = authHeader === adminSecret;
+
+    const orders = paymentService.getRecentOrders(100, !isAdmin);
+    return res.json(orders);
+  });
+
+  app.get('/api/payment/admin/logs', (req, res) => {
+    const adminSecret = process.env.ADMIN_SECRET || 'ramy-admin-secure-key';
+    const authHeader = req.headers['x-admin-key'] || req.query.key;
+    const isAdmin = authHeader === adminSecret;
+
+    const logs = paymentService.getPaymentLogs(150, !isAdmin);
+    return res.json(logs);
   });
 
   // --- Dedicated Razorpay Merchant Verification & Legal Compliance Routes ---

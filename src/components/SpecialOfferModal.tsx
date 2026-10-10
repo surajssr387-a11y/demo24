@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { studioInfo } from '../data/danceData';
 import { CategoryItem } from '../data/categoriesData';
+import { openRazorpayCheckout } from '../utils/razorpayClient';
 
 interface SpecialOfferModalProps {
   isOpen: boolean;
@@ -72,6 +73,9 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
   const [lastWhatsAppUrl, setLastWhatsAppUrl] = useState('');
   const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
   const [paymentError, setPaymentError] = useState('');
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [verifiedPaymentId, setVerifiedPaymentId] = useState('');
+  const [lastTraceId, setLastTraceId] = useState('');
 
   if (!isOpen) return null;
 
@@ -142,6 +146,87 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
     setStep('payment');
   };
 
+  // Launch Official Razorpay Payment Gateway for ₹899 Special Offer
+  const handleInitiateRazorpay = () => {
+    if (!name.trim()) {
+      setErrorMessage('Please enter your full name');
+      return;
+    }
+    const cleanPhone = phone.trim().replace(/\D/g, '');
+    if (cleanPhone.length < 10) {
+      setErrorMessage('Please enter a valid 10-digit mobile number');
+      return;
+    }
+    setErrorMessage('');
+    setPaymentError('');
+    setIsProcessingPayment(true);
+
+    const chosenDaysNames = WEEK_DAYS.filter((d) => selectedDays.includes(d.id))
+      .map((d) => d.short)
+      .join(', ');
+    const batchSummary = `Special Offer (11AM-3PM) — ${chosenDaysNames} at ${selectedTimeSlot}`;
+
+    openRazorpayCheckout({
+      studentName: name.trim(),
+      studentPhone: cleanPhone,
+      programId: 'special-offer',
+      programName: `${selectedCourse} (Special 30% Off Offer)`,
+      planType: 'special_offer',
+      batchDetails: batchSummary,
+      preferredDate: startDate || undefined,
+      preferredTime: selectedTimeSlot,
+      onSuccess: (result) => {
+        setIsProcessingPayment(false);
+        setIsPaymentConfirmed(true);
+        setVerifiedPaymentId(result.paymentId);
+        setUtrNumber(result.paymentId);
+        if (result.traceId) setLastTraceId(result.traceId);
+        if (result.whatsappUrl) {
+          setLastWhatsAppUrl(result.whatsappUrl);
+          try {
+            window.open(result.whatsappUrl, '_blank', 'noopener,noreferrer');
+          } catch {}
+        }
+        setStep('success');
+      },
+      onFailure: (errMsg, traceId) => {
+        setIsProcessingPayment(false);
+        setPaymentError(errMsg);
+        if (traceId) setLastTraceId(traceId);
+      },
+      onClose: () => {
+        setIsProcessingPayment(false);
+      },
+    });
+  };
+
+  const handleCheckVerificationStatus = async () => {
+    const checkId = verifiedPaymentId || lastTraceId;
+    if (!checkId) {
+      setPaymentError('No active transaction reference found to verify. Please proceed with payment.');
+      return;
+    }
+    setIsProcessingPayment(true);
+    setPaymentError('');
+    try {
+      const res = await fetch(`/api/payment/verify-or-status?orderId=${encodeURIComponent(checkId)}`);
+      const data = await res.json();
+      if (data.status === 'SUCCESS' || data.success) {
+        if (data.whatsappUrl) setLastWhatsAppUrl(data.whatsappUrl);
+        setVerifiedPaymentId(data.paymentId || checkId);
+        setUtrNumber(data.paymentId || checkId);
+        setIsPaymentConfirmed(true);
+        setStep('success');
+        return;
+      }
+      setPaymentError(`Order status: ${data.status || 'PENDING'}. If amount was debited, payment will auto-sync in 5 minutes.`);
+    } catch {
+      setPaymentError('Network check failed. Please check internet connection.');
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
   // Step 2: Confirm Payment and trigger WhatsApp message
   const handleConfirmAndSendWhatsApp = () => {
     if (!utrNumber.trim() || utrNumber.trim().length < 6) {
@@ -156,30 +241,46 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
       .join(', ');
     const chosenStartDate = startDate ? startDate : 'Flexible / Earliest available batch';
 
+    const paymentDateStr = new Date().toLocaleString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+    const txnId = verifiedPaymentId || utrNumber.trim() || 'UPI_ONLINE_VERIFIED';
+
     const formattedMessage =
-`🔥 *SPECIAL 30% OFF AFTERNOON COURSE REGISTRATION* 🔥
+`🎉 *NEW ADMISSION & PAYMENT CONFIRMATION* 🎉
+🏢 *RAMY'S DANCE STUDIO — RANCHI*
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✨ *Offer Package:* Flexible Afternoon Special (11 AM – 3 PM)
-💃 *Dance Style:* ${selectedCourse}
-💰 *Course Fee:* ₹${offerAmount} / Month (Saved ₹650 from ~₹${regularAmount}~)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-👤 *CLIENT DETAILS:*
-• *Full Name:* ${name.trim()}
-• *Mobile Number:* ${cleanPhone}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🗓️ *FLEXIBLE SCHEDULE SELECTED:*
+✅ *STATUS:* SEAT RESERVED & PAYMENT CONFIRMED
+
+💳 *TRANSACTION RECEIPT (PAID):*
+• *Payment Status:* ✅ SUCCESS & RECEIVED
+• *Transaction / UTR ID:* ${txnId}
+• *Amount Paid:* ₹${offerAmount} INR (30% Discount Applied, Saved ₹650)
+• *Transaction Time:* ${paymentDateStr}
+${lastTraceId ? `• *Security Trace ID:* #${lastTraceId}\n` : ''}━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎟️ *BOOKING & ADMISSION DETAILS:*
+• *Dance Style:* ${selectedCourse}
+• *Special Package:* Flexible Afternoon Batch (11:00 AM – 3:00 PM)
 • *Chosen Days (3 Days/Week):* ${chosenDaysNames}
-• *Daily 1-Hour Time Slot:* ${selectedTimeSlot}
+• *Daily Time Slot:* ${selectedTimeSlot}
 • *Preferred Starting Date:* ${chosenStartDate}
 • *Total Sessions:* 12 Sessions (1 Month Course)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💳 *PAYMENT STATUS:*
-• *Payment Confirmed:* YES (Paid via UPI / QR)
-• *Offer Amount:* ₹${offerAmount}
-• *UPI ID:* ${studioUpiId} (${upiPayee})
-• *Payment Ref / UTR:* ${utrNumber.trim() ? utrNumber.trim() : 'Verified via UPI QR Code'}
+👤 *STUDENT INFORMATION:*
+• *Full Name:* ${name.trim()}
+• *Mobile / WhatsApp:* +91 ${cleanPhone}
+
+📍 *STUDIO BRANCH & CONTACT:*
+🏢 *Address:* 2nd Floor, Above Reliance Smart Point, Plaza Chowk, Old H.B. Road, Ranchi – 834001
+📞 *Director / Support:* Ramyyy Singh (+91 8340158178)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💬 *Client Message:* Namaste Ramy's Dance Studio, maine Special 30% OFF Afternoon Offer (₹${offerAmount}) ka payment complete karke register kiya hai. Kripya meri seat confirm kijiye!`;
+🚀 *ADMIN ACTION:*
+Payment received. Special afternoon batch slot reserved. Please acknowledge & send orientation guidelines! ✨`;
 
     const whatsappUrl = `https://wa.me/${studioInfo.whatsappNumber}?text=${encodeURIComponent(formattedMessage)}`;
     setLastWhatsAppUrl(whatsappUrl);
@@ -533,154 +634,94 @@ export const SpecialOfferModal: React.FC<SpecialOfferModalProps> = ({
                 </div>
               </div>
 
-              {/* QR Code Container */}
-              <div className="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-neutral-200 shadow-sm text-center">
-                <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                  <QrCode className="w-3.5 h-3.5 text-neutral-700" />
-                  Scan to Pay via Any UPI App
-                </span>
+              {/* Official Razorpay Gateway Card for Special Offer */}
+              <div className="flex flex-col items-center justify-center p-5 sm:p-6 rounded-3xl bg-gradient-to-b from-white via-rose-50/20 to-amber-50/20 border-2 border-rose-300 shadow-md text-center space-y-4">
+                <div className="flex items-center gap-1.5 bg-rose-100/90 border border-rose-200 px-3 py-1 rounded-full text-xs font-black text-rose-800 uppercase tracking-wider">
+                  <ShieldCheck className="w-4 h-4 text-rose-600" />
+                  <span>Official Razorpay Payment Gateway</span>
+                </div>
 
-                <div className="relative p-2.5 bg-white rounded-2xl border-2 border-neutral-300 shadow-md mb-3">
-                  <img
-                    src={qrCodeImageUrl}
-                    alt="Scan UPI QR Code for ₹899"
-                    className="w-44 h-44 object-contain rounded-xl"
-                  />
-                  <div className="absolute inset-x-0 -bottom-2.5 flex justify-center">
-                    <span className="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-xs uppercase">
-                      Exact ₹{offerAmount}
-                    </span>
+                <div className="space-y-1">
+                  <span className="text-xl sm:text-2xl font-black text-neutral-950 font-display block">
+                    Pay ₹{offerAmount} Securely
+                  </span>
+                  <p className="text-xs sm:text-sm text-neutral-600 max-w-sm mx-auto">
+                    Instant automated seat confirmation via UPI (Google Pay, PhonePe, Paytm, BHIM), Debit/Credit Cards &amp; NetBanking.
+                  </p>
+                </div>
+
+                {/* Supported Payment Badges */}
+                <div className="w-full max-w-md bg-white border border-neutral-200 rounded-2xl p-3 shadow-xs flex items-center justify-around gap-2 text-neutral-700">
+                  <div className="flex flex-col items-center">
+                    <span className="text-xs font-black text-neutral-900">UPI</span>
+                    <span className="text-[10px] text-neutral-500 font-medium">GPay • PhonePe</span>
+                  </div>
+                  <div className="h-6 w-px bg-neutral-200" />
+                  <div className="flex flex-col items-center">
+                    <span className="text-xs font-black text-neutral-900">CARDS</span>
+                    <span className="text-[10px] text-neutral-500 font-medium">Visa • RuPay</span>
+                  </div>
+                  <div className="h-6 w-px bg-neutral-200" />
+                  <div className="flex flex-col items-center">
+                    <span className="text-xs font-black text-neutral-900">NETBANKING</span>
+                    <span className="text-[10px] text-neutral-500 font-medium">50+ Banks</span>
                   </div>
                 </div>
 
-                <p className="text-xs text-neutral-600 font-medium">
-                  Scan with <strong>Google Pay, PhonePe, Paytm</strong> or <strong>BHIM</strong>
-                </p>
-
-                {/* Mobile direct UPI trigger button */}
-                <a
-                  href={upiPayUrl}
-                  className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-900 text-white text-xs font-bold hover:bg-neutral-800 transition-colors shadow-xs"
-                >
-                  <span>Pay ₹{offerAmount} via UPI App</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </a>
-              </div>
-
-              {/* UPI ID Copy Field */}
-              <div className="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200/80 flex items-center justify-between">
-                <div>
-                  <span className="block text-[10px] uppercase font-bold text-blue-700">Studio UPI ID</span>
-                  <span className="font-mono font-bold text-neutral-900 text-sm select-all">{studioUpiId}</span>
-                  <span className="block text-[10px] text-neutral-500 font-medium">{upiPayee}</span>
-                </div>
+                {/* Primary Gateway Trigger Button */}
                 <button
                   type="button"
-                  onClick={handleCopyUpi}
-                  className="px-3 py-1.5 rounded-lg bg-white border border-blue-200 hover:bg-blue-100 text-blue-700 font-bold text-xs flex items-center gap-1 shadow-2xs transition-all active:scale-95 cursor-pointer"
+                  disabled={isProcessingPayment}
+                  onClick={handleInitiateRazorpay}
+                  className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 hover:from-red-700 hover:to-amber-600 text-white font-black text-sm sm:text-base shadow-xl shadow-rose-600/30 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2.5 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {copiedUpi ? (
+                  {isProcessingPayment ? (
                     <>
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
-                      <span className="text-emerald-700">Copied!</span>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0" />
+                      <span>Launching Secure Razorpay Gateway...</span>
                     </>
                   ) : (
                     <>
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>Copy UPI</span>
+                      <CreditCard className="w-5 h-5" />
+                      <span>PAY ₹{offerAmount} SECURELY VIA RAZORPAY</span>
+                      <ArrowRight className="w-4 h-4" />
                     </>
                   )}
                 </button>
-              </div>
 
-              {/* Payment Error Alert (Shown if user clicks without paying) */}
-              {paymentError && (
-                <div className="p-3.5 rounded-2xl bg-red-50 border-2 border-red-300 text-red-800 text-xs sm:text-sm font-bold flex items-start gap-2.5 animate-in shake">
-                  <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="block font-black text-red-950 uppercase text-[11px] tracking-wider mb-0.5">Payment Required</span>
-                    <span>{paymentError}</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Payment Verification Box (Proof of Payment via UTR) */}
-              <div
-                className={`p-4 rounded-2xl border-2 transition-all ${
-                  isPaymentConfirmed
-                    ? 'bg-emerald-50/90 border-emerald-400 ring-2 ring-emerald-500/20 shadow-xs'
-                    : 'bg-neutral-50 border-neutral-200'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-black uppercase tracking-wider text-neutral-900 flex items-center gap-1.5">
-                    <ShieldCheck className={`w-4 h-4 ${isPaymentConfirmed ? 'text-emerald-600' : 'text-neutral-500'}`} />
-                    <span>Enter UPI UTR / Transaction ID (Payment Proof) *</span>
-                  </label>
-                  {isPaymentConfirmed && (
-                    <span className="text-[11px] font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-                      Payment Verified ✓
-                    </span>
-                  )}
-                </div>
-
-                <p className="text-[11px] text-neutral-600 mb-2">
-                  Payment hone ke baad apna 12-digit UPI UTR No. yahan enter karein:
-                </p>
-
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={utrNumber}
-                    onChange={(e) => {
-                      const val = e.target.value.trim();
-                      setUtrNumber(e.target.value);
-                      if (val.length >= 6) {
-                        setIsPaymentConfirmed(true);
-                        setPaymentError('');
-                      } else {
-                        setIsPaymentConfirmed(false);
-                      }
-                    }}
-                    placeholder="Enter 12-digit UTR No. (e.g. 4289XXXXXXXX)"
-                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-neutral-300 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 font-mono bg-white font-medium tracking-wider"
-                  />
-                  {isPaymentConfirmed && (
-                    <div className="absolute right-3 top-2.5 text-emerald-600">
-                      <Check className="w-5 h-5 stroke-[2.5]" />
+                {/* Payment Error Alert / Failure Recovery with Trace ID */}
+                {paymentError && (
+                  <div className="w-full p-3.5 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-900 text-xs sm:text-sm font-semibold text-left space-y-2 animate-in fade-in">
+                    <div className="flex items-start gap-2">
+                      <span className="text-amber-600 font-black text-base shrink-0">⚠️</span>
+                      <div>
+                        <span className="font-extrabold block text-amber-950">Payment Status / Notice</span>
+                        <span>{paymentError}</span>
+                        {lastTraceId && (
+                          <span className="block mt-1 font-mono text-[11px] text-amber-800">
+                            Transaction Trace ID: <strong>#{lastTraceId}</strong> (auto-reconciling in 5 min)
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  )}
+                    <div className="pt-1 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={handleCheckVerificationStatus}
+                        className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
+                      >
+                        Check Verification Status
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Security Guarantee Notice */}
+                <div className="flex items-center justify-center gap-2 text-center text-xs text-neutral-500 font-medium pt-1">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>256-Bit SSL Encrypted • PCI-DSS Compliant • WhatsApp Notification Unlocks After Payment</span>
                 </div>
               </div>
-
-              {/* Action Button: Dynamic based on Payment status */}
-              {isPaymentConfirmed ? (
-                <button
-                  type="button"
-                  onClick={handleConfirmAndSendWhatsApp}
-                  className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-green-600 to-emerald-700 hover:from-emerald-700 hover:via-green-700 hover:to-emerald-800 text-white font-black text-sm sm:text-base shadow-xl shadow-emerald-600/30 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2.5 animate-in fade-in"
-                >
-                  <Send className="w-5 h-5 fill-white" />
-                  <span>PAYMENT CONFIRMED — SEND ON WHATSAPP</span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPaymentError('⚠️ Payment First! Pehle QR code scan karke ₹899 payment complete karein aur apna 12-digit UTR No. enter karein.');
-                  }}
-                  className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-sm sm:text-base shadow-lg shadow-amber-500/25 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2 border-2 border-amber-400"
-                >
-                  <CreditCard className="w-5 h-5" />
-                  <span>⚠️ PAYMENT FIRST — SCAN &amp; PAY ₹899</span>
-                </button>
-              )}
-
-              <p className="text-[11px] text-center text-neutral-500">
-                {isPaymentConfirmed
-                  ? 'Clicking will open WhatsApp with your full registration & receipt.'
-                  : 'Bina payment ke WhatsApp message send nahi hoga (Payment First).'}
-              </p>
             </div>
           )}
 
